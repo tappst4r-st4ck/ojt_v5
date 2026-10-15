@@ -59,7 +59,7 @@
 <!-- ======================================================== -->
 <!-- 1. PERSISTENT GLOBAL VERTICAL SIDEBAR                    -->
 <!-- ======================================================== -->
-<aside class="w-64 bg-gradient-to-b from-[#1e3a5f] to-[#152d4a] text-white flex flex-col flex-shrink-0 border-r border-[#152d4a]/80 shadow-xl z-30">
+<aside class="w-64 bg-gradient-to-b from-[#1e3a5f] to-[#152d4a] text-white flex flex-col flex-shrink-0 border-r border-[#152d4a]/80 shadow-xl z-30" id="appSidebar">
 <!-- Branding Header -->
 <div class="p-4 border-b border-blue-400/20">
 <div class="flex items-center gap-3">
@@ -88,7 +88,7 @@
           </span>
 </div>
 </div>
-<div class="mt-2.5 pt-2 border-t border-white/10 flex items-center justify-between text-[10px]"><div class="flex items-center justify-between w-full text-[10px]"><div class="flex items-center gap-1 text-blue-300"><span class="">Mode:</span><button class="text-white hover:text-blue-200 underline font-semibold transition" onclick="toggleUserRoleSimulation()" title="Switch Simulation Role">Switch Profile</button></div><button class="inline-flex items-center gap-1 text-blue-200 hover:text-white font-semibold transition" onclick="switchView('login')" title="Sign out to Login"><span class="material-symbols-outlined text-[13px]">logout</span><span class="">Sign Out</span></button></div></div>
+<div class="mt-2.5 pt-2 border-t border-white/10 flex items-center justify-between text-[10px]"><div class="flex items-center gap-1 text-blue-300"><span>Mode:</span><button class="text-white hover:text-blue-200 underline font-semibold transition" onclick="toggleUserRoleSimulation()" title="Switch Simulation Role">Switch Profile</button></div></div>
 </div>
 <!-- Navigation Menu Items -->
 <nav class="flex-1 px-3 py-2 space-y-1 overflow-y-auto custom-scroll text-xs">
@@ -107,6 +107,12 @@
 <span class="">Curriculum Hub</span>
 </button>
 </nav>
+<div class="px-3 pb-3">
+<button class="w-full inline-flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold text-blue-200 hover:text-white hover:bg-white/10 transition" onclick="switchView('login')" title="Sign out to Login">
+<span class="material-symbols-outlined text-sm">logout</span>
+<span>Sign Out</span>
+</button>
+</div>
 <!-- Bottom System Status in Sidebar -->
 <div class="p-3 bg-[#152d4a]/90 border-t border-blue-400/20 text-[10px] text-blue-200/80 space-y-1.5">
 <div class="flex items-center justify-between">
@@ -125,33 +131,9 @@
 <!-- ======================================================== -->
 <!-- MAIN APPLICATION SHELL                                   -->
 <!-- ======================================================== -->
-<div class="flex-1 flex flex-col min-w-0 overflow-hidden">
-<!-- TOP HEADER BAR -->
-<header class="bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between shadow-xs z-20 flex-shrink-0">
-<div class="flex items-center gap-3">
-<div>
-<h2 class="text-base font-bold text-[#1d4ed8] leading-tight" id="topHeaderTitle">Master Schedule &amp; Timetable Matrix</h2>
-<p class="text-xs text-[#3b6fa0]" id="topHeaderSubtitle">Fixed matrix curriculum scheduling with automatic faculty load mapping.</p>
-</div>
-</div>
-<div class="flex items-center gap-3">
-<!-- DB Status Pill -->
-<div class="hidden sm:inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-[11px] font-semibold text-emerald-700">
-<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-<span class="">Google Sheet DB Sync: Connected</span>
-</div>
-<!-- Quick Action Trigger Buttons -->
-<div class="flex items-center gap-2">
-<button class="bg-[#2563eb] hover:bg-blue-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-xs transition" id="quickActionButton" onclick="handleQuickAddAction()">
-<span class="material-symbols-outlined text-sm">add_circle</span>
-<span id="quickActionButtonText" class="">New Timetable Entry</span>
-</button>
-<button class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-slate-300 flex items-center gap-1 transition" onclick="switchView('login')" title="Authentication Switch"><span class="material-symbols-outlined text-sm">logout</span><span class="hidden md:inline">Sign Out</span></button>
-</div>
-</div>
-</header>
+<div class="relative flex-1 flex flex-col min-w-0 overflow-hidden">
 <!-- CONTENT WRAPPER -->
-<main class="flex-1 overflow-y-auto p-4 md:p-6 custom-scroll">
+<main class="flex-1 overflow-y-auto p-4 pt-16 md:p-6 md:pt-16 custom-scroll" id="contentArea">
 <!-- ======================================================== -->
 <!-- VIEW 1: LOGIN GATEWAY                                    -->
 <!-- ======================================================== -->
@@ -214,7 +196,7 @@
 <path d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.24C.45 8.15 0 9.92 0 12s.45 3.85 1.24 5.42l4.04-3.15z" fill="#FBBC05"></path>
 <path d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.24 6.58l4.04 3.15c.95-2.83 3.6-4.98 6.72-4.98z" fill="#EA4335"></path>
 </svg>
-<span class="text-xs">Sign in with Google Workspace</span>
+<span class="text-xs">Sign in With Google</span>
 </button>
 <!-- Quick Direct Access Buttons -->
 <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100">
@@ -285,6 +267,12 @@
 <option>SY 2024-2025</option>
 <option>SY 2025-2026</option>
 </select>
+</div>
+<div class="flex justify-end pt-3">
+<button class="bg-[#2563eb] hover:bg-blue-700 text-white text-xs font-semibold px-3 py-2 rounded-lg flex items-center gap-1.5 shadow-xs transition" id="quickActionButton" onclick="handleQuickAddAction()">
+<span class="material-symbols-outlined text-sm">add_circle</span>
+<span>New Timetable Entry</span>
+</button>
 </div>
 </div>
 </div>
@@ -732,7 +720,7 @@
                     </td>
                     <td class="py-2.5 px-3 text-center">
                       <button onclick="showToast('Syllabus breakdown for CRP 121 verified with TESDA National Standards.')" class="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold">
-                        Inspect
+                        Edit
                       </button>
                     </td>
                   </tr>
@@ -752,7 +740,7 @@
                     </td>
                     <td class="py-2.5 px-3 text-center">
                       <button onclick="showToast('Syllabus breakdown for CAD 122 verified with TESDA National Standards.')" class="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold">
-                        Inspect
+                        Edit
                       </button>
                     </td>
                   </tr>
@@ -804,7 +792,7 @@
                     </td>
                     <td class="py-2.5 px-3 text-center">
                       <button onclick="showToast('Syllabus breakdown for PLM 211 verified with TESDA National Standards.')" class="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold">
-                        Inspect
+                        Edit
                       </button>
                     </td>
                   </tr>
@@ -824,7 +812,7 @@
                     </td>
                     <td class="py-2.5 px-3 text-center">
                       <button onclick="showToast('Syllabus breakdown for MAS 212 verified with TESDA National Standards.')" class="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold">
-                        Inspect
+                        Edit
                       </button>
                     </td>
                   </tr>
@@ -876,7 +864,7 @@
                     </td>
                     <td class="py-2.5 px-3 text-center">
                       <button onclick="showToast('Syllabus breakdown for EIM 211 verified with TESDA National Standards.')" class="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold">
-                        Inspect
+                        Edit
                       </button>
                     </td>
                   </tr>
@@ -896,7 +884,7 @@
                     </td>
                     <td class="py-2.5 px-3 text-center">
                       <button onclick="showToast('Syllabus breakdown for MCT 212 verified with TESDA National Standards.')" class="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold">
-                        Inspect
+                        Edit
                       </button>
                     </td>
                   </tr>
@@ -1335,6 +1323,12 @@
     function switchView(target) {
       currentView = target;
       const views = ['login', 'schedule', 'faculty', 'curriculum'];
+      const sidebar = document.getElementById('appSidebar');
+      const content = document.getElementById('contentArea');
+      sidebar.classList.toggle('hidden', target === 'login');
+      content.classList.toggle('flex', target === 'login');
+      content.classList.toggle('items-center', target === 'login');
+      content.classList.toggle('justify-center', target === 'login');
 
       views.forEach(v => {
         const el = document.getElementById(`view-${v}`);
@@ -1360,29 +1354,11 @@
         }
       });
 
-      // Update Header Text dynamically
-      const titleEl = document.getElementById('topHeaderTitle');
-      const subEl = document.getElementById('topHeaderSubtitle');
-      const actionText = document.getElementById('quickActionButtonText');
-
-      if (target === 'login') {
-        titleEl.innerText = "Institutional Login Gateway";
-        subEl.innerText = "Role-based authorization and session credential verifier.";
-        actionText.innerText = "Sign In Now";
-      } else if (target === 'schedule') {
-        titleEl.innerText = "Master Schedule & Timetable Matrix";
-        subEl.innerText = "Fixed matrix curriculum scheduling with automatic faculty load mapping.";
-        actionText.innerText = "New Timetable Entry";
+      if (target === 'schedule') {
         renderTimetable();
       } else if (target === 'faculty') {
-        titleEl.innerText = "Faculty & Trainer Directory";
-        subEl.innerText = "Dense Google Sheets-style directory with cross-discipline shared tagging.";
-        actionText.innerText = "Add Faculty Member";
         renderFacultyTable(getVisibleFaculty());
       } else if (target === 'curriculum') {
-        titleEl.innerText = "Curriculum Central Registry";
-        subEl.innerText = "Official TESDA circular syllabi, credit units, and qualifications.";
-        actionText.innerText = "Add Course / Diploma";
         renderCurriculumSections();
       }
 
@@ -1390,27 +1366,15 @@
     }
 
     function handleQuickAddAction() {
-      if (currentUserRole !== 'head' && currentView !== 'schedule') return;
-
-      if (currentView === 'schedule') {
-        alert("Schedule Editor: All time matrix positions locked under Fixed Matrix Protocol. Faculty assignments mapped via Curriculum Registry.");
-      } else if (currentView === 'faculty') {
-        openFacultyModal('add');
-      } else if (currentView === 'curriculum') {
-        openAddCurriculumModal();
-      } else {
-        switchView('schedule');
-      }
+      if (currentUserRole !== 'head' || currentView !== 'schedule') return;
+      alert("Schedule Editor: All time matrix positions locked under Fixed Matrix Protocol. Faculty assignments mapped via Curriculum Registry.");
     }
 
     function updateRolePermissions() {
       const isHeadTrainer = currentUserRole === 'head';
       document.getElementById('facultyAddButton').classList.toggle('hidden', !isHeadTrainer);
       document.getElementById('curriculumAddButton').classList.toggle('hidden', !isHeadTrainer);
-      document.getElementById('quickActionButton').classList.toggle(
-        'hidden',
-        !isHeadTrainer && currentView !== 'schedule'
-      );
+      document.getElementById('quickActionButton').classList.toggle('hidden', !isHeadTrainer);
 
       if (!isHeadTrainer) {
         document.getElementById('facultyFormModal').classList.add('hidden');
@@ -1845,6 +1809,9 @@
 
         const totalCourses = sec.courses.length;
         const totalUnits = sec.courses.reduce((sum, c) => sum + c.total, 0);
+        const actionHeader = currentUserRole === 'head'
+          ? '<th class="py-2.5 px-3 text-center w-24">Actions</th>'
+          : '';
 
         wrap.innerHTML = `
           <div class="bg-gradient-to-r from-slate-50 to-blue-50/60 p-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
@@ -1870,11 +1837,11 @@
                   <th class="py-2.5 px-3 text-center w-24 border-r border-slate-200">Total Units</th>
                   <th class="py-2.5 px-3 border-r border-slate-200 w-32">Pre-requisites</th>
                   <th class="py-2.5 px-3">Resultant Qualification</th>
-                  <th class="py-2.5 px-3 text-center w-24">Actions</th>
+                  ${actionHeader}
                 </tr>
               </thead>
               <tbody class="divide-y divide-slate-200">
-                ${sec.courses.map(c => `
+                ${sec.courses.map((c, index) => `
                   <tr class="hover:bg-slate-50 transition border-b border-slate-200">
                     <td class="py-2.5 px-3 font-mono font-bold text-[#1d4ed8] border-r border-slate-200">${escapeHtml(c.code)}</td>
                     <td class="py-2.5 px-3 font-semibold text-slate-800 border-r border-slate-200">${escapeHtml(c.name)}</td>
@@ -1888,11 +1855,13 @@
                         ${escapeHtml(c.qual)}
                       </span>
                     </td>
-                    <td class="py-2.5 px-3 text-center">
-                      <button onclick="showToast('Syllabus breakdown verified with TESDA National Standards.')" class="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold">
-                        Inspect
-                      </button>
-                    </td>
+                    ${currentUserRole === 'head' ? `
+                      <td class="py-2.5 px-3 text-center">
+                        <button data-edit-section="${escapeHtml(sec.id)}" data-edit-course="${index}" class="px-2 py-1 rounded bg-blue-100 hover:bg-blue-200 text-blue-800 text-[10px] font-bold">
+                          Edit
+                        </button>
+                      </td>
+                    ` : ''}
                   </tr>
                 `).join('')}
               </tbody>
@@ -1900,6 +1869,11 @@
           </div>
         `;
         container.appendChild(wrap);
+        wrap.querySelectorAll('[data-edit-section]').forEach(button => {
+          button.addEventListener('click', () => {
+            openEditCurriculumCourse(button.dataset.editSection, Number(button.dataset.editCourse));
+          });
+        });
       });
 
       emptyDiplomas.forEach(diploma => appendEmptyDiplomaCard(diploma, container));
@@ -2082,6 +2056,7 @@
     // CURRICULUM ADD MODAL
     // --------------------------------------------------------
     let curriculumFormMode = 'course';
+    let editingCurriculumCourse = null;
 
     function openAddCurriculumModal(mode = 'course', diplomaCode = '') {
       if (currentUserRole !== 'head') {
@@ -2095,12 +2070,27 @@
       if (diplomaCode) {
         document.getElementById('curricTargetDiploma').value = diplomaCode;
       }
+      if (mode === 'edit-course') {
+        const section = curriculumSections.find(item => item.id === editingCurriculumCourse?.sectionId);
+        const course = section?.courses[editingCurriculumCourse?.courseIndex];
+        if (section && course) {
+          document.getElementById('curricTargetYear').value = section.yearLevel;
+          document.getElementById('curricTargetSem').value = section.semester;
+          document.getElementById('curricCourseCode').value = course.code;
+          document.getElementById('curricCourseName').value = course.name;
+          document.getElementById('curricLecUnits').value = course.lec;
+          document.getElementById('curricLabUnits').value = course.lab;
+          document.getElementById('curricPrereq').value = course.prereq;
+          document.getElementById('curricQual').value = course.qual;
+        }
+      }
       document.getElementById('addCurriculumModal').classList.remove('hidden');
     }
 
     function setCurriculumFormMode(mode) {
       curriculumFormMode = mode;
       const isDiplomaMode = mode === 'diploma';
+      const isEditingCourse = mode === 'edit-course';
       const courseFields = document.getElementById('courseFormFields');
       const diplomaFields = document.getElementById('diplomaFormFields');
       const courseButton = document.getElementById('curriculumCourseModeButton');
@@ -2109,7 +2099,8 @@
       courseFields.classList.toggle('hidden', isDiplomaMode);
       diplomaFields.classList.toggle('hidden', !isDiplomaMode);
       courseFields.querySelectorAll('input, select').forEach(field => {
-        field.disabled = isDiplomaMode;
+        field.disabled = isDiplomaMode ||
+          (isEditingCourse && ['curricTargetDiploma', 'curricTargetYear', 'curricTargetSem'].includes(field.id));
       });
       diplomaFields.querySelectorAll('input').forEach(field => {
         field.disabled = !isDiplomaMode;
@@ -2122,16 +2113,41 @@
         : "rounded-md px-3 py-2 font-semibold text-slate-600 transition hover:bg-white/70";
       courseButton.setAttribute('aria-pressed', String(!isDiplomaMode));
       diplomaButton.setAttribute('aria-pressed', String(isDiplomaMode));
-      document.getElementById('curriculumFormTitle').innerText = isDiplomaMode
-        ? "Add a Diploma to the Registry"
-        : "Add Course to Curriculum Registry";
-      document.getElementById('curriculumSubmitButton').innerText = isDiplomaMode
-        ? "Add Diploma"
-        : "Add Course";
+      courseButton.disabled = isEditingCourse;
+      diplomaButton.disabled = isEditingCourse;
+      document.getElementById('curriculumFormTitle').innerText = isEditingCourse
+        ? "Edit Course in Curriculum Registry"
+        : isDiplomaMode
+          ? "Add a Diploma to the Registry"
+          : "Add Course to Curriculum Registry";
+      document.getElementById('curriculumSubmitButton').innerText = isEditingCourse
+        ? "Save Changes"
+        : isDiplomaMode
+          ? "Add Diploma"
+          : "Add Course";
     }
 
     function closeAddCurriculumModal() {
       document.getElementById('addCurriculumModal').classList.add('hidden');
+      editingCurriculumCourse = null;
+      setCurriculumFormMode('course');
+    }
+
+    function openEditCurriculumCourse(sectionId, courseIndex) {
+      if (currentUserRole !== 'head') {
+        showToast("Only the Head Trainer can edit curriculum courses.");
+        return;
+      }
+
+      const section = curriculumSections.find(item => item.id === sectionId);
+      const course = section?.courses[courseIndex];
+      if (!section || !course) {
+        showToast("The selected course could not be found.");
+        return;
+      }
+
+      editingCurriculumCourse = { sectionId, courseIndex };
+      openAddCurriculumModal('edit-course', section.diploma);
     }
 
     function handleSaveCurriculum(e) {
@@ -2166,6 +2182,29 @@
         closeAddCurriculumModal();
         renderCurriculumSections();
         showToast(`${code} - ${title} added to the diploma registry.`);
+        return;
+      }
+
+      if (curriculumFormMode === 'edit-course') {
+        const section = curriculumSections.find(item => item.id === editingCurriculumCourse?.sectionId);
+        const course = section?.courses[editingCurriculumCourse?.courseIndex];
+        if (!section || !course) {
+          showToast("The selected course could not be found.");
+          closeAddCurriculumModal();
+          return;
+        }
+
+        course.code = document.getElementById('curricCourseCode').value.trim();
+        course.name = document.getElementById('curricCourseName').value.trim();
+        course.lec = parseInt(document.getElementById('curricLecUnits').value, 10);
+        course.lab = parseInt(document.getElementById('curricLabUnits').value, 10);
+        course.total = course.lec + course.lab;
+        course.prereq = document.getElementById('curricPrereq').value.trim();
+        course.qual = document.getElementById('curricQual').value.trim();
+
+        closeAddCurriculumModal();
+        renderCurriculumSections();
+        showToast(`Course ${course.code} updated.`);
         return;
       }
 
