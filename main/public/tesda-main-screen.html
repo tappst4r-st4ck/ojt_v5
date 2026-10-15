@@ -53,9 +53,12 @@
       font-size: 18px;
       line-height: 1;
     }
+    body[data-loading="true"] #contentArea {
+      visibility: hidden;
+    }
   </style>
 </head>
-<body class="h-full flex overflow-hidden bg-[#f0f4f8] text-slate-800 antialiased select-none">
+<body class="h-full flex overflow-hidden bg-[#f0f4f8] text-slate-800 antialiased select-none" data-loading="true">
 <!-- ======================================================== -->
 <!-- 1. PERSISTENT GLOBAL VERTICAL SIDEBAR                    -->
 <!-- ======================================================== -->
@@ -82,13 +85,12 @@
           ED
         </div>
 <div class="min-w-0 flex-1">
-<p class="text-xs font-bold text-white truncate" id="sidebarUserName">Engr. Ramon Morales</p>
-<span class="inline-block mt-0.5 text-[9px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 px-1.5 py-0.2 rounded" id="sidebarUserRoleBadge">
-            Head Trainer Admin
+<p class="text-xs font-bold text-white truncate" id="sidebarUserName">Public Viewer</p>
+<span class="inline-block mt-0.5 text-[9px] font-semibold bg-blue-500/20 text-blue-200 border border-blue-400/30 px-1.5 py-0.2 rounded" id="sidebarUserRoleBadge">
+            Read-only
           </span>
 </div>
 </div>
-<div class="mt-2.5 pt-2 border-t border-white/10 flex items-center justify-between text-[10px]"><div class="flex items-center gap-1 text-blue-300"><span>Mode:</span><button class="text-white hover:text-blue-200 underline font-semibold transition" onclick="toggleUserRoleSimulation()" title="Switch Simulation Role">Switch Profile</button></div></div>
 </div>
 <!-- Navigation Menu Items -->
 <nav class="flex-1 px-3 py-2 space-y-1 overflow-y-auto custom-scroll text-xs">
@@ -108,18 +110,18 @@
 </button>
 </nav>
 <div class="px-3 pb-3">
-<button class="w-full inline-flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold text-blue-200 hover:text-white hover:bg-white/10 transition" onclick="switchView('login')" title="Sign out to Login">
-<span class="material-symbols-outlined text-sm">logout</span>
-<span>Sign Out</span>
+<button class="w-full inline-flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold text-blue-200 hover:text-white hover:bg-white/10 transition" id="sidebarAuthButton" onclick="handleSidebarAuthAction()" title="Sign in with Google">
+<span class="material-symbols-outlined text-sm" id="sidebarAuthIcon">login</span>
+<span id="sidebarAuthLabel">Sign in</span>
 </button>
 </div>
 <!-- Bottom System Status in Sidebar -->
 <div class="p-3 bg-[#152d4a]/90 border-t border-blue-400/20 text-[10px] text-blue-200/80 space-y-1.5">
 <div class="flex items-center justify-between">
 <span class="text-blue-300">Google Sheet DB:</span>
-<span class="inline-flex items-center gap-1 text-emerald-300 font-bold">
+<span class="inline-flex items-center gap-1 text-slate-300 font-bold" id="googleConnectionStatus">
 <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-          Connected
+          Loading
         </span>
 </div>
 <div class="flex items-center justify-between text-slate-300">
@@ -162,53 +164,14 @@
                 </p>
 </div>
 </div>
-<!-- Role Selector Toggle / Simulation -->
-<div>
-<label class="block text-xs font-bold text-[#1d4ed8] uppercase tracking-wider mb-2">Select Simulation Authentication Profile</label>
-<div class="space-y-2.5">
-<label class="flex items-center justify-between p-3.5 rounded-xl border-2 border-blue-600 bg-blue-50/70 cursor-pointer transition" id="authCardHead">
-<div class="flex items-center gap-3">
-<input checked="" class="text-blue-600 focus:ring-blue-500 w-4 h-4" name="authSelectRole" onchange="setAuthRole('head')" type="radio" value="head">
-<div>
-<div class="text-sm font-bold text-slate-800">Engr. Ramon Morales</div>
-<div class="text-xs text-[#3b6fa0]">Head Trainer (Administrative Access) - r.morales@tesda.gov.ph</div>
+<div class="rounded-xl border border-blue-200 bg-blue-50 p-4 text-center">
+<p class="text-xs leading-relaxed text-[#3b6fa0]">Sign in with the Google account listed in the Faculty Database. Editing permissions are verified against the current faculty role.</p>
 </div>
-</div>
-<span class="text-[10px] font-bold bg-[#1e3a5f] text-white px-2 py-0.5 rounded">FULL ADMIN</span>
-</label>
-<label class="flex items-center justify-between p-3.5 rounded-xl border border-slate-200 hover:border-blue-300 hover:bg-slate-50 cursor-pointer transition" id="authCardTrainee">
-<div class="flex items-center gap-3">
-<input class="text-blue-600 focus:ring-blue-500 w-4 h-4" name="authSelectRole" onchange="setAuthRole('trainee')" type="radio" value="trainee">
-<div>
-<div class="text-sm font-bold text-slate-800">Maria Santos</div>
-<div class="text-xs text-[#3b6fa0]">Trainee / Faculty (Read-only Timetable Access) - m.santos@tesda.gov.ph</div>
-</div>
-</div>
-<span class="text-[10px] font-bold bg-amber-600 text-white px-2 py-0.5 rounded">READ-ONLY</span>
-</label>
-</div>
-</div>
-<!-- Google Sign in Simulation Button -->
-<button class="w-full flex items-center justify-center gap-3 bg-white border border-slate-300 hover:border-blue-500 hover:bg-blue-50/40 text-slate-700 font-semibold py-3 px-4 rounded-xl shadow-xs hover:shadow transition" onclick="executeGoogleLogin()">
-<svg class="w-5 h-5" viewBox="0 0 24 24">
-<path d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z" fill="#4285F4"></path>
-<path d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.24v3.15C3.26 21.36 7.33 24 12 24z" fill="#34A853"></path>
-<path d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.24C.45 8.15 0 9.92 0 12s.45 3.85 1.24 5.42l4.04-3.15z" fill="#FBBC05"></path>
-<path d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.24 6.58l4.04 3.15c.95-2.83 3.6-4.98 6.72-4.98z" fill="#EA4335"></path>
-</svg>
-<span class="text-xs">Sign in With Google</span>
-</button>
-<!-- Quick Direct Access Buttons -->
-<div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100">
-<button class="px-3 py-2 text-xs font-semibold rounded-lg bg-[#2563eb] hover:bg-blue-700 text-white transition text-center shadow-xs" onclick="loginAs('head')">
-                Quick Login (Head Trainer)
-              </button>
-<button class="px-3 py-2 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 transition text-center" onclick="loginAs('trainee')">
-                Quick Login (Trainee Read-Only)
-              </button>
-</div>
+<div class="flex justify-center" id="googleIdentityButton"></div>
+<p class="hidden text-[11px] text-center text-rose-600" id="authMessage"></p>
+<button class="w-full rounded-lg bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-200" onclick="switchView('schedule')" type="button">Return to dashboard</button>
 <p class="text-[11px] text-center text-slate-400">
-              Government operational system protected by administrative credentials. All login transactions verified.
+              Public viewers can browse the schedule, faculty directory, and curriculum. Contact details require sign-in.
             </p>
 </div>
 </div>
@@ -250,7 +213,7 @@
 <label class="block text-[11px] font-bold text-[#3b6fa0] uppercase tracking-wider mb-1">Semester</label>
 <select class="w-full text-xs bg-slate-50 border border-slate-300 rounded-lg p-2 font-semibold text-slate-700 focus:border-blue-500 focus:bg-white transition" id="schedSemFilter" onchange="renderTimetable()">
 <option value="1">1st Semester</option>
-<option value="2">2nd Semester</option>
+<option selected="" value="2">2nd Semester</option>
 </select>
 </div>
 <div>
@@ -263,7 +226,7 @@
 </div>
 <div>
 <label class="block text-[11px] font-bold text-[#3b6fa0] uppercase tracking-wider mb-1">School Year (SY)</label>
-<select class="w-full text-xs bg-slate-50 border border-slate-300 rounded-lg p-2 font-semibold text-slate-700 focus:border-blue-500 focus:bg-white transition">
+<select class="w-full text-xs bg-slate-50 border border-slate-300 rounded-lg p-2 font-semibold text-slate-700 focus:border-blue-500 focus:bg-white transition" id="schedSchoolYearFilter" onchange="renderTimetable()">
 <option>SY 2024-2025</option>
 <option>SY 2025-2026</option>
 </select>
@@ -321,91 +284,7 @@
 <th class="py-2.5 px-3 w-1/5 text-center">Friday</th>
 </tr>
 </thead>
-<tbody class="divide-y divide-slate-200" id="timetableBody"><tr class="hover:bg-slate-50/70 transition border-b border-slate-200"><td class="py-3 px-3 font-mono text-[11px] font-bold text-slate-600 bg-slate-50 border-r border-slate-200 text-center">8:00 AM - 9:00 AM</td><td colspan="5" class="py-3 px-4 bg-[#bfdbfe] border-r border-slate-200 text-center shadow-inner">
-            <div class="flex items-center justify-center gap-2 text-blue-950 font-extrabold text-xs tracking-wide">
-              <span class="material-symbols-outlined text-blue-800 text-base">lock</span>
-              <span>BLOCKED - STAFF MEETING (MANDATORY ADMINISTRATIVE PERIOD - NO CLASSES PERMITTED)</span>
-              <span class="text-[10px] bg-blue-300 text-blue-900 px-2 py-0.5 rounded font-mono font-bold uppercase">RESERVED</span>
-            </div>
-          </td></tr><tr class="hover:bg-slate-50/70 transition border-b border-slate-200"><td class="py-3 px-3 font-mono text-[11px] font-bold text-slate-600 bg-slate-50 border-r border-slate-200 text-center">9:00 AM - 10:00 AM</td><td colspan="5" class="py-3 px-4 bg-[#bfdbfe] border-r border-slate-200 text-center shadow-inner">
-            <div class="flex items-center justify-center gap-2 text-blue-950 font-extrabold text-xs tracking-wide">
-              <span class="material-symbols-outlined text-blue-800 text-base">lock</span>
-              <span>BLOCKED - STAFF MEETING (MANDATORY ADMINISTRATIVE PERIOD - NO CLASSES PERMITTED)</span>
-              <span class="text-[10px] bg-blue-300 text-blue-900 px-2 py-0.5 rounded font-mono font-bold uppercase">RESERVED</span>
-            </div>
-          </td></tr><tr class="hover:bg-slate-50/70 transition border-b border-slate-200"><td class="py-3 px-3 font-mono text-[11px] font-bold text-slate-600 bg-slate-50 border-r border-slate-200 text-center">10:00 AM - 11:30 AM</td><td class="py-2 px-2 border-r border-slate-200 align-top text-xs">
-                <div class="bg-blue-50/90 border border-blue-200 rounded-lg p-2.5 shadow-2xs hover:shadow-xs transition hover:border-blue-400">
-                  <div class="flex items-center justify-between gap-1">
-                    <span class="font-extrabold text-[#1d4ed8] text-xs font-mono">CRP 121</span>
-                    <span class="text-[10px] px-1.5 py-0.2 bg-blue-100 text-blue-800 rounded font-bold">Lec/Lab</span>
-                  </div>
-                  <div class="text-[11px] font-bold text-slate-800 mt-1 leading-snug line-clamp-1">Carpentry NC II</div>
-                  <div class="mt-1.5 pt-1 border-t border-blue-100 flex items-center justify-between">
-                    <button onclick="openTrainerModalByName('Alexander O. Dagohoy')" class="text-[10px] font-semibold text-[#2563eb] hover:underline text-left flex items-center gap-1 group">
-                      <span class="material-symbols-outlined text-[13px] text-blue-600 group-hover:scale-110 transition">person</span>
-                      <span class="truncate max-w-[110px]">Alexander O. Dagohoy</span>
-                    </button>
-                    <span class="text-[9px] bg-blue-200 text-blue-900 px-1 py-0.2 rounded font-bold" title="Multi-department shared trainer">Shared</span>
-                  </div>
-                  <div class="text-[10px] text-[#3b6fa0] font-mono mt-1 font-medium">
-                    4 Units (2L/2L) | 5.0 hrs/wk
-                  </div>
-                </div>
-              </td><td class="py-2 px-2 border-r border-slate-200 align-top text-xs">
-                <div class="bg-blue-50/90 border border-blue-200 rounded-lg p-2.5 shadow-2xs hover:shadow-xs transition hover:border-blue-400">
-                  <div class="flex items-center justify-between gap-1">
-                    <span class="font-extrabold text-[#1d4ed8] text-xs font-mono">CAD 122</span>
-                    <span class="text-[10px] px-1.5 py-0.2 bg-blue-100 text-blue-800 rounded font-bold">Lab</span>
-                  </div>
-                  <div class="text-[11px] font-bold text-slate-800 mt-1 leading-snug line-clamp-1">Computer-Aided Drafting</div>
-                  <div class="mt-1.5 pt-1 border-t border-blue-100 flex items-center justify-between">
-                    <button onclick="openTrainerModalByName('Haitham Jenor L. Sedomar')" class="text-[10px] font-semibold text-[#2563eb] hover:underline text-left flex items-center gap-1 group">
-                      <span class="material-symbols-outlined text-[13px] text-blue-600 group-hover:scale-110 transition">person</span>
-                      <span class="truncate max-w-[110px]">Haitham Jenor L. Sedomar</span>
-                    </button>
-                    <span class="text-[9px] bg-blue-200 text-blue-900 px-1 py-0.2 rounded font-bold" title="Multi-department shared trainer">Shared</span>
-                  </div>
-                  <div class="text-[10px] text-[#3b6fa0] font-mono mt-1 font-medium">
-                    2 Lab Units | 3.0 hrs/wk
-                  </div>
-                </div>
-              </td><td class="py-2 px-2 border-r border-slate-200 align-top text-xs"><span class="text-[11px] text-slate-300 italic block text-center py-3 font-mono">- Open -</span></td><td class="py-2 px-2 border-r border-slate-200 align-top text-xs"><span class="text-[11px] text-slate-300 italic block text-center py-3 font-mono">- Open -</span></td><td class="py-2 px-2 border-r border-slate-200 align-top text-xs"><span class="text-[11px] text-slate-300 italic block text-center py-3 font-mono">- Open -</span></td></tr><tr class="hover:bg-slate-50/70 transition border-b border-slate-200"><td class="py-3 px-3 font-mono text-[11px] font-bold text-slate-600 bg-slate-50 border-r border-slate-200 text-center">11:30 AM - 1:00 PM</td><td class="py-2 px-2 border-r border-slate-200 align-top text-xs"><span class="text-[11px] text-slate-300 italic block text-center py-3 font-mono">- Open -</span></td><td class="py-2 px-2 border-r border-slate-200 align-top text-xs"><span class="text-[11px] text-slate-300 italic block text-center py-3 font-mono">- Open -</span></td><td class="py-2 px-2 border-r border-slate-200 align-top text-xs">
-                <div class="bg-blue-50/90 border border-blue-200 rounded-lg p-2.5 shadow-2xs hover:shadow-xs transition hover:border-blue-400">
-                  <div class="flex items-center justify-between gap-1">
-                    <span class="font-extrabold text-[#1d4ed8] text-xs font-mono">PLM 211</span>
-                    <span class="text-[10px] px-1.5 py-0.2 bg-blue-100 text-blue-800 rounded font-bold">Lec/Lab</span>
-                  </div>
-                  <div class="text-[11px] font-bold text-slate-800 mt-1 leading-snug line-clamp-1">Plumbing NC II</div>
-                  <div class="mt-1.5 pt-1 border-t border-blue-100 flex items-center justify-between">
-                    <button onclick="openTrainerModalByName('Haitham Jenor L. Sedomar')" class="text-[10px] font-semibold text-[#2563eb] hover:underline text-left flex items-center gap-1 group">
-                      <span class="material-symbols-outlined text-[13px] text-blue-600 group-hover:scale-110 transition">person</span>
-                      <span class="truncate max-w-[110px]">Haitham Jenor L. Sedomar</span>
-                    </button>
-                    <span class="text-[9px] bg-blue-200 text-blue-900 px-1 py-0.2 rounded font-bold" title="Multi-department shared trainer">Shared</span>
-                  </div>
-                  <div class="text-[10px] text-[#3b6fa0] font-mono mt-1 font-medium">
-                    3 Units (1L/2L) | 4.0 hrs/wk
-                  </div>
-                </div>
-              </td><td class="py-2 px-2 border-r border-slate-200 align-top text-xs"><span class="text-[11px] text-slate-300 italic block text-center py-3 font-mono">- Open -</span></td><td class="py-2 px-2 border-r border-slate-200 align-top text-xs"><span class="text-[11px] text-slate-300 italic block text-center py-3 font-mono">- Open -</span></td></tr><tr class="hover:bg-slate-50/70 transition border-b border-slate-200"><td class="py-3 px-3 font-mono text-[11px] font-bold text-slate-600 bg-slate-50 border-r border-slate-200 text-center">1:00 PM - 2:30 PM</td><td class="py-2 px-2 border-r border-slate-200 align-top text-xs"><span class="text-[11px] text-slate-300 italic block text-center py-3 font-mono">- Open -</span></td><td class="py-2 px-2 border-r border-slate-200 align-top text-xs"><span class="text-[11px] text-slate-300 italic block text-center py-3 font-mono">- Open -</span></td><td class="py-2 px-2 border-r border-slate-200 align-top text-xs"><span class="text-[11px] text-slate-300 italic block text-center py-3 font-mono">- Open -</span></td><td class="py-2 px-2 border-r border-slate-200 align-top text-xs">
-                <div class="bg-blue-50/90 border border-blue-200 rounded-lg p-2.5 shadow-2xs hover:shadow-xs transition hover:border-blue-400">
-                  <div class="flex items-center justify-between gap-1">
-                    <span class="font-extrabold text-[#1d4ed8] text-xs font-mono">MAS 212</span>
-                    <span class="text-[10px] px-1.5 py-0.2 bg-blue-100 text-blue-800 rounded font-bold">Lec/Lab</span>
-                  </div>
-                  <div class="text-[11px] font-bold text-slate-800 mt-1 leading-snug line-clamp-1">Masonry NC II</div>
-                  <div class="mt-1.5 pt-1 border-t border-blue-100 flex items-center justify-between">
-                    <button onclick="openTrainerModalByName('Alexander O. Dagohoy')" class="text-[10px] font-semibold text-[#2563eb] hover:underline text-left flex items-center gap-1 group">
-                      <span class="material-symbols-outlined text-[13px] text-blue-600 group-hover:scale-110 transition">person</span>
-                      <span class="truncate max-w-[110px]">Alexander O. Dagohoy</span>
-                    </button>
-                    <span class="text-[9px] bg-blue-200 text-blue-900 px-1 py-0.2 rounded font-bold" title="Multi-department shared trainer">Shared</span>
-                  </div>
-                  <div class="text-[10px] text-[#3b6fa0] font-mono mt-1 font-medium">
-                    3 Units (1L/2L) | 4.0 hrs/wk
-                  </div>
-                </div>
-              </td><td class="py-2 px-2 border-r border-slate-200 align-top text-xs"><span class="text-[11px] text-slate-300 italic block text-center py-3 font-mono">- Open -</span></td></tr><tr class="hover:bg-slate-50/70 transition border-b border-slate-200"><td class="py-3 px-3 font-mono text-[11px] font-bold text-slate-600 bg-slate-50 border-r border-slate-200 text-center">2:30 PM - 4:00 PM</td><td class="py-2 px-2 border-r border-slate-200 align-top text-xs"><span class="text-[11px] text-slate-300 italic block text-center py-3 font-mono">- Open -</span></td><td class="py-2 px-2 border-r border-slate-200 align-top text-xs"><span class="text-[11px] text-slate-300 italic block text-center py-3 font-mono">- Open -</span></td><td class="py-2 px-2 border-r border-slate-200 align-top text-xs"><span class="text-[11px] text-slate-300 italic block text-center py-3 font-mono">- Open -</span></td><td class="py-2 px-2 border-r border-slate-200 align-top text-xs"><span class="text-[11px] text-slate-300 italic block text-center py-3 font-mono">- Open -</span></td><td class="py-2 px-2 border-r border-slate-200 align-top text-xs"><span class="text-[11px] text-slate-300 italic block text-center py-3 font-mono">- Open -</span></td></tr><tr class="hover:bg-slate-50/70 transition border-b border-slate-200"><td class="py-3 px-3 font-mono text-[11px] font-bold text-slate-600 bg-slate-50 border-r border-slate-200 text-center">4:00 PM - 5:00 PM</td><td class="py-2 px-2 border-r border-slate-200 align-top text-xs"><span class="text-[11px] text-slate-300 italic block text-center py-3 font-mono">- Open -</span></td><td class="py-2 px-2 border-r border-slate-200 align-top text-xs"><span class="text-[11px] text-slate-300 italic block text-center py-3 font-mono">- Open -</span></td><td class="py-2 px-2 border-r border-slate-200 align-top text-xs"><span class="text-[11px] text-slate-300 italic block text-center py-3 font-mono">- Open -</span></td><td class="py-2 px-2 border-r border-slate-200 align-top text-xs"><span class="text-[11px] text-slate-300 italic block text-center py-3 font-mono">- Open -</span></td><td class="py-2 px-2 border-r border-slate-200 align-top text-xs"><span class="text-[11px] text-slate-300 italic block text-center py-3 font-mono">- Open -</span></td></tr></tbody>
+<tbody class="divide-y divide-slate-200" id="timetableBody"></tbody>
 </table>
 </div>
 </div>
@@ -468,154 +347,7 @@
 <th class="py-2.5 px-3 text-center">Actions</th>
 </tr>
 </thead>
-<tbody class="divide-y divide-slate-200 font-sans text-xs" id="facultyTableBody"><tr class="hover:bg-[#eff6ff] transition border-b border-slate-200">
-          <td class="py-2.5 px-3 font-bold text-slate-800 border-r border-slate-200">Dagohoy</td>
-          <td class="py-2.5 px-3 text-slate-700 border-r border-slate-200">Alexander</td>
-          <td class="py-2.5 px-2 text-center text-slate-500 font-mono border-r border-slate-200">O.</td>
-          <td class="py-2.5 px-3 border-r border-slate-200">
-            <div class="flex items-center gap-1.5 flex-wrap">
-              <span class="font-bold text-slate-900">DCET</span>
-              
-                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#bfdbfe] text-[#1e3a5f] border border-blue-300">
-                  <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
-                  SHARED FACULTY
-                </span>
-              
-              
-            </div>
-          </td>
-          <td class="py-2.5 px-3 border-r border-slate-200 font-medium">
-            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700">
-              JO
-            </span>
-          </td>
-          <td class="py-2.5 px-3 text-slate-600 border-r border-slate-200 max-w-xs truncate" title="Masonry NC II">Masonry NC II</td>
-          <td class="py-2.5 px-3 text-slate-700 border-r border-slate-200 font-mono text-[11px]">9307603532</td>
-          <td class="py-2.5 px-3 text-[#2563eb] border-r border-slate-200 font-mono text-[11px] hover:underline cursor-pointer">alexanderdagohoy7@gmail.com</td>
-          <td class="py-2.5 px-3 text-center">
-            <div class="flex items-center justify-center gap-1">
-              <button onclick="openFacultyModal('add')" class="px-2 py-1 rounded bg-slate-100 text-slate-700 hover:bg-slate-200 text-[10px] font-bold transition">
-                Add
-              </button>
-              <button onclick="openFacultyModal('edit', 1)" class="px-2 py-1 rounded bg-slate-100 text-slate-700 hover:bg-slate-200 text-[10px] font-bold transition">
-                Edit
-              </button>
-              <button onclick="openTrainerModalById(1)" class="px-2.5 py-1 rounded bg-blue-100 text-[#1d4ed8] hover:bg-blue-200 text-[10px] font-extrabold transition shadow-2xs">
-                View Load
-              </button>
-            </div>
-          </td>
-        </tr><tr class="hover:bg-[#eff6ff] transition border-b border-slate-200">
-          <td class="py-2.5 px-3 font-bold text-slate-800 border-r border-slate-200">Sedomar</td>
-          <td class="py-2.5 px-3 text-slate-700 border-r border-slate-200">Haitham Jenor</td>
-          <td class="py-2.5 px-2 text-center text-slate-500 font-mono border-r border-slate-200">L.</td>
-          <td class="py-2.5 px-3 border-r border-slate-200">
-            <div class="flex items-center gap-1.5 flex-wrap">
-              <span class="font-bold text-slate-900">DCET</span>
-              
-                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#bfdbfe] text-[#1e3a5f] border border-blue-300">
-                  <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
-                  SHARED FACULTY
-                </span>
-              
-              
-            </div>
-          </td>
-          <td class="py-2.5 px-3 border-r border-slate-200 font-medium">
-            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700">
-              JO
-            </span>
-          </td>
-          <td class="py-2.5 px-3 text-slate-600 border-r border-slate-200 max-w-xs truncate" title="Civil Engineering Orientation, Hydraulics, Physics for Engineers">Civil Engineering Orientation, Hydraulics, Physics for Engineers</td>
-          <td class="py-2.5 px-3 text-slate-700 border-r border-slate-200 font-mono text-[11px]">9162655967</td>
-          <td class="py-2.5 px-3 text-[#2563eb] border-r border-slate-200 font-mono text-[11px] hover:underline cursor-pointer">haithamibnsajid@gmail.com</td>
-          <td class="py-2.5 px-3 text-center">
-            <div class="flex items-center justify-center gap-1">
-              <button onclick="openFacultyModal('add')" class="px-2 py-1 rounded bg-slate-100 text-slate-700 hover:bg-slate-200 text-[10px] font-bold transition">
-                Add
-              </button>
-              <button onclick="openFacultyModal('edit', 2)" class="px-2 py-1 rounded bg-slate-100 text-slate-700 hover:bg-slate-200 text-[10px] font-bold transition">
-                Edit
-              </button>
-              <button onclick="openTrainerModalById(2)" class="px-2.5 py-1 rounded bg-blue-100 text-[#1d4ed8] hover:bg-blue-200 text-[10px] font-extrabold transition shadow-2xs">
-                View Load
-              </button>
-            </div>
-          </td>
-        </tr><tr class="hover:bg-[#eff6ff] transition border-b border-slate-200">
-          <td class="py-2.5 px-3 font-bold text-slate-800 border-r border-slate-200">Dacoco</td>
-          <td class="py-2.5 px-3 text-slate-700 border-r border-slate-200">Belinda</td>
-          <td class="py-2.5 px-2 text-center text-slate-500 font-mono border-r border-slate-200">C.</td>
-          <td class="py-2.5 px-3 border-r border-slate-200">
-            <div class="flex items-center gap-1.5 flex-wrap">
-              <span class="font-bold text-slate-900">DWT</span>
-              
-                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#bfdbfe] text-[#1e3a5f] border border-blue-300">
-                  <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
-                  SHARED FACULTY
-                </span>
-              
-              
-            </div>
-          </td>
-          <td class="py-2.5 px-3 border-r border-slate-200 font-medium">
-            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700">
-              JO
-            </span>
-          </td>
-          <td class="py-2.5 px-3 text-slate-600 border-r border-slate-200 max-w-xs truncate" title="SMAW, FCAW, GMAW, GTAW, NC I and II">SMAW, FCAW, GMAW, GTAW, NC I and II</td>
-          <td class="py-2.5 px-3 text-slate-700 border-r border-slate-200 font-mono text-[11px]">9955220861</td>
-          <td class="py-2.5 px-3 text-[#2563eb] border-r border-slate-200 font-mono text-[11px] hover:underline cursor-pointer">bcdadacs55@gmail.com</td>
-          <td class="py-2.5 px-3 text-center">
-            <div class="flex items-center justify-center gap-1">
-              <button onclick="openFacultyModal('add')" class="px-2 py-1 rounded bg-slate-100 text-slate-700 hover:bg-slate-200 text-[10px] font-bold transition">
-                Add
-              </button>
-              <button onclick="openFacultyModal('edit', 3)" class="px-2 py-1 rounded bg-slate-100 text-slate-700 hover:bg-slate-200 text-[10px] font-bold transition">
-                Edit
-              </button>
-              <button onclick="openTrainerModalById(3)" class="px-2.5 py-1 rounded bg-blue-100 text-[#1d4ed8] hover:bg-blue-200 text-[10px] font-extrabold transition shadow-2xs">
-                View Load
-              </button>
-            </div>
-          </td>
-        </tr><tr class="hover:bg-[#eff6ff] transition border-b border-slate-200">
-          <td class="py-2.5 px-3 font-bold text-slate-800 border-r border-slate-200">Bravo Jr.</td>
-          <td class="py-2.5 px-3 text-slate-700 border-r border-slate-200">Albert</td>
-          <td class="py-2.5 px-2 text-center text-slate-500 font-mono border-r border-slate-200">B.</td>
-          <td class="py-2.5 px-3 border-r border-slate-200">
-            <div class="flex items-center gap-1.5 flex-wrap">
-              <span class="font-bold text-slate-900">DCET</span>
-              
-              
-                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
-                  Lead Instructor
-                </span>
-              
-            </div>
-          </td>
-          <td class="py-2.5 px-3 border-r border-slate-200 font-medium">
-            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-100 text-purple-900">
-              TESD Specialist II
-            </span>
-          </td>
-          <td class="py-2.5 px-3 text-slate-600 border-r border-slate-200 max-w-xs truncate" title="MAED Language Teaching">MAED Language Teaching</td>
-          <td class="py-2.5 px-3 text-slate-700 border-r border-slate-200 font-mono text-[11px]">9078670778</td>
-          <td class="py-2.5 px-3 text-[#2563eb] border-r border-slate-200 font-mono text-[11px] hover:underline cursor-pointer">albertbravojr28@gmail.com</td>
-          <td class="py-2.5 px-3 text-center">
-            <div class="flex items-center justify-center gap-1">
-              <button onclick="openFacultyModal('add')" class="px-2 py-1 rounded bg-slate-100 text-slate-700 hover:bg-slate-200 text-[10px] font-bold transition">
-                Add
-              </button>
-              <button onclick="openFacultyModal('edit', 4)" class="px-2 py-1 rounded bg-slate-100 text-slate-700 hover:bg-slate-200 text-[10px] font-bold transition">
-                Edit
-              </button>
-              <button onclick="openTrainerModalById(4)" class="px-2.5 py-1 rounded bg-blue-100 text-[#1d4ed8] hover:bg-blue-200 text-[10px] font-extrabold transition shadow-2xs">
-                View Load
-              </button>
-            </div>
-          </td>
-        </tr></tbody>
+<tbody class="divide-y divide-slate-200 font-sans text-xs" id="facultyTableBody"></tbody>
 </table>
 </div>
 </div>
@@ -676,224 +408,7 @@
 </div>
 </div>
 <!-- Curriculum Table Container -->
-<div class="space-y-4" id="curriculumContainers"><div class="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
-          <div class="bg-gradient-to-r from-slate-50 to-blue-50/60 p-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <div>
-              <span class="text-[10px] font-extrabold uppercase tracking-wider text-blue-800 bg-blue-100/90 px-2 py-0.5 rounded border border-blue-200">
-                First Year, Second Semester
-              </span>
-              <h4 class="text-sm font-bold text-[#1d4ed8] mt-1">DCMT - Diploma in Construction Management Technology</h4>
-            </div>
-            <div class="flex items-center gap-2 text-xs font-mono">
-              <span class="text-slate-600 bg-white px-2.5 py-1 rounded border border-slate-200 font-medium">Courses: 2</span>
-              <span class="text-blue-900 bg-blue-100/80 px-2.5 py-1 rounded font-bold border border-blue-200">Total: 6 Units</span>
-            </div>
-          </div>
-          <div class="overflow-x-auto custom-scroll">
-            <table class="w-full text-left text-xs border-collapse min-w-[780px]">
-              <thead>
-                <tr class="bg-slate-100 text-slate-700 border-b border-slate-200 text-[10px] font-bold uppercase tracking-wider">
-                  <th class="py-2.5 px-3 w-28 border-r border-slate-200">Course Code</th>
-                  <th class="py-2.5 px-3 border-r border-slate-200">Course Name</th>
-                  <th class="py-2.5 px-3 text-center w-24 border-r border-slate-200">Lec Units</th>
-                  <th class="py-2.5 px-3 text-center w-24 border-r border-slate-200">Lab Units</th>
-                  <th class="py-2.5 px-3 text-center w-24 border-r border-slate-200">Total Units</th>
-                  <th class="py-2.5 px-3 border-r border-slate-200 w-32">Pre-requisites</th>
-                  <th class="py-2.5 px-3">Resultant Qualification</th>
-                  <th class="py-2.5 px-3 text-center w-24">Actions</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-slate-200">
-                
-                  <tr class="hover:bg-slate-50 transition border-b border-slate-200">
-                    <td class="py-2.5 px-3 font-mono font-bold text-[#1d4ed8] border-r border-slate-200">CRP 121</td>
-                    <td class="py-2.5 px-3 font-semibold text-slate-800 border-r border-slate-200">Carpentry NC II</td>
-                    <td class="py-2.5 px-3 text-center border-r border-slate-200 font-mono text-slate-600">2</td>
-                    <td class="py-2.5 px-3 text-center border-r border-slate-200 font-mono text-slate-600">2</td>
-                    <td class="py-2.5 px-3 text-center border-r border-slate-200 font-mono font-bold text-blue-700 bg-blue-50/50">4</td>
-                    <td class="py-2.5 px-3 border-r border-slate-200 font-mono text-slate-500 text-[11px]">None</td>
-                    <td class="py-2.5 px-3">
-                      <span class="inline-flex items-center gap-1 font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded text-[11px]">
-                        <span class="material-symbols-outlined text-[13px] text-emerald-600">verified</span>
-                        Carpentry NC II
-                      </span>
-                    </td>
-                    <td class="py-2.5 px-3 text-center">
-                      <button onclick="showToast('Syllabus breakdown for CRP 121 verified with TESDA National Standards.')" class="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold">
-                        Edit
-                      </button>
-                    </td>
-                  </tr>
-                
-                  <tr class="hover:bg-slate-50 transition border-b border-slate-200">
-                    <td class="py-2.5 px-3 font-mono font-bold text-[#1d4ed8] border-r border-slate-200">CAD 122</td>
-                    <td class="py-2.5 px-3 font-semibold text-slate-800 border-r border-slate-200">Computer-Aided Drafting</td>
-                    <td class="py-2.5 px-3 text-center border-r border-slate-200 font-mono text-slate-600">0</td>
-                    <td class="py-2.5 px-3 text-center border-r border-slate-200 font-mono text-slate-600">2</td>
-                    <td class="py-2.5 px-3 text-center border-r border-slate-200 font-mono font-bold text-blue-700 bg-blue-50/50">2</td>
-                    <td class="py-2.5 px-3 border-r border-slate-200 font-mono text-slate-500 text-[11px]">DRAW 101</td>
-                    <td class="py-2.5 px-3">
-                      <span class="inline-flex items-center gap-1 font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded text-[11px]">
-                        <span class="material-symbols-outlined text-[13px] text-emerald-600">verified</span>
-                        Technical Drafting NC II
-                      </span>
-                    </td>
-                    <td class="py-2.5 px-3 text-center">
-                      <button onclick="showToast('Syllabus breakdown for CAD 122 verified with TESDA National Standards.')" class="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold">
-                        Edit
-                      </button>
-                    </td>
-                  </tr>
-                
-              </tbody>
-            </table>
-          </div>
-        </div><div class="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
-          <div class="bg-gradient-to-r from-slate-50 to-blue-50/60 p-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <div>
-              <span class="text-[10px] font-extrabold uppercase tracking-wider text-blue-800 bg-blue-100/90 px-2 py-0.5 rounded border border-blue-200">
-                Second Year, First Semester
-              </span>
-              <h4 class="text-sm font-bold text-[#1d4ed8] mt-1">DCMT - Diploma in Construction Management Technology</h4>
-            </div>
-            <div class="flex items-center gap-2 text-xs font-mono">
-              <span class="text-slate-600 bg-white px-2.5 py-1 rounded border border-slate-200 font-medium">Courses: 2</span>
-              <span class="text-blue-900 bg-blue-100/80 px-2.5 py-1 rounded font-bold border border-blue-200">Total: 6 Units</span>
-            </div>
-          </div>
-          <div class="overflow-x-auto custom-scroll">
-            <table class="w-full text-left text-xs border-collapse min-w-[780px]">
-              <thead>
-                <tr class="bg-slate-100 text-slate-700 border-b border-slate-200 text-[10px] font-bold uppercase tracking-wider">
-                  <th class="py-2.5 px-3 w-28 border-r border-slate-200">Course Code</th>
-                  <th class="py-2.5 px-3 border-r border-slate-200">Course Name</th>
-                  <th class="py-2.5 px-3 text-center w-24 border-r border-slate-200">Lec Units</th>
-                  <th class="py-2.5 px-3 text-center w-24 border-r border-slate-200">Lab Units</th>
-                  <th class="py-2.5 px-3 text-center w-24 border-r border-slate-200">Total Units</th>
-                  <th class="py-2.5 px-3 border-r border-slate-200 w-32">Pre-requisites</th>
-                  <th class="py-2.5 px-3">Resultant Qualification</th>
-                  <th class="py-2.5 px-3 text-center w-24">Actions</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-slate-200">
-                
-                  <tr class="hover:bg-slate-50 transition border-b border-slate-200">
-                    <td class="py-2.5 px-3 font-mono font-bold text-[#1d4ed8] border-r border-slate-200">PLM 211</td>
-                    <td class="py-2.5 px-3 font-semibold text-slate-800 border-r border-slate-200">Plumbing NC II</td>
-                    <td class="py-2.5 px-3 text-center border-r border-slate-200 font-mono text-slate-600">1</td>
-                    <td class="py-2.5 px-3 text-center border-r border-slate-200 font-mono text-slate-600">2</td>
-                    <td class="py-2.5 px-3 text-center border-r border-slate-200 font-mono font-bold text-blue-700 bg-blue-50/50">3</td>
-                    <td class="py-2.5 px-3 border-r border-slate-200 font-mono text-slate-500 text-[11px]">None</td>
-                    <td class="py-2.5 px-3">
-                      <span class="inline-flex items-center gap-1 font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded text-[11px]">
-                        <span class="material-symbols-outlined text-[13px] text-emerald-600">verified</span>
-                        Plumbing NC II
-                      </span>
-                    </td>
-                    <td class="py-2.5 px-3 text-center">
-                      <button onclick="showToast('Syllabus breakdown for PLM 211 verified with TESDA National Standards.')" class="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold">
-                        Edit
-                      </button>
-                    </td>
-                  </tr>
-                
-                  <tr class="hover:bg-slate-50 transition border-b border-slate-200">
-                    <td class="py-2.5 px-3 font-mono font-bold text-[#1d4ed8] border-r border-slate-200">MAS 212</td>
-                    <td class="py-2.5 px-3 font-semibold text-slate-800 border-r border-slate-200">Masonry NC II</td>
-                    <td class="py-2.5 px-3 text-center border-r border-slate-200 font-mono text-slate-600">1</td>
-                    <td class="py-2.5 px-3 text-center border-r border-slate-200 font-mono text-slate-600">2</td>
-                    <td class="py-2.5 px-3 text-center border-r border-slate-200 font-mono font-bold text-blue-700 bg-blue-50/50">3</td>
-                    <td class="py-2.5 px-3 border-r border-slate-200 font-mono text-slate-500 text-[11px]">None</td>
-                    <td class="py-2.5 px-3">
-                      <span class="inline-flex items-center gap-1 font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded text-[11px]">
-                        <span class="material-symbols-outlined text-[13px] text-emerald-600">verified</span>
-                        Masonry NC II
-                      </span>
-                    </td>
-                    <td class="py-2.5 px-3 text-center">
-                      <button onclick="showToast('Syllabus breakdown for MAS 212 verified with TESDA National Standards.')" class="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold">
-                        Edit
-                      </button>
-                    </td>
-                  </tr>
-                
-              </tbody>
-            </table>
-          </div>
-        </div><div class="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
-          <div class="bg-gradient-to-r from-slate-50 to-blue-50/60 p-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <div>
-              <span class="text-[10px] font-extrabold uppercase tracking-wider text-blue-800 bg-blue-100/90 px-2 py-0.5 rounded border border-blue-200">
-                Repackaged 2025 - Second Year, First Semester
-              </span>
-              <h4 class="text-sm font-bold text-[#1d4ed8] mt-1">DEMT - Diploma in Electro-Mechatronics Technology</h4>
-            </div>
-            <div class="flex items-center gap-2 text-xs font-mono">
-              <span class="text-slate-600 bg-white px-2.5 py-1 rounded border border-slate-200 font-medium">Courses: 2</span>
-              <span class="text-blue-900 bg-blue-100/80 px-2.5 py-1 rounded font-bold border border-blue-200">Total: 7 Units</span>
-            </div>
-          </div>
-          <div class="overflow-x-auto custom-scroll">
-            <table class="w-full text-left text-xs border-collapse min-w-[780px]">
-              <thead>
-                <tr class="bg-slate-100 text-slate-700 border-b border-slate-200 text-[10px] font-bold uppercase tracking-wider">
-                  <th class="py-2.5 px-3 w-28 border-r border-slate-200">Course Code</th>
-                  <th class="py-2.5 px-3 border-r border-slate-200">Course Name</th>
-                  <th class="py-2.5 px-3 text-center w-24 border-r border-slate-200">Lec Units</th>
-                  <th class="py-2.5 px-3 text-center w-24 border-r border-slate-200">Lab Units</th>
-                  <th class="py-2.5 px-3 text-center w-24 border-r border-slate-200">Total Units</th>
-                  <th class="py-2.5 px-3 border-r border-slate-200 w-32">Pre-requisites</th>
-                  <th class="py-2.5 px-3">Resultant Qualification</th>
-                  <th class="py-2.5 px-3 text-center w-24">Actions</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-slate-200">
-                
-                  <tr class="hover:bg-slate-50 transition border-b border-slate-200">
-                    <td class="py-2.5 px-3 font-mono font-bold text-[#1d4ed8] border-r border-slate-200">EIM 211</td>
-                    <td class="py-2.5 px-3 font-semibold text-slate-800 border-r border-slate-200">Electrical Installation and Maintenance NCII</td>
-                    <td class="py-2.5 px-3 text-center border-r border-slate-200 font-mono text-slate-600">2</td>
-                    <td class="py-2.5 px-3 text-center border-r border-slate-200 font-mono text-slate-600">2</td>
-                    <td class="py-2.5 px-3 text-center border-r border-slate-200 font-mono font-bold text-blue-700 bg-blue-50/50">4</td>
-                    <td class="py-2.5 px-3 border-r border-slate-200 font-mono text-slate-500 text-[11px]">None</td>
-                    <td class="py-2.5 px-3">
-                      <span class="inline-flex items-center gap-1 font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded text-[11px]">
-                        <span class="material-symbols-outlined text-[13px] text-emerald-600">verified</span>
-                        Electrical Installation and Maintenance NCII
-                      </span>
-                    </td>
-                    <td class="py-2.5 px-3 text-center">
-                      <button onclick="showToast('Syllabus breakdown for EIM 211 verified with TESDA National Standards.')" class="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold">
-                        Edit
-                      </button>
-                    </td>
-                  </tr>
-                
-                  <tr class="hover:bg-slate-50 transition border-b border-slate-200">
-                    <td class="py-2.5 px-3 font-mono font-bold text-[#1d4ed8] border-r border-slate-200">MCT 212</td>
-                    <td class="py-2.5 px-3 font-semibold text-slate-800 border-r border-slate-200">Mechatronics Servicing NCIII</td>
-                    <td class="py-2.5 px-3 text-center border-r border-slate-200 font-mono text-slate-600">1</td>
-                    <td class="py-2.5 px-3 text-center border-r border-slate-200 font-mono text-slate-600">2</td>
-                    <td class="py-2.5 px-3 text-center border-r border-slate-200 font-mono font-bold text-blue-700 bg-blue-50/50">3</td>
-                    <td class="py-2.5 px-3 border-r border-slate-200 font-mono text-slate-500 text-[11px]">EMR 122</td>
-                    <td class="py-2.5 px-3">
-                      <span class="inline-flex items-center gap-1 font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded text-[11px]">
-                        <span class="material-symbols-outlined text-[13px] text-emerald-600">verified</span>
-                        Mechatronics Servicing NCIII
-                      </span>
-                    </td>
-                    <td class="py-2.5 px-3 text-center">
-                      <button onclick="showToast('Syllabus breakdown for MCT 212 verified with TESDA National Standards.')" class="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold">
-                        Edit
-                      </button>
-                    </td>
-                  </tr>
-                
-              </tbody>
-            </table>
-          </div>
-        </div></div>
-</section>
+<div class="space-y-4" id="curriculumContainers"></div></section>
 </main>
 </div>
 <!-- ======================================================== -->
@@ -932,11 +447,11 @@
 </div>
 <div class="flex justify-between">
 <span class="text-slate-500 font-medium">Contact Phone:</span>
-<span class="font-semibold font-mono text-slate-800" id="modalTrainerPhone">9307603532</span>
+<span class="font-semibold font-mono text-slate-800" id="modalTrainerPhone">Sign in to view</span>
 </div>
 <div class="flex justify-between">
 <span class="text-slate-500 font-medium">Verified Email:</span>
-<span class="font-semibold font-mono text-[#2563eb]" id="modalTrainerEmail">alexanderdagohoy7@gmail.com</span>
+<span class="font-semibold font-mono text-[#2563eb]" id="modalTrainerEmail">Sign in to view</span>
 </div>
 </div>
 <div class="pt-2 flex justify-end gap-2 border-t border-slate-100">
@@ -984,6 +499,7 @@
 <option value="JO">JO (Job Order)</option>
 <option value="TESD Specialist II">TESD Specialist II</option>
 <option value="Head Trainer">Head Trainer</option>
+<option value="Head Trainer Admin">Head Trainer Admin</option>
 <option value="Lead Instructor">Lead Instructor</option>
 <option value="Trainer">Trainer</option>
 </select>
@@ -1007,11 +523,11 @@
 <div class="grid grid-cols-2 gap-2">
 <div>
 <label class="block font-bold text-slate-700 mb-1">Mobile Number</label>
-<input class="w-full p-2 border border-slate-300 rounded-lg text-xs" id="facMobile" placeholder="9307603532" required="" type="text">
+<input class="w-full p-2 border border-slate-300 rounded-lg text-xs" id="facMobile" placeholder="+63" required="" type="text">
 </div>
 <div>
 <label class="block font-bold text-slate-700 mb-1">Contact Email</label>
-<input class="w-full p-2 border border-slate-300 rounded-lg text-xs" id="facEmail" placeholder="name@gmail.com" required="" type="email">
+<input class="w-full p-2 border border-slate-300 rounded-lg text-xs" id="facEmail" placeholder="name@example.com" required="" type="email">
 </div>
 </div>
 <div class="pt-2 flex justify-end gap-2 border-t border-slate-200">
@@ -1115,192 +631,25 @@
 <span id="toastMessage" class="">Success</span>
 </div>
 <!-- ======================================================== -->
-<!-- JAVASCRIPT STATE ENGINE & MOCK DATA                      -->
+<!-- JAVASCRIPT APPLICATION STATE                      -->
 <!-- ======================================================== -->
 <script>
     // --------------------------------------------------------
     // APPLICATION STATE
     // --------------------------------------------------------
-    let currentUserRole = 'head'; // 'head' (Head Trainer) or 'trainee' (Trainee Read-Only)
+    let currentUserRole = null;
+    let currentUser = null;
     let currentView = 'schedule';
     let selectedTrainerForModal = null;
     let currentFacultyFilter = 'all';
+    let scheduleEntries = [];
+    let editingScheduleId = null;
+    let googleIdentityInitialized = false;
 
     // --------------------------------------------------------
-    // 4. FACULTY EXACT MOCK DATA
-    // --------------------------------------------------------
-    let facultyDatabase = [
-      {
-        id: 1,
-        lastName: "Dagohoy",
-        firstName: "Alexander",
-        mi: "O.",
-        dept: "DCET",
-        role: "JO",
-        quals: "Masonry NC II",
-        mobile: "9307603532",
-        email: "alexanderdagohoy7@gmail.com",
-        isShared: true,
-        sharedGroup: "DCET / DCMT",
-        courses: [
-          { code: "MAS 212", name: "Masonry NC II", lec: 1, lab: 2, total: 3 },
-          { code: "CRP 121", name: "Carpentry NC II", lec: 2, lab: 2, total: 4 }
-        ]
-      },
-      {
-        id: 2,
-        lastName: "Sedomar",
-        firstName: "Haitham Jenor",
-        mi: "L.",
-        dept: "DCET",
-        role: "JO",
-        quals: "Civil Engineering Orientation, Hydraulics, Physics for Engineers",
-        mobile: "9162655967",
-        email: "haithamibnsajid@gmail.com",
-        isShared: true,
-        sharedGroup: "DCET / DCMT",
-        courses: [
-          { code: "CAD 122", name: "Computer-Aided Drafting", lec: 0, lab: 2, total: 2 },
-          { code: "PLM 211", name: "Plumbing NC II", lec: 1, lab: 2, total: 3 }
-        ]
-      },
-      {
-        id: 3,
-        lastName: "Dacoco",
-        firstName: "Belinda",
-        mi: "C.",
-        dept: "DWT",
-        role: "JO",
-        quals: "SMAW, FCAW, GMAW, GTAW, NC I and II",
-        mobile: "9955220861",
-        email: "bcdadacs55@gmail.com",
-        isShared: true,
-        sharedGroup: "DWT / DEMT",
-        courses: [
-          { code: "EIM 211", name: "Electrical Installation & Maintenance NCII", lec: 2, lab: 2, total: 4 },
-          { code: "WLD 101", name: "Basic Welding Fusion", lec: 1, lab: 2, total: 3 }
-        ]
-      },
-      {
-        id: 4,
-        lastName: "Bravo Jr.",
-        firstName: "Albert",
-        mi: "B.",
-        dept: "DCET",
-        role: "TESD Specialist II",
-        quals: "MAED Language Teaching",
-        mobile: "9078670778",
-        email: "albertbravojr28@gmail.com",
-        isShared: false,
-        leadTag: "Lead Instructor",
-        courses: [
-          { code: "MCT 212", name: "Mechatronics Servicing NCIII", lec: 1, lab: 2, total: 3 },
-          { code: "ENG 101", name: "Technical Communication in TVET", lec: 3, lab: 0, total: 3 }
-        ]
-      }
-    ];
-
-    // --------------------------------------------------------
-    // 5. CURRICULUM CENTRAL REGISTRY DATA
-    // --------------------------------------------------------
-    let curriculumDiplomas = [
-      { code: "DCMT", title: "Diploma in Construction Management Technology" },
-      { code: "DEMT", title: "Diploma in Electro-Mechatronics Technology" },
-      { code: "DCET", title: "Diploma in Computer Engineering Technology" }
-    ];
-
-    let curriculumSections = [
-      {
-        id: "dcmt-y1-s2",
-        diploma: "DCMT",
-        diplomaTitle: "DCMT - Diploma in Construction Management Technology",
-        yearLevel: "1",
-        semester: "2",
-        yearRevision: "First Year, Second Semester",
-        courses: [
-          {
-            code: "CRP 121",
-            name: "Carpentry NC II",
-            lec: 2,
-            lab: 2,
-            total: 4,
-            prereq: "None",
-            qual: "Carpentry NC II",
-            trainerName: "Alexander O. Dagohoy"
-          },
-          {
-            code: "CAD 122",
-            name: "Computer-Aided Drafting",
-            lec: 0,
-            lab: 2,
-            total: 2,
-            prereq: "DRAW 101",
-            qual: "Technical Drafting NC II",
-            trainerName: "Haitham Jenor L. Sedomar"
-          }
-        ]
-      },
-      {
-        id: "dcmt-y2-s1",
-        diploma: "DCMT",
-        diplomaTitle: "DCMT - Diploma in Construction Management Technology",
-        yearLevel: "2",
-        semester: "1",
-        yearRevision: "Second Year, First Semester",
-        courses: [
-          {
-            code: "PLM 211",
-            name: "Plumbing NC II",
-            lec: 1,
-            lab: 2,
-            total: 3,
-            prereq: "None",
-            qual: "Plumbing NC II",
-            trainerName: "Haitham Jenor L. Sedomar"
-          },
-          {
-            code: "MAS 212",
-            name: "Masonry NC II",
-            lec: 1,
-            lab: 2,
-            total: 3,
-            prereq: "None",
-            qual: "Masonry NC II",
-            trainerName: "Alexander O. Dagohoy"
-          }
-        ]
-      },
-      {
-        id: "demt-y2-s1",
-        diploma: "DEMT",
-        diplomaTitle: "DEMT - Diploma in Electro-Mechatronics Technology",
-        yearLevel: "2",
-        semester: "1",
-        yearRevision: "Repackaged 2025 - Second Year, First Semester",
-        courses: [
-          {
-            code: "EIM 211",
-            name: "Electrical Installation and Maintenance NCII",
-            lec: 2,
-            lab: 2,
-            total: 4,
-            prereq: "None",
-            qual: "Electrical Installation and Maintenance NCII",
-            trainerName: "Belinda C. Dacoco"
-          },
-          {
-            code: "MCT 212",
-            name: "Mechatronics Servicing NCIII",
-            lec: 1,
-            lab: 2,
-            total: 3,
-            prereq: "EMR 122",
-            qual: "Mechatronics Servicing NCIII",
-            trainerName: "Albert B. Bravo Jr."
-          }
-        ]
-      }
-    ];
+    let facultyDatabase = [];
+    let curriculumDiplomas = [];
+    let curriculumSections = [];
 
     // --------------------------------------------------------
     // TOAST SYSTEM
@@ -1315,6 +664,257 @@
         toast.classList.remove('translate-y-0', 'opacity-100');
         toast.classList.add('translate-y-20', 'opacity-0');
       }, 2800);
+    }
+
+    async function apiRequest(url, options = {}) {
+      const response = await fetch(url, {
+        credentials: 'same-origin',
+        ...options,
+        headers: {
+          ...(options.body ? { 'Content-Type': 'application/json' } : {}),
+          ...(options.headers || {})
+        }
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(result.error || `Request failed with status ${response.status}.`);
+      }
+      return result;
+    }
+
+    function makeFacultyRecord(record, schedule) {
+      const fullName = `${record.firstName} ${record.mi || ''} ${record.lastName}`.replace(/\s+/g, ' ').trim();
+      const assignedCourses = new Map();
+      for (const entry of schedule.filter(item => item.assignedTrainer === fullName)) {
+        const key = `${entry.courseCode}|${entry.courseName}`;
+        assignedCourses.set(key, {
+          code: entry.courseCode,
+          name: entry.courseName,
+          lec: Number(entry.lectureUnits || 0),
+          lab: Number(entry.labUnits || 0),
+          total: Number(entry.lectureUnits || 0) + Number(entry.labUnits || 0)
+        });
+      }
+      return {
+        ...record,
+        dept: String(record.department || '').split('/')[0].trim(),
+        quals: record.qualifications || '',
+        mobile: record.mobileNumber || '',
+        sharedGroup: String(record.department || '').includes('/') ? record.department : '',
+        isShared: String(record.department || '').includes('/'),
+        courses: [...assignedCourses.values()]
+      };
+    }
+
+    function applyDashboardData(data) {
+      const selectedDiploma = document.getElementById('schedDiplomaFilter').value;
+      const selectedSemester = document.getElementById('schedSemFilter').value;
+      const selectedYear = document.getElementById('schedYearFilter').value;
+      const selectedSchoolYear = document.getElementById('schedSchoolYearFilter')?.value;
+
+      facultyDatabase = data.faculty.map(record => makeFacultyRecord(record, data.schedule));
+      curriculumDiplomas = data.diplomas.map(record => ({
+        id: record.id,
+        code: record.code,
+        title: record.name
+      }));
+      scheduleEntries = data.schedule;
+      const grouped = new Map();
+      for (const record of data.courses) {
+        const key = `${record.diplomaCode}|${record.diplomaYear}|${record.semester}`;
+        if (!grouped.has(key)) {
+          const diploma = curriculumDiplomas.find(item => item.code === record.diplomaCode);
+          const year = String(record.diplomaYear || '');
+          const semester = String(record.semester || '');
+          const yearNames = { '1': 'First', '2': 'Second', '3': 'Third' };
+          const semesterNames = { '1': 'First', '2': 'Second' };
+          grouped.set(key, {
+            id: key,
+            diploma: record.diplomaCode,
+            diplomaTitle: `${record.diplomaCode} - ${diploma?.title || record.diplomaName}`,
+            yearLevel: year,
+            semester,
+            yearRevision: `${yearNames[year] || `Year ${year}`}, ${semesterNames[semester] || `Semester ${semester}`} Semester`,
+            courses: []
+          });
+        }
+        grouped.get(key).courses.push({
+          id: record.id,
+          code: record.code,
+          name: record.name,
+          lec: Number(record.lecUnits || 0),
+          lab: Number(record.labUnits || 0),
+          total: Number(record.totalUnits || 0),
+          prereq: record.prerequisites || '',
+          qual: record.qualification || '',
+        });
+      }
+      curriculumSections = [...grouped.values()];
+
+      const diplomaSelect = document.getElementById('schedDiplomaFilter');
+      const previousDiploma = curriculumDiplomas.some(item => item.code === selectedDiploma)
+        ? selectedDiploma
+        : (curriculumDiplomas[0]?.code || '');
+      diplomaSelect.innerHTML = curriculumDiplomas.map(item =>
+        `<option value="${escapeHtml(item.code)}">${escapeHtml(item.code)} - ${escapeHtml(item.title)}</option>`
+      ).join('');
+      diplomaSelect.value = previousDiploma;
+      if (selectedSemester) document.getElementById('schedSemFilter').value = selectedSemester;
+      if (selectedYear) document.getElementById('schedYearFilter').value = selectedYear;
+      if (selectedSchoolYear) document.getElementById('schedSchoolYearFilter').value = selectedSchoolYear;
+
+      renderFacultyFilters();
+      renderTimetable();
+      renderFacultyTable(getVisibleFaculty());
+      renderCurriculumSections();
+      updateRolePermissions();
+    }
+
+    function renderFacultyFilters() {
+      const container = document.querySelector('.faculty-chip')?.parentElement;
+      if (!container) return;
+      const departments = [...new Set(facultyDatabase.flatMap(faculty =>
+        `${faculty.dept || ''} ${faculty.sharedGroup || ''}`
+          .split('/')
+          .map(value => value.trim())
+          .filter(Boolean)
+      ))].sort();
+      const filters = [
+        { value: 'all', label: `All (${facultyDatabase.length})` },
+        { value: 'shared', label: `★ Shared Faculty (${facultyDatabase.filter(item => item.isShared).length})` },
+        ...departments.map(department => ({ value: department, label: department }))
+      ];
+      if (!filters.some(filter => filter.value === currentFacultyFilter)) currentFacultyFilter = 'all';
+      container.querySelectorAll('.faculty-chip').forEach(chip => chip.remove());
+      for (const filter of filters) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.dataset.dept = filter.value;
+        button.textContent = filter.label;
+        button.className = filter.value === currentFacultyFilter
+          ? 'faculty-chip px-2.5 py-1 rounded-md bg-[#1e3a5f] text-white font-medium'
+          : 'faculty-chip px-2.5 py-1 rounded-md bg-white border border-slate-300 text-slate-700 hover:bg-blue-50 font-medium';
+        button.addEventListener('click', () => filterFaculty(filter.value));
+        container.appendChild(button);
+      }
+    }
+
+    async function refreshDashboardData() {
+      const data = await apiRequest('/api/data');
+      applyDashboardData(data);
+      setAuthenticatedUser(data.user);
+      const status = document.getElementById('googleConnectionStatus');
+      status.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>Connected';
+      status.className = 'inline-flex items-center gap-1 text-emerald-300 font-bold';
+      return data;
+    }
+
+    function setAuthenticatedUser(user) {
+      currentUser = user;
+      currentUserRole = user?.isHeadTrainer ? 'head' : (user ? 'trainee' : null);
+      const avatar = document.getElementById('sidebarUserAvatar');
+      const name = document.getElementById('sidebarUserName');
+      const roleBadge = document.getElementById('sidebarUserRoleBadge');
+      const authButton = document.getElementById('sidebarAuthButton');
+      const authIcon = document.getElementById('sidebarAuthIcon');
+      const authLabel = document.getElementById('sidebarAuthLabel');
+
+      if (!user) {
+        avatar.innerText = 'PV';
+        avatar.className = 'w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-xs font-bold text-white shadow-xs';
+        name.innerText = 'Public Viewer';
+        roleBadge.innerText = 'Read-only';
+        roleBadge.className = 'inline-block mt-0.5 text-[9px] font-semibold bg-blue-500/20 text-blue-200 border border-blue-400/30 px-1.5 py-0.2 rounded';
+        authButton.title = 'Sign in with Google';
+        authIcon.innerText = 'login';
+        authLabel.innerText = 'Sign in';
+      } else {
+        avatar.innerText = String(user.name || user.email).split(/\s+/).slice(0, 2).map(part => part[0]).join('').toUpperCase();
+        avatar.className = `w-8 h-8 rounded-lg ${user.isHeadTrainer ? 'bg-blue-600' : 'bg-amber-600'} flex items-center justify-center text-xs font-bold text-white shadow-xs`;
+        name.innerText = user.name || user.email;
+        roleBadge.innerText = user.role || 'Faculty';
+        roleBadge.className = `inline-block mt-0.5 text-[9px] font-semibold ${user.isHeadTrainer ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30' : 'bg-amber-500/20 text-amber-300 border-amber-400/30'} border px-1.5 py-0.2 rounded`;
+        authButton.title = 'Sign out';
+        authIcon.innerText = 'logout';
+        authLabel.innerText = 'Sign Out';
+      }
+      updateRolePermissions();
+      if (currentView === 'schedule') renderTimetable();
+      if (currentView === 'faculty') renderFacultyTable(getVisibleFaculty());
+      if (currentView === 'curriculum') renderCurriculumSections();
+    }
+
+    function handleGoogleCredential(response) {
+      apiRequest('/api/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({ credential: response.credential })
+      }).then(async result => {
+        setAuthenticatedUser(result.user);
+        await refreshDashboardData();
+        document.getElementById('authMessage').classList.add('hidden');
+        showToast(result.user.isHeadTrainer ? 'Signed in with Head Trainer access.' : 'Signed in with read-only access.');
+        switchView('schedule');
+      }).catch(error => {
+        const message = document.getElementById('authMessage');
+        message.textContent = error.message;
+        message.classList.remove('hidden');
+      });
+    }
+
+    async function initializeGoogleIdentity() {
+      try {
+        const { googleClientId } = await apiRequest('/api/auth/config');
+        if (!googleClientId) {
+          throw new Error('Google sign-in is not configured on the server.');
+        }
+        const initialize = () => {
+          if (!window.google?.accounts?.id || googleIdentityInitialized) return;
+          window.google.accounts.id.initialize({
+            client_id: googleClientId,
+            callback: handleGoogleCredential,
+            auto_select: false
+          });
+          window.google.accounts.id.renderButton(
+            document.getElementById('googleIdentityButton'),
+            { type: 'standard', theme: 'outline', size: 'large', text: 'signin_with', shape: 'rectangular', width: 280 }
+          );
+          googleIdentityInitialized = true;
+        };
+        if (window.google?.accounts?.id) {
+          initialize();
+        } else {
+          const script = document.createElement('script');
+          script.src = 'https://accounts.google.com/gsi/client';
+          script.async = true;
+          script.defer = true;
+          script.onload = initialize;
+          script.onerror = () => {
+            document.getElementById('authMessage').textContent = 'Google sign-in could not be loaded.';
+            document.getElementById('authMessage').classList.remove('hidden');
+          };
+          document.head.appendChild(script);
+        }
+      } catch (error) {
+        const message = document.getElementById('authMessage');
+        message.textContent = error.message;
+        message.classList.remove('hidden');
+      }
+    }
+
+    async function handleSidebarAuthAction() {
+      if (!currentUser) {
+        initializeGoogleIdentity();
+        switchView('login');
+        return;
+      }
+      try {
+        await apiRequest('/api/auth/logout', { method: 'POST' });
+        setAuthenticatedUser(null);
+        await refreshDashboardData();
+        showToast('Signed out. The dashboard remains available in read-only mode.');
+      } catch (error) {
+        showToast(error.message);
+      }
     }
 
     // --------------------------------------------------------
@@ -1367,7 +967,7 @@
 
     function handleQuickAddAction() {
       if (currentUserRole !== 'head' || currentView !== 'schedule') return;
-      alert("Schedule Editor: All time matrix positions locked under Fixed Matrix Protocol. Faculty assignments mapped via Curriculum Registry.");
+      openScheduleModal(null, 'Monday', '10:00 AM - 11:30 AM');
     }
 
     function updateRolePermissions() {
@@ -1386,56 +986,200 @@
       }
     }
 
-    // --------------------------------------------------------
-    // USER ROLE & LOGIN SIMULATION
-    // --------------------------------------------------------
-    function setAuthRole(role) {
-      currentUserRole = role;
-      const headCard = document.getElementById('authCardHead');
-      const traineeCard = document.getElementById('authCardTrainee');
+    function getTimetableCard(diploma, sem, year, day, time) {
+      const schoolYear = document.getElementById('schedSchoolYearFilter').value;
+      const record = scheduleEntries.find(item =>
+        item.diplomaCode === diploma &&
+        String(item.semester) === String(sem) &&
+        String(item.diplomaYear) === String(year) &&
+        item.schoolYear === schoolYear &&
+        item.day === day &&
+        item.scheduledTime === time
+      );
+      if (!record) return null;
+      const trainer = facultyDatabase.find(person =>
+        `${person.firstName} ${person.mi || ''} ${person.lastName}`.replace(/\s+/g, ' ').trim() === record.assignedTrainer
+      );
+      const lectureUnits = Number(record.lectureUnits || 0);
+      const labUnits = Number(record.labUnits || 0);
+      const totalUnits = lectureUnits + labUnits;
+      const hours = lectureUnits + (labUnits * 1.5);
+      const type = lectureUnits && labUnits ? 'Lec/Lab' : (lectureUnits ? 'Lecture' : 'Lab');
+      return {
+        scheduleRecord: record,
+        code: record.courseCode,
+        title: record.courseName,
+        type,
+        trainer: record.assignedTrainer,
+        units: `${totalUnits} Units (${lectureUnits}L/${labUnits}L)`,
+        hours: `${hours.toFixed(1)} hrs/wk`,
+        isShared: Boolean(trainer?.isShared)
+      };
+    }
 
-      if (role === 'head') {
-        headCard.className = "flex items-center justify-between p-3.5 rounded-xl border-2 border-blue-600 bg-blue-50/70 cursor-pointer transition";
-        traineeCard.className = "flex items-center justify-between p-3.5 rounded-xl border border-slate-200 hover:border-blue-300 hover:bg-slate-50 cursor-pointer transition";
+    function ensureScheduleModal() {
+      if (document.getElementById('scheduleAssignmentModal')) return;
+      const modal = document.createElement('div');
+      modal.id = 'scheduleAssignmentModal';
+      modal.className = 'hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4';
+      modal.innerHTML = `
+        <form class="bg-white rounded-2xl max-w-lg w-full border border-slate-200 shadow-2xl overflow-hidden" id="scheduleAssignmentForm">
+          <div class="bg-gradient-to-r from-[#1e3a5f] to-[#152d4a] text-white p-4 flex items-center justify-between">
+            <div>
+              <h3 class="text-sm font-bold" id="scheduleAssignmentTitle">New Timetable Entry</h3>
+              <p class="text-[11px] text-blue-200" id="scheduleAssignmentSubtitle"></p>
+            </div>
+            <button class="text-blue-200 hover:text-white p-1 rounded-md hover:bg-white/10" type="button" onclick="closeScheduleModal()">
+              <span class="material-symbols-outlined">close</span>
+            </button>
+          </div>
+          <div class="p-5 space-y-3 text-xs">
+            <label class="block font-semibold text-slate-700">Curriculum Course
+              <select class="mt-1 w-full rounded-lg border border-slate-300 p-2" id="scheduleCourseSelect" required></select>
+            </label>
+            <label class="block font-semibold text-slate-700">Assigned Trainer
+              <select class="mt-1 w-full rounded-lg border border-slate-300 p-2" id="scheduleTrainerSelect" required></select>
+            </label>
+            <div class="grid grid-cols-2 gap-3">
+              <label class="block font-semibold text-slate-700">Day
+                <select class="mt-1 w-full rounded-lg border border-slate-300 p-2" id="scheduleDaySelect">
+                  <option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option>
+                </select>
+              </label>
+              <label class="block font-semibold text-slate-700">Scheduled Time
+                <select class="mt-1 w-full rounded-lg border border-slate-300 p-2" id="scheduleTimeSelect">
+                  <option>10:00 AM - 11:30 AM</option><option>11:30 AM - 1:00 PM</option><option>1:00 PM - 2:30 PM</option><option>2:30 PM - 4:00 PM</option><option>4:00 PM - 5:00 PM</option>
+                </select>
+              </label>
+            </div>
+            <p class="text-[11px] text-slate-500">Diploma, year, semester, school year, and course units are taken from the selected schedule filters and curriculum.</p>
+          </div>
+          <div class="px-5 py-3 border-t border-slate-200 flex items-center justify-between">
+            <button class="hidden rounded-lg bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-700 hover:bg-rose-100" id="scheduleDeleteButton" type="button">Remove Assignment</button>
+            <div class="ml-auto flex gap-2">
+              <button class="rounded-lg bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-700" type="button" onclick="closeScheduleModal()">Cancel</button>
+              <button class="rounded-lg bg-[#2563eb] px-4 py-2 text-xs font-semibold text-white hover:bg-blue-700" type="submit">Save Assignment</button>
+            </div>
+          </div>
+        </form>
+      `;
+      document.body.appendChild(modal);
+      modal.querySelector('#scheduleAssignmentForm').addEventListener('submit', saveScheduleAssignment);
+      modal.querySelector('#scheduleDeleteButton').addEventListener('click', deleteScheduleAssignment);
+    }
+
+    function openScheduleModal(courseCard, day, time) {
+      if (currentUserRole !== 'head') {
+        showToast('Only the Head Trainer can edit timetable assignments.');
+        return;
+      }
+      ensureScheduleModal();
+      const diploma = document.getElementById('schedDiplomaFilter').value;
+      const year = document.getElementById('schedYearFilter').value;
+      const semester = document.getElementById('schedSemFilter').value;
+      const courses = curriculumSections
+        .filter(section => section.diploma === diploma && section.yearLevel === String(year) && section.semester === String(semester))
+        .flatMap(section => section.courses);
+      const courseSelect = document.getElementById('scheduleCourseSelect');
+      const trainerSelect = document.getElementById('scheduleTrainerSelect');
+      const schedule = courseCard?.scheduleRecord || null;
+      editingScheduleId = schedule?.id || null;
+      courseSelect.innerHTML = courses.map(course =>
+        `<option value="${escapeHtml(course.id)}">${escapeHtml(course.code)} - ${escapeHtml(course.name)}</option>`
+      ).join('');
+      trainerSelect.innerHTML = facultyDatabase.map(faculty => {
+        const fullName = `${faculty.firstName} ${faculty.mi || ''} ${faculty.lastName}`.replace(/\s+/g, ' ').trim();
+        return `<option value="${escapeHtml(faculty.id)}">${escapeHtml(fullName)}</option>`;
+      }).join('');
+
+      if (schedule) {
+        courseSelect.value = courses.find(course => course.code === schedule.courseCode)?.id || '';
+        const assignedFaculty = facultyDatabase.find(person =>
+          `${person.firstName} ${person.mi || ''} ${person.lastName}`.replace(/\s+/g, ' ').trim() === schedule.assignedTrainer
+        );
+        if (assignedFaculty) trainerSelect.value = assignedFaculty.id;
       } else {
-        headCard.className = "flex items-center justify-between p-3.5 rounded-xl border border-slate-200 hover:border-blue-300 hover:bg-slate-50 cursor-pointer transition";
-        traineeCard.className = "flex items-center justify-between p-3.5 rounded-xl border-2 border-amber-600 bg-amber-50/70 cursor-pointer transition";
+        const preferredCourse = courses.find(course => !scheduleEntries.some(item =>
+          item.diplomaCode === diploma &&
+          String(item.diplomaYear) === String(year) &&
+          String(item.semester) === String(semester) &&
+          item.courseCode === course.code
+        ));
+        if (preferredCourse) courseSelect.value = preferredCourse.id;
+      }
+
+      const modal = document.getElementById('scheduleAssignmentModal');
+      const deleteButton = document.getElementById('scheduleDeleteButton');
+      document.getElementById('scheduleAssignmentTitle').textContent = schedule ? 'Edit Timetable Entry' : 'New Timetable Entry';
+      document.getElementById('scheduleAssignmentSubtitle').textContent = `${diploma} - Year ${year}, Semester ${semester}`;
+      document.getElementById('scheduleDaySelect').value = schedule?.day || day;
+      document.getElementById('scheduleTimeSelect').value = schedule?.scheduledTime || time;
+      deleteButton.classList.toggle('hidden', !schedule);
+      courseSelect.disabled = courses.length === 0;
+      trainerSelect.disabled = facultyDatabase.length === 0;
+      if (courses.length === 0 || facultyDatabase.length === 0) {
+        showToast('Add a curriculum course and a faculty record before assigning this timetable slot.');
+        return;
+      }
+      modal.classList.remove('hidden');
+    }
+
+    function closeScheduleModal() {
+      document.getElementById('scheduleAssignmentModal')?.classList.add('hidden');
+      editingScheduleId = null;
+    }
+
+    async function saveScheduleAssignment(event) {
+      event.preventDefault();
+      if (currentUserRole !== 'head') return;
+      const courseId = document.getElementById('scheduleCourseSelect').value;
+      const course = curriculumSections.flatMap(section => section.courses).find(item => item.id === courseId);
+      const trainer = facultyDatabase.find(item => String(item.id) === document.getElementById('scheduleTrainerSelect').value);
+      if (!course || !trainer) {
+        showToast('Select a valid curriculum course and trainer.');
+        return;
+      }
+      const diplomaCode = document.getElementById('schedDiplomaFilter').value;
+      const diploma = curriculumDiplomas.find(item => item.code === diplomaCode);
+      const record = {
+        id: editingScheduleId || crypto.randomUUID(),
+        diplomaCode,
+        diplomaName: diploma?.title || diplomaCode,
+        diplomaYear: Number(document.getElementById('schedYearFilter').value),
+        semester: Number(document.getElementById('schedSemFilter').value),
+        schoolYear: document.getElementById('schedSchoolYearFilter').value,
+        day: document.getElementById('scheduleDaySelect').value,
+        scheduledTime: document.getElementById('scheduleTimeSelect').value,
+        courseCode: course.code,
+        courseName: course.name,
+        assignedTrainer: `${trainer.firstName} ${trainer.mi || ''} ${trainer.lastName}`.replace(/\s+/g, ' ').trim(),
+        lectureUnits: Number(course.lec || 0),
+        labUnits: Number(course.lab || 0)
+      };
+      try {
+        const path = `/api/records/${encodeURIComponent('Master Schedule')}`;
+        await apiRequest(editingScheduleId ? `${path}/${encodeURIComponent(editingScheduleId)}` : path, {
+          method: editingScheduleId ? 'PUT' : 'POST',
+          body: JSON.stringify(record)
+        });
+        closeScheduleModal();
+        await refreshDashboardData();
+        showToast(`Timetable assignment for ${record.courseCode} saved.`);
+      } catch (error) {
+        showToast(error.message);
       }
     }
 
-    function toggleUserRoleSimulation() {
-      const nextRole = currentUserRole === 'head' ? 'trainee' : 'head';
-      loginAs(nextRole);
-    }
-
-    function loginAs(role) {
-      currentUserRole = role;
-      const avatar = document.getElementById('sidebarUserAvatar');
-      const name = document.getElementById('sidebarUserName');
-      const roleBadge = document.getElementById('sidebarUserRoleBadge');
-
-      if (role === 'head') {
-        avatar.innerText = "RM";
-        avatar.className = "w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-xs font-bold text-white shadow-xs";
-        name.innerText = "Engr. Ramon Morales";
-        roleBadge.innerText = "Head Trainer Admin";
-        roleBadge.className = "inline-block mt-0.5 text-[9px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 px-1.5 py-0.2 rounded";
-        showToast("Authenticated as Head Trainer Engr. Ramon Morales (Full Admin Access)");
-      } else {
-        avatar.innerText = "MS";
-        avatar.className = "w-8 h-8 rounded-lg bg-amber-600 flex items-center justify-center text-xs font-bold text-white shadow-xs";
-        name.innerText = "Maria Santos";
-        roleBadge.innerText = "Trainee Read-Only";
-        roleBadge.className = "inline-block mt-0.5 text-[9px] font-semibold bg-amber-500/20 text-amber-300 border border-amber-400/30 px-1.5 py-0.2 rounded";
-        showToast("Authenticated as Maria Santos (Trainee Read-Only Timetable Mode)");
+    async function deleteScheduleAssignment() {
+      if (!editingScheduleId || currentUserRole !== 'head') return;
+      try {
+        await apiRequest(`/api/records/${encodeURIComponent('Master Schedule')}/${encodeURIComponent(editingScheduleId)}`, { method: 'DELETE' });
+        closeScheduleModal();
+        await refreshDashboardData();
+        showToast('Timetable assignment removed.');
+      } catch (error) {
+        showToast(error.message);
       }
-
-      updateRolePermissions();
-      switchView('schedule');
-    }
-
-    function executeGoogleLogin() {
-      loginAs(currentUserRole);
     }
 
     // --------------------------------------------------------
@@ -1493,19 +1237,19 @@
             const td = document.createElement('td');
             td.className = "py-2 px-2 border-r border-slate-200 align-top text-xs";
 
-            const course = getTimetableCard(diploma, sem, year, day, slot.slotKey);
+            const course = getTimetableCard(diploma, sem, year, day, slot.time);
             if (course) {
               td.innerHTML = `
                 <div class="bg-blue-50/90 border border-blue-200 rounded-lg p-2.5 shadow-2xs hover:shadow-xs transition hover:border-blue-400">
                   <div class="flex items-center justify-between gap-1">
-                    <span class="font-extrabold text-[#1d4ed8] text-xs font-mono">${course.code}</span>
+                    <span class="font-extrabold text-[#1d4ed8] text-xs font-mono">${escapeHtml(course.code)}</span>
                     <span class="text-[10px] px-1.5 py-0.2 bg-blue-100 text-blue-800 rounded font-bold">${course.type}</span>
                   </div>
-                  <div class="text-[11px] font-bold text-slate-800 mt-1 leading-snug line-clamp-1">${course.title}</div>
+                  <div class="text-[11px] font-bold text-slate-800 mt-1 leading-snug line-clamp-1">${escapeHtml(course.title)}</div>
                   <div class="mt-1.5 pt-1 border-t border-blue-100 flex items-center justify-between">
-                    <button onclick="openTrainerModalByName('${course.trainer}')" class="text-[10px] font-semibold text-[#2563eb] hover:underline text-left flex items-center gap-1 group">
+                    <button data-schedule-trainer="${escapeHtml(course.trainer)}" class="text-[10px] font-semibold text-[#2563eb] hover:underline text-left flex items-center gap-1 group">
                       <span class="material-symbols-outlined text-[13px] text-blue-600 group-hover:scale-110 transition">person</span>
-                      <span class="truncate max-w-[110px]">${course.trainer}</span>
+                      <span class="truncate max-w-[110px]">${escapeHtml(course.trainer)}</span>
                     </button>
                     ${course.isShared ? '<span class="text-[9px] bg-blue-200 text-blue-900 px-1 py-0.2 rounded font-bold" title="Multi-department shared trainer">Shared</span>' : ''}
                   </div>
@@ -1515,7 +1259,14 @@
                 </div>
               `;
             } else {
-              td.innerHTML = `<span class="text-[11px] text-slate-300 italic block text-center py-3 font-mono">- Open -</span>`;
+              td.innerHTML = `<span class="text-[11px] text-slate-300 italic block text-center py-3 font-mono">${currentUserRole === 'head' ? 'Click to assign' : '- Open -'}</span>`;
+            }
+            if (currentUserRole === 'head') {
+              td.classList.add('cursor-pointer');
+              td.addEventListener('click', event => {
+                if (event.target.closest('[data-schedule-trainer]')) return;
+                openScheduleModal(course, day, slot.time);
+              });
             }
             tr.appendChild(td);
           });
@@ -1523,96 +1274,14 @@
 
         tbody.appendChild(tr);
       });
+      tbody.querySelectorAll('[data-schedule-trainer]').forEach(button => {
+        button.addEventListener('click', event => {
+          event.stopPropagation();
+          openTrainerModalByName(button.dataset.scheduleTrainer);
+        });
+      });
     }
 
-    function getTimetableCard(diploma, sem, year, day, slotKey) {
-      // Mock class mappings for DCMT
-      if (diploma === 'DCMT') {
-        if (day === 'Monday' && slotKey === 'morning') {
-          return {
-            code: "CRP 121",
-            title: "Carpentry NC II",
-            type: "Lec/Lab",
-            trainer: "Alexander O. Dagohoy",
-            units: "4 Units (2L/2L)",
-            hours: "5.0 hrs/wk",
-            isShared: true
-          };
-        }
-        if (day === 'Tuesday' && slotKey === 'morning') {
-          return {
-            code: "CAD 122",
-            title: "Computer-Aided Drafting",
-            type: "Lab",
-            trainer: "Haitham Jenor L. Sedomar",
-            units: "2 Lab Units",
-            hours: "3.0 hrs/wk",
-            isShared: true
-          };
-        }
-        if (day === 'Wednesday' && slotKey === 'midday') {
-          return {
-            code: "PLM 211",
-            title: "Plumbing NC II",
-            type: "Lec/Lab",
-            trainer: "Haitham Jenor L. Sedomar",
-            units: "3 Units (1L/2L)",
-            hours: "4.0 hrs/wk",
-            isShared: true
-          };
-        }
-        if (day === 'Thursday' && slotKey === 'afternoon1') {
-          return {
-            code: "MAS 212",
-            title: "Masonry NC II",
-            type: "Lec/Lab",
-            trainer: "Alexander O. Dagohoy",
-            units: "3 Units (1L/2L)",
-            hours: "4.0 hrs/wk",
-            isShared: true
-          };
-        }
-      } else if (diploma === 'DEMT') {
-        if (day === 'Monday' && slotKey === 'morning') {
-          return {
-            code: "EIM 211",
-            title: "Electrical Installation & Maintenance NCII",
-            type: "Lec/Lab",
-            trainer: "Belinda C. Dacoco",
-            units: "4 Units (2L/2L)",
-            hours: "5.0 hrs/wk",
-            isShared: true
-          };
-        }
-        if (day === 'Wednesday' && slotKey === 'morning') {
-          return {
-            code: "MCT 212",
-            title: "Mechatronics Servicing NCIII",
-            type: "Lec/Lab",
-            trainer: "Albert B. Bravo Jr.",
-            units: "3 Units (1L/2L)",
-            hours: "4.0 hrs/wk",
-            isShared: false
-          };
-        }
-      } else {
-        // DCET default
-        if (day === 'Tuesday' && slotKey === 'midday') {
-          return {
-            code: "CAD 122",
-            title: "Computer-Aided Drafting",
-            type: "Lab",
-            trainer: "Haitham Jenor L. Sedomar",
-            units: "2 Lab Units",
-            hours: "3.0 hrs/wk",
-            isShared: true
-          };
-        }
-      }
-      return null;
-    }
-
-    // --------------------------------------------------------
     // 4. FACULTY DATABASE LOGIC
     // --------------------------------------------------------
     function getVisibleFaculty() {
@@ -1631,8 +1300,8 @@
       return list.filter(f =>
         f.lastName.toLowerCase().includes(query) ||
         f.firstName.toLowerCase().includes(query) ||
-        f.quals.toLowerCase().includes(query) ||
-        f.email.toLowerCase().includes(query)
+        (f.quals || '').toLowerCase().includes(query) ||
+        (f.email || '').toLowerCase().includes(query)
       );
     }
 
@@ -1650,12 +1319,12 @@
         tr.className = "hover:bg-[#eff6ff] transition border-b border-slate-200";
 
         tr.innerHTML = `
-          <td class="py-2.5 px-3 font-bold text-slate-800 border-r border-slate-200">${f.lastName}</td>
-          <td class="py-2.5 px-3 text-slate-700 border-r border-slate-200">${f.firstName}</td>
-          <td class="py-2.5 px-2 text-center text-slate-500 font-mono border-r border-slate-200">${f.mi}</td>
+          <td class="py-2.5 px-3 font-bold text-slate-800 border-r border-slate-200">${escapeHtml(f.lastName)}</td>
+          <td class="py-2.5 px-3 text-slate-700 border-r border-slate-200">${escapeHtml(f.firstName)}</td>
+          <td class="py-2.5 px-2 text-center text-slate-500 font-mono border-r border-slate-200">${escapeHtml(f.mi || '')}</td>
           <td class="py-2.5 px-3 border-r border-slate-200">
             <div class="flex items-center gap-1.5 flex-wrap">
-              <span class="font-bold text-slate-900">${f.dept}</span>
+              <span class="font-bold text-slate-900">${escapeHtml(f.dept)}</span>
               ${f.isShared ? `
                 <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#bfdbfe] text-[#1e3a5f] border border-blue-300">
                   <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
@@ -1664,30 +1333,33 @@
               ` : ''}
               ${f.leadTag ? `
                 <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
-                  ${f.leadTag}
+                  ${escapeHtml(f.leadTag)}
                 </span>
               ` : ''}
             </div>
           </td>
           <td class="py-2.5 px-3 border-r border-slate-200 font-medium">
-            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${f.role.includes('Specialist') ? 'bg-purple-100 text-purple-900' : 'bg-slate-100 text-slate-700'}">
-              ${f.role}
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${(f.role || '').includes('Specialist') ? 'bg-purple-100 text-purple-900' : 'bg-slate-100 text-slate-700'}">
+              ${escapeHtml(f.role)}
             </span>
           </td>
-          <td class="py-2.5 px-3 text-slate-600 border-r border-slate-200 max-w-xs truncate" title="${f.quals}">${f.quals}</td>
-          <td class="py-2.5 px-3 text-slate-700 border-r border-slate-200 font-mono text-[11px]">${f.mobile}</td>
-          <td class="py-2.5 px-3 text-[#2563eb] border-r border-slate-200 font-mono text-[11px] hover:underline cursor-pointer">${f.email}</td>
+          <td class="py-2.5 px-3 text-slate-600 border-r border-slate-200 max-w-xs truncate" title="${escapeHtml(f.quals || '')}">${escapeHtml(f.quals || '')}</td>
+          <td class="py-2.5 px-3 text-slate-700 border-r border-slate-200 font-mono text-[11px]">${escapeHtml(f.mobile || 'Sign in to view')}</td>
+          <td class="py-2.5 px-3 text-[#2563eb] border-r border-slate-200 font-mono text-[11px]">${escapeHtml(f.email || 'Sign in to view')}</td>
           <td class="py-2.5 px-3 text-center">
             <div class="flex items-center justify-center gap-1">
               ${currentUserRole === 'head' ? `
-                <button onclick="openFacultyModal('add')" class="px-2 py-1 rounded bg-slate-100 text-slate-700 hover:bg-slate-200 text-[10px] font-bold transition">
+                <button data-faculty-add class="px-2 py-1 rounded bg-slate-100 text-slate-700 hover:bg-slate-200 text-[10px] font-bold transition">
                   Add
                 </button>
-                <button onclick="openFacultyModal('edit', ${f.id})" class="px-2 py-1 rounded bg-slate-100 text-slate-700 hover:bg-slate-200 text-[10px] font-bold transition">
+                <button data-faculty-edit="${escapeHtml(f.id)}" class="px-2 py-1 rounded bg-slate-100 text-slate-700 hover:bg-slate-200 text-[10px] font-bold transition">
                   Edit
                 </button>
+                <button data-faculty-delete="${escapeHtml(f.id)}" class="px-2 py-1 rounded bg-rose-50 text-rose-700 hover:bg-rose-100 text-[10px] font-bold transition">
+                  Remove
+                </button>
               ` : ''}
-              <button onclick="openTrainerModalById(${f.id})" class="px-2.5 py-1 rounded bg-blue-100 text-[#1d4ed8] hover:bg-blue-200 text-[10px] font-extrabold transition shadow-2xs">
+              <button data-faculty-load="${escapeHtml(f.id)}" class="px-2.5 py-1 rounded bg-blue-100 text-[#1d4ed8] hover:bg-blue-200 text-[10px] font-extrabold transition shadow-2xs">
                 View Load
               </button>
             </div>
@@ -1695,6 +1367,18 @@
         `;
         tbody.appendChild(tr);
       });
+      tbody.querySelectorAll('[data-faculty-add]').forEach(button =>
+        button.addEventListener('click', () => openFacultyModal('add'))
+      );
+      tbody.querySelectorAll('[data-faculty-edit]').forEach(button =>
+        button.addEventListener('click', () => openFacultyModal('edit', button.dataset.facultyEdit))
+      );
+      tbody.querySelectorAll('[data-faculty-delete]').forEach(button =>
+        button.addEventListener('click', () => removeFaculty(button.dataset.facultyDelete))
+      );
+      tbody.querySelectorAll('[data-faculty-load]').forEach(button =>
+        button.addEventListener('click', () => openTrainerModalById(button.dataset.facultyLoad))
+      );
     }
 
     function handleFacultySearch() {
@@ -1887,23 +1571,23 @@
         `${f.firstName} ${f.lastName}`.toLowerCase().includes(name.toLowerCase()) ||
         name.toLowerCase().includes(f.lastName.toLowerCase())
       );
-      if (match) {
-        openTrainerModalById(match.id);
-      } else {
-        openTrainerModalById(1);
-      }
+      if (match) openTrainerModalById(match.id);
     }
 
     function openTrainerModalById(id) {
-      const trainer = facultyDatabase.find(f => f.id === id) || facultyDatabase[0];
+      const trainer = facultyDatabase.find(f => String(f.id) === String(id));
+      if (!trainer) {
+        showToast('The selected faculty member is not available.');
+        return;
+      }
       selectedTrainerForModal = trainer;
 
       const modal = document.getElementById('trainerModal');
       document.getElementById('modalTrainerFullName').innerText = `${trainer.firstName} ${trainer.mi} ${trainer.lastName}`;
       document.getElementById('modalTrainerAvatar').innerText = `${trainer.firstName[0]}${trainer.lastName[0]}`;
       document.getElementById('modalTrainerDepartment').innerText = `${trainer.dept} ${trainer.isShared ? '(Shared: ' + trainer.sharedGroup + ')' : ''}`;
-      document.getElementById('modalTrainerPhone').innerText = trainer.mobile;
-      document.getElementById('modalTrainerEmail').innerText = trainer.email;
+      document.getElementById('modalTrainerPhone').innerText = trainer.mobile || 'Sign in to view';
+      document.getElementById('modalTrainerEmail').innerText = trainer.email || 'Sign in to view';
 
       const courseContainer = document.getElementById('modalTrainerCourseList');
       courseContainer.innerHTML = '';
@@ -1911,7 +1595,7 @@
       let totalCalculatedHours = 0;
       let totalUnits = 0;
 
-      trainer.courses.forEach(c => {
+      (trainer.courses || []).forEach(c => {
         // Calculation Formula: Lecture x 1.0 hr + Lab x 1.5 hrs
         const hours = (c.lec * 1.0) + (c.lab * 1.5);
         totalCalculatedHours += hours;
@@ -1985,7 +1669,7 @@
         document.getElementById('facFirstName').value = "";
         document.getElementById('facMI').value = "";
         document.getElementById('facQuals').value = "";
-        document.getElementById('facMobile').value = "9";
+        document.getElementById('facMobile').value = "+63";
         document.getElementById('facEmail').value = "";
       }
       modal.classList.remove('hidden');
@@ -1995,7 +1679,7 @@
       document.getElementById('facultyFormModal').classList.add('hidden');
     }
 
-    function handleSaveFaculty(e) {
+    async function handleSaveFaculty(e) {
       e.preventDefault();
       if (currentUserRole !== 'head') {
         showToast("Only the Head Trainer can add or edit faculty records.");
@@ -2011,45 +1695,47 @@
       const mobile = document.getElementById('facMobile').value;
       const email = document.getElementById('facEmail').value;
 
-      const isShared = deptValue.includes('/');
-      const baseDept = isShared ? deptValue.split('/')[0].trim() : deptValue;
-
-      if (currentEditFacultyId) {
-        const item = facultyDatabase.find(f => f.id === currentEditFacultyId);
-        if (item) {
-          item.lastName = lastName;
-          item.firstName = firstName;
-          item.mi = mi;
-          item.role = role;
-          item.dept = baseDept;
-          item.isShared = isShared;
-          item.sharedGroup = deptValue;
-          item.quals = quals;
-          item.mobile = mobile;
-          item.email = email;
-        }
-        showToast(`Faculty record for ${firstName} ${lastName} updated.`);
-      } else {
-        const newId = facultyDatabase.length + 1;
-        facultyDatabase.push({
-          id: newId,
-          lastName,
-          firstName,
-          mi,
-          dept: baseDept,
-          role,
-          quals,
-          mobile,
-          email,
-          isShared,
-          sharedGroup: deptValue,
-          courses: [{ code: "GEN 101", name: "Institutional Orientation", lec: 1, lab: 0, total: 1 }]
+      const record = {
+        id: currentEditFacultyId || crypto.randomUUID(),
+        lastName,
+        firstName,
+        mi,
+        role,
+        qualifications: quals,
+        mobileNumber: mobile,
+        email,
+        department: deptValue
+      };
+      try {
+        const path = `/api/records/Faculty`;
+        await apiRequest(currentEditFacultyId ? `${path}/${encodeURIComponent(currentEditFacultyId)}` : path, {
+          method: currentEditFacultyId ? 'PUT' : 'POST',
+          body: JSON.stringify(record)
         });
-        showToast(`New faculty ${firstName} ${lastName} added and synced with Google Sheet DB.`);
+        closeFacultyFormModal();
+        await refreshDashboardData();
+        showToast(currentEditFacultyId
+          ? `Faculty record for ${firstName} ${lastName} updated.`
+          : `New faculty ${firstName} ${lastName} added.`);
+      } catch (error) {
+        showToast(error.message);
       }
+    }
 
-      closeFacultyFormModal();
-      renderFacultyTable(facultyDatabase);
+    async function removeFaculty(id) {
+      if (currentUserRole !== 'head') {
+        showToast('Only the Head Trainer can remove faculty records.');
+        return;
+      }
+      const faculty = facultyDatabase.find(person => String(person.id) === String(id));
+      if (!faculty || !window.confirm(`Remove ${faculty.firstName} ${faculty.lastName} from the faculty database?`)) return;
+      try {
+        await apiRequest(`/api/records/Faculty/${encodeURIComponent(id)}`, { method: 'DELETE' });
+        await refreshDashboardData();
+        showToast(`${faculty.firstName} ${faculty.lastName} removed from the faculty database.`);
+      } catch (error) {
+        showToast(error.message);
+      }
     }
 
     // --------------------------------------------------------
@@ -2151,7 +1837,7 @@
       openAddCurriculumModal('edit-course', section.diploma);
     }
 
-    function handleSaveCurriculum(e) {
+    async function handleSaveCurriculum(e) {
       e.preventDefault();
       if (currentUserRole !== 'head') {
         showToast("Only the Head Trainer can add courses or diplomas.");
@@ -2176,13 +1862,20 @@
           return;
         }
 
-        curriculumDiplomas.push({ code, title });
-        refreshCurriculumDiplomaOptions();
-        document.getElementById('curriculumDiplomaSelect').value = code;
-        document.getElementById('curricTargetDiploma').value = code;
-        closeAddCurriculumModal();
-        renderCurriculumSections();
-        showToast(`${code} - ${title} added to the diploma registry.`);
+        try {
+          await apiRequest('/api/records/Diplomas', {
+            method: 'POST',
+            body: JSON.stringify({ id: crypto.randomUUID(), code, name: title })
+          });
+          await refreshDashboardData();
+          document.getElementById('curriculumDiplomaSelect').value = code;
+          document.getElementById('curricTargetDiploma').value = code;
+          closeAddCurriculumModal();
+          renderCurriculumSections();
+          showToast(`${code} - ${title} added to the diploma registry.`);
+        } catch (error) {
+          showToast(error.message);
+        }
         return;
       }
 
@@ -2195,17 +1888,33 @@
           return;
         }
 
-        course.code = document.getElementById('curricCourseCode').value.trim();
-        course.name = document.getElementById('curricCourseName').value.trim();
-        course.lec = parseInt(document.getElementById('curricLecUnits').value, 10);
-        course.lab = parseInt(document.getElementById('curricLabUnits').value, 10);
-        course.total = course.lec + course.lab;
-        course.prereq = document.getElementById('curricPrereq').value.trim();
-        course.qual = document.getElementById('curricQual').value.trim();
-
-        closeAddCurriculumModal();
-        renderCurriculumSections();
-        showToast(`Course ${course.code} updated.`);
+        const lec = parseInt(document.getElementById('curricLecUnits').value, 10);
+        const lab = parseInt(document.getElementById('curricLabUnits').value, 10);
+        const record = {
+          id: course.id,
+          diplomaCode: section.diploma,
+          diplomaName: curriculumDiplomas.find(item => item.code === section.diploma)?.title || section.diploma,
+          diplomaYear: Number(section.yearLevel),
+          semester: Number(section.semester),
+          code: document.getElementById('curricCourseCode').value.trim(),
+          name: document.getElementById('curricCourseName').value.trim(),
+          lecUnits: lec,
+          labUnits: lab,
+          totalUnits: lec + lab,
+          prerequisites: document.getElementById('curricPrereq').value.trim(),
+          qualification: document.getElementById('curricQual').value.trim(),
+        };
+        try {
+          await apiRequest(`/api/records/Courses/${encodeURIComponent(course.id)}`, {
+            method: 'PUT',
+            body: JSON.stringify(record)
+          });
+          closeAddCurriculumModal();
+          await refreshDashboardData();
+          showToast(`Course ${record.code} updated.`);
+        } catch (error) {
+          showToast(error.message);
+        }
         return;
       }
 
@@ -2219,45 +1928,52 @@
       const prereq = document.getElementById('curricPrereq').value;
       const qual = document.getElementById('curricQual').value;
 
-      // Find or create target section
-      let targetSec = curriculumSections.find(s => s.diploma === diploma && s.yearLevel === year && s.semester === sem);
-      if (!targetSec) {
-        const diplomaInfo = curriculumDiplomas.find(item => item.code === diploma);
-        targetSec = {
-          id: `${diploma.toLowerCase()}-y${year}-s${sem}`,
-          diploma: diploma,
-          diplomaTitle: `${diploma} - ${diplomaInfo.title}`,
-          yearLevel: year,
-          semester: sem,
-          yearRevision: `Year ${year}, Semester ${sem} Matrix`,
-          courses: []
-        };
-        curriculumSections.push(targetSec);
+      const diplomaInfo = curriculumDiplomas.find(item => item.code === diploma);
+      const newCourse = {
+        id: crypto.randomUUID(),
+        diplomaCode: diploma,
+        diplomaName: diplomaInfo?.title || diploma,
+        diplomaYear: Number(year),
+        semester: Number(sem),
+        code: code.trim(),
+        name: name.trim(),
+        lecUnits: lec,
+        labUnits: lab,
+        totalUnits: lec + lab,
+        prerequisites: prereq.trim(),
+        qualification: qual.trim(),
+      };
+      try {
+        await apiRequest('/api/records/Courses', {
+          method: 'POST',
+          body: JSON.stringify(newCourse)
+        });
+        closeAddCurriculumModal();
+        await refreshDashboardData();
+        showToast(`Course ${newCourse.code} added to ${diploma} curriculum registry.`);
+      } catch (error) {
+        showToast(error.message);
       }
-
-      targetSec.courses.push({
-        code,
-        name,
-        lec,
-        lab,
-        total: (lec + lab),
-        prereq,
-        qual,
-        trainerName: "Alexander O. Dagohoy"
-      });
-
-      closeAddCurriculumModal();
-      renderCurriculumSections();
-      showToast(`Course ${code} added to ${diploma} curriculum registry.`);
     }
 
     // --------------------------------------------------------
     // INITIALIZATION
     // --------------------------------------------------------
-    window.addEventListener('DOMContentLoaded', () => {
-      renderTimetable();
-      renderFacultyTable(facultyDatabase);
-      renderCurriculumSections();
+    window.addEventListener('DOMContentLoaded', async () => {
+      facultyDatabase = [];
+      curriculumDiplomas = [];
+      curriculumSections = [];
+      scheduleEntries = [];
+      setAuthenticatedUser(null);
+      switchView('schedule');
+      document.body.removeAttribute('data-loading');
+      try {
+        await refreshDashboardData();
+      } catch (error) {
+        const status = document.getElementById('googleConnectionStatus');
+        status.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span>Unavailable`;
+        showToast(error.message);
+      }
     });
   </script>
 
