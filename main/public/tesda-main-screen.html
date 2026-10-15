@@ -1033,7 +1033,7 @@
 </button>
 </div>
 <form class="p-4 space-y-3 text-xs" onsubmit="handleSaveCurriculum(event)">
-<div class="grid grid-cols-2 gap-2 rounded-lg bg-slate-100 p-1">
+<div class="grid grid-cols-2 gap-2 rounded-lg bg-slate-100 p-1" id="curriculumFormModeSwitch">
 <button class="rounded-md bg-white px-3 py-2 font-bold text-[#1d4ed8] shadow-xs transition" id="curriculumCourseModeButton" type="button" aria-pressed="true" onclick="setCurriculumFormMode('course')">Add a Course</button>
 <button class="rounded-md px-3 py-2 font-semibold text-slate-600 transition hover:bg-white/70" id="curriculumDiplomaModeButton" type="button" aria-pressed="false" onclick="setCurriculumFormMode('diploma')">Add a Diploma</button>
 </div>
@@ -2091,6 +2091,7 @@
       curriculumFormMode = mode;
       const isDiplomaMode = mode === 'diploma';
       const isEditingCourse = mode === 'edit-course';
+      document.getElementById('curriculumFormModeSwitch').classList.toggle('hidden', isEditingCourse);
       const courseFields = document.getElementById('courseFormFields');
       const diplomaFields = document.getElementById('diplomaFormFields');
       const courseButton = document.getElementById('curriculumCourseModeButton');
