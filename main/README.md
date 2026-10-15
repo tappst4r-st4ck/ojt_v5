@@ -17,6 +17,8 @@ This is a Next.js App Router application with a Google Sheets-backed API. The da
 
 Do not commit `.env.local`, service-account credentials, OAuth client secrets, or setup tokens. The API uses an HTTP-only, same-site session cookie. Browser code never receives the service-account credentials.
 
+For local UI testing without repeated sign-in, set `ENABLE_ROLE_PREVIEW=true` in `.env.local` and restart the server. The login screen then offers Head Trainer and Trainee previews. These previews only change the visible interface; all API writes still require a real Google session and Head Trainer role. Remove the setting or set it to `false` when role previews are no longer needed. Do not enable it on a public deployment.
+
 ## Initialize the spreadsheet
 
 The setup endpoint creates these worksheets and writes their column headers:
@@ -48,4 +50,3 @@ Deploy the `main` folder as the Vercel project root and configure the same serve
 The application and API must be deployed together. GitHub Pages cannot host the Next.js API routes or protect the Google credentials. Deployment and live Google Sheets verification require the Google Cloud project, spreadsheet, and Vercel environment to be configured by the project owner.
 
 Before deployment, revoke or rotate any API key that was previously committed to Git history. Do not reuse the exposed key.
-   
