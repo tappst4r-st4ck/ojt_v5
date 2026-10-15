@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rtk ls *)",
+      "Bash(pdftotext \"d:\\\\User Files\\\\Downloads\\\\stitch_tesda_ojt_project\\\\stitch_tesda_ojt_project\\\\tesda-scheduling-draft_11zon.pdf\" -)",
+      "Bash(rtk read *)",
+      "Bash(git clone *)",
+      "Bash(rtk pip *)",
+      "Bash(graphify install *)",
+      "Bash(graphifyy --help)",
+      "Bash(python -c \"import pandas as pd; xl = pd.ExcelFile\\('D:/User Files/Desktop/School/3rd Term/Practicium \\(OJT\\)/OJT Project/Data/Main Context/TESDA-FACULTY-LOADING.xlsx'\\); print\\('Sheets:', xl.sheet_names\\)\")",
+      "Bash(mkdir -p /tmp/excel_inspect)",
+      "Bash(unzip -l \"D:/User Files/Desktop/School/3rd Term/Practicium \\(OJT\\)/OJT Project/Data/Main Context/TESDA-FACULTY-LOADING.xlsx\")",
+      "Bash(unzip -p \"D:/User Files/Desktop/School/3rd Term/Practicium \\(OJT\\)/OJT Project/Data/Main Context/TESDA-FACULTY-LOADING.xlsx\" xl/workbook.xml)",
+      "Bash(unzip -p \"D:/User Files/Desktop/School/3rd Term/Practicium \\(OJT\\)/OJT Project/Data/Main Context/TESDA-FACULTY-LOADING.xlsx\" xl/sharedStrings.xml)",
+      "Bash(npm run *)",
+      "Bash(rtk npm *)",
+      "Bash(kill -9 3132)"
+    ]
+  },
+  "anthropic_base_url": "http://localhost:20128/v1",
+  "anthropic_api_token": "sk-8a8c041b1ee33ab3-d2c010-87db4013",
+  "claude_enable_gateway_model_discovery": true
+}

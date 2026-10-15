@@ -1,0 +1,2227 @@
+<!DOCTYPE html><html class="h-full" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>TESDA Regional Operations Hub - PoC Portal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            tesdaNavyTop: '#1e3a5f',
+            tesdaNavyBottom: '#152d4a',
+            tesdaPrimary: '#2563eb',
+            tesdaHeader: '#1d4ed8',
+            tesdaSubtext: '#3b6fa0',
+            tesdaAppBg: '#f0f4f8',
+            tesdaCardBg: '#eff6ff',
+            tesdaBlocked: '#bfdbfe',
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f0f4f8;
+      color: #1e293b;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+    .custom-scroll::-webkit-scrollbar {
+      height: 6px;
+      width: 6px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #93c5fd;
+      border-radius: 4px;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+      font-size: 18px;
+      line-height: 1;
+    }
+  </style>
+</head>
+<body class="h-full flex overflow-hidden bg-[#f0f4f8] text-slate-800 antialiased select-none">
+<!-- ======================================================== -->
+<!-- 1. PERSISTENT GLOBAL VERTICAL SIDEBAR                    -->
+<!-- ======================================================== -->
+<aside class="w-64 bg-gradient-to-b from-[#1e3a5f] to-[#152d4a] text-white flex flex-col flex-shrink-0 border-r border-[#152d4a]/80 shadow-xl z-30">
+<!-- Branding Header -->
+<div class="p-4 border-b border-blue-400/20">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-800 p-2 flex items-center justify-center border border-blue-300/30 shadow-inner flex-shrink-0">
+<span class="material-symbols-outlined text-white text-xl">account_balance</span>
+</div>
+<div class="overflow-hidden">
+<div class="flex items-center gap-1.5">
+<span class="text-[10px] font-extrabold tracking-wider uppercase text-blue-300">TESDA REGION X</span>
+<span class="bg-blue-400/20 text-blue-200 text-[9px] px-1.5 py-0.2 rounded font-mono border border-blue-300/30">PoC</span>
+</div>
+<h1 class="text-xs font-bold text-white tracking-tight leading-tight truncate mt-0.5">TESDA Regional Operations Hub</h1>
+</div>
+</div>
+</div>
+<!-- Active User & Role Profile Card -->
+<div class="mx-3 my-3 p-3 rounded-xl bg-white/5 border border-white/10 backdrop-blur-xs">
+<div class="flex items-center gap-2.5">
+<div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-xs font-bold text-white shadow-xs" id="sidebarUserAvatar">
+          ED
+        </div>
+<div class="min-w-0 flex-1">
+<p class="text-xs font-bold text-white truncate" id="sidebarUserName">Engr. Ramon Morales</p>
+<span class="inline-block mt-0.5 text-[9px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 px-1.5 py-0.2 rounded" id="sidebarUserRoleBadge">
+            Head Trainer Admin
+          </span>
+</div>
+</div>
+<div class="mt-2.5 pt-2 border-t border-white/10 flex items-center justify-between text-[10px]"><div class="flex items-center justify-between w-full text-[10px]"><div class="flex items-center gap-1 text-blue-300"><span class="">Mode:</span><button class="text-white hover:text-blue-200 underline font-semibold transition" onclick="toggleUserRoleSimulation()" title="Switch Simulation Role">Switch Profile</button></div><button class="inline-flex items-center gap-1 text-blue-200 hover:text-white font-semibold transition" onclick="switchView('login')" title="Sign out to Login"><span class="material-symbols-outlined text-[13px]">logout</span><span class="">Sign Out</span></button></div></div>
+</div>
+<!-- Navigation Menu Items -->
+<nav class="flex-1 px-3 py-2 space-y-1 overflow-y-auto custom-scroll text-xs">
+<div class="px-2 pb-1 text-[10px] font-bold text-blue-300/70 uppercase tracking-wider">Navigation Tabs</div>
+
+<button class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg font-bold text-white bg-[#2563eb] shadow-sm transition text-left" id="sidebar-nav-schedule" onclick="switchView('schedule')">
+<span class="material-symbols-outlined text-white">calendar_month</span>
+<span class="">Master Schedule</span>
+</button>
+<button class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg font-medium text-blue-200 hover:text-white hover:bg-white/10 transition text-left" id="sidebar-nav-faculty" onclick="switchView('faculty')">
+<span class="material-symbols-outlined text-blue-300">group</span>
+<span class="">Faculty Database</span>
+</button>
+<button class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg font-medium text-blue-200 hover:text-white hover:bg-white/10 transition text-left" id="sidebar-nav-curriculum" onclick="switchView('curriculum')">
+<span class="material-symbols-outlined text-blue-300">menu_book</span>
+<span class="">Curriculum Hub</span>
+</button>
+</nav>
+<!-- Bottom System Status in Sidebar -->
+<div class="p-3 bg-[#152d4a]/90 border-t border-blue-400/20 text-[10px] text-blue-200/80 space-y-1.5">
+<div class="flex items-center justify-between">
+<span class="text-blue-300">Google Sheet DB:</span>
+<span class="inline-flex items-center gap-1 text-emerald-300 font-bold">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          Connected
+        </span>
+</div>
+<div class="flex items-center justify-between text-slate-300">
+<span class="">Standard Sync:</span>
+<span class="font-mono text-white">v3.4 PoC live</span>
+</div>
+</div>
+</aside>
+<!-- ======================================================== -->
+<!-- MAIN APPLICATION SHELL                                   -->
+<!-- ======================================================== -->
+<div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+<!-- TOP HEADER BAR -->
+<header class="bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between shadow-xs z-20 flex-shrink-0">
+<div class="flex items-center gap-3">
+<div>
+<h2 class="text-base font-bold text-[#1d4ed8] leading-tight" id="topHeaderTitle">Master Schedule &amp; Timetable Matrix</h2>
+<p class="text-xs text-[#3b6fa0]" id="topHeaderSubtitle">Fixed matrix curriculum scheduling with automatic faculty load mapping.</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<!-- DB Status Pill -->
+<div class="hidden sm:inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-[11px] font-semibold text-emerald-700">
+<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+<span class="">Google Sheet DB Sync: Connected</span>
+</div>
+<!-- Quick Action Trigger Buttons -->
+<div class="flex items-center gap-2">
+<button class="bg-[#2563eb] hover:bg-blue-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-xs transition" id="quickActionButton" onclick="handleQuickAddAction()">
+<span class="material-symbols-outlined text-sm">add_circle</span>
+<span id="quickActionButtonText" class="">New Timetable Entry</span>
+</button>
+<button class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-slate-300 flex items-center gap-1 transition" onclick="switchView('login')" title="Authentication Switch"><span class="material-symbols-outlined text-sm">logout</span><span class="hidden md:inline">Sign Out</span></button>
+</div>
+</div>
+</header>
+<!-- CONTENT WRAPPER -->
+<main class="flex-1 overflow-y-auto p-4 md:p-6 custom-scroll">
+<!-- ======================================================== -->
+<!-- VIEW 1: LOGIN GATEWAY                                    -->
+<!-- ======================================================== -->
+<section class="max-w-xl mx-auto py-8 animate-fade-in hidden" id="view-login">
+<div class="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+<!-- Banner -->
+<div class="bg-gradient-to-r from-[#1e3a5f] to-[#152d4a] p-6 text-center text-white relative">
+<div class="w-14 h-14 mx-auto mb-3 rounded-2xl bg-white/10 p-2 backdrop-blur border border-blue-300/30 shadow-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-3xl text-blue-300">verified_user</span>
+</div>
+<span class="text-[10px] uppercase tracking-widest text-blue-300 font-bold">Technical Education and Skills Development Authority</span>
+<h2 class="text-xl font-bold tracking-tight text-white mt-1">Institutional Operations Portal</h2>
+<p class="text-xs text-blue-200/80 mt-1 max-w-md mx-auto">
+              Centralized course scheduling, faculty loading, and diploma curriculum registry gateway.
+            </p>
+</div>
+<!-- Body -->
+<div class="p-6 space-y-5">
+<!-- Informational Banner -->
+<div class="bg-[#eff6ff] border border-blue-200 rounded-xl p-4 text-xs text-[#1e3a5f] flex items-start gap-3">
+<span class="material-symbols-outlined text-[#2563eb] text-xl flex-shrink-0">info</span>
+<div>
+<p class="font-bold text-[#1d4ed8]">Role-based Access Verification</p>
+<p class="text-[#3b6fa0] mt-1 leading-relaxed">
+                  Role-based access verification against Google Sheet database. Head Trainers receive full schedule matrix editing &amp; faculty loading controls. Trainees receive read-only schedule visibility.
+                </p>
+</div>
+</div>
+<!-- Role Selector Toggle / Simulation -->
+<div>
+<label class="block text-xs font-bold text-[#1d4ed8] uppercase tracking-wider mb-2">Select Simulation Authentication Profile</label>
+<div class="space-y-2.5">
+<label class="flex items-center justify-between p-3.5 rounded-xl border-2 border-blue-600 bg-blue-50/70 cursor-pointer transition" id="authCardHead">
+<div class="flex items-center gap-3">
+<input checked="" class="text-blue-600 focus:ring-blue-500 w-4 h-4" name="authSelectRole" onchange="setAuthRole('head')" type="radio" value="head">
+<div>
+<div class="text-sm font-bold text-slate-800">Engr. Ramon Morales</div>
+<div class="text-xs text-[#3b6fa0]">Head Trainer (Administrative Access) - r.morales@tesda.gov.ph</div>
+</div>
+</div>
+<span class="text-[10px] font-bold bg-[#1e3a5f] text-white px-2 py-0.5 rounded">FULL ADMIN</span>
+</label>
+<label class="flex items-center justify-between p-3.5 rounded-xl border border-slate-200 hover:border-blue-300 hover:bg-slate-50 cursor-pointer transition" id="authCardTrainee">
+<div class="flex items-center gap-3">
+<input class="text-blue-600 focus:ring-blue-500 w-4 h-4" name="authSelectRole" onchange="setAuthRole('trainee')" type="radio" value="trainee">
+<div>
+<div class="text-sm font-bold text-slate-800">Maria Santos</div>
+<div class="text-xs text-[#3b6fa0]">Trainee / Faculty (Read-only Timetable Access) - m.santos@tesda.gov.ph</div>
+</div>
+</div>
+<span class="text-[10px] font-bold bg-amber-600 text-white px-2 py-0.5 rounded">READ-ONLY</span>
+</label>
+</div>
+</div>
+<!-- Google Sign in Simulation Button -->
+<button class="w-full flex items-center justify-center gap-3 bg-white border border-slate-300 hover:border-blue-500 hover:bg-blue-50/40 text-slate-700 font-semibold py-3 px-4 rounded-xl shadow-xs hover:shadow transition" onclick="executeGoogleLogin()">
+<svg class="w-5 h-5" viewBox="0 0 24 24">
+<path d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z" fill="#4285F4"></path>
+<path d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.24v3.15C3.26 21.36 7.33 24 12 24z" fill="#34A853"></path>
+<path d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.24C.45 8.15 0 9.92 0 12s.45 3.85 1.24 5.42l4.04-3.15z" fill="#FBBC05"></path>
+<path d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.24 6.58l4.04 3.15c.95-2.83 3.6-4.98 6.72-4.98z" fill="#EA4335"></path>
+</svg>
+<span class="text-xs">Sign in with Google Workspace</span>
+</button>
+<!-- Quick Direct Access Buttons -->
+<div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100">
+<button class="px-3 py-2 text-xs font-semibold rounded-lg bg-[#2563eb] hover:bg-blue-700 text-white transition text-center shadow-xs" onclick="loginAs('head')">
+                Quick Login (Head Trainer)
+              </button>
+<button class="px-3 py-2 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 transition text-center" onclick="loginAs('trainee')">
+                Quick Login (Trainee Read-Only)
+              </button>
+</div>
+<p class="text-[11px] text-center text-slate-400">
+              Government operational system protected by administrative credentials. All login transactions verified.
+            </p>
+</div>
+</div>
+</section>
+<!-- ======================================================== -->
+<!-- VIEW 2: MASTER SCHEDULE (TIMETABLE)                      -->
+<!-- ======================================================== -->
+<section class="space-y-4 animate-fade-in" id="view-schedule">
+<!-- Filter and Rule Controls -->
+<div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+<div>
+<div class="flex items-center gap-2">
+<h3 class="text-base font-bold text-[#1d4ed8]">Master Schedule Matrix</h3>
+<span class="bg-blue-100 text-[#1d4ed8] text-[11px] font-bold px-2 py-0.5 rounded">Fixed Matrix Protocol</span>
+</div>
+<p class="text-xs text-[#3b6fa0] mt-0.5">
+                Curriculum schedule generated automatically. Faculty allocations assigned post-generation without disrupting base matrices.
+              </p>
+</div>
+<div class="flex items-center gap-2">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-[#bfdbfe] border border-blue-300 text-blue-900 text-xs font-bold shadow-xs">
+<span class="material-symbols-outlined text-sm text-blue-700">lock</span>
+<span class="">8:00 AM - 10:00 AM Strict Staff Reserved</span>
+</span>
+</div>
+</div>
+<!-- Filters Grid -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-3 pt-3">
+<div>
+<label class="block text-[11px] font-bold text-[#3b6fa0] uppercase tracking-wider mb-1">Diploma Name</label>
+<select class="w-full text-xs bg-slate-50 border border-slate-300 rounded-lg p-2 font-semibold text-slate-700 focus:border-blue-500 focus:bg-white transition" id="schedDiplomaFilter" onchange="renderTimetable()">
+<option value="DCMT">DCMT - 3-Year Construction Management</option>
+<option value="DEMT">DEMT - Electro-Mechatronics</option>
+<option value="DCET">DCET - Computer Engineering Tech</option>
+</select>
+</div>
+<div>
+<label class="block text-[11px] font-bold text-[#3b6fa0] uppercase tracking-wider mb-1">Semester</label>
+<select class="w-full text-xs bg-slate-50 border border-slate-300 rounded-lg p-2 font-semibold text-slate-700 focus:border-blue-500 focus:bg-white transition" id="schedSemFilter" onchange="renderTimetable()">
+<option value="1">1st Semester</option>
+<option value="2">2nd Semester</option>
+</select>
+</div>
+<div>
+<label class="block text-[11px] font-bold text-[#3b6fa0] uppercase tracking-wider mb-1">Year Level</label>
+<select class="w-full text-xs bg-slate-50 border border-slate-300 rounded-lg p-2 font-semibold text-slate-700 focus:border-blue-500 focus:bg-white transition" id="schedYearFilter" onchange="renderTimetable()">
+<option value="1">1st Year</option>
+<option value="2">2nd Year</option>
+<option value="3">3rd Year</option>
+</select>
+</div>
+<div>
+<label class="block text-[11px] font-bold text-[#3b6fa0] uppercase tracking-wider mb-1">School Year (SY)</label>
+<select class="w-full text-xs bg-slate-50 border border-slate-300 rounded-lg p-2 font-semibold text-slate-700 focus:border-blue-500 focus:bg-white transition">
+<option>SY 2024-2025</option>
+<option>SY 2025-2026</option>
+</select>
+</div>
+</div>
+</div>
+<!-- Conversion Legend Badges -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+<div class="bg-white p-3 rounded-xl border border-slate-200 flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-blue-100 text-[#1d4ed8] font-bold flex items-center justify-center text-xs">LEC</div>
+<div>
+<div class="text-xs font-bold text-slate-800">Lecture Hour Standard</div>
+<div class="text-[11px] text-[#3b6fa0]">1 Lecture Unit = 1.0 Contact Hour/Week</div>
+</div>
+</div>
+<div class="bg-white p-3 rounded-xl border border-slate-200 flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-700 font-bold flex items-center justify-center text-xs">LAB</div>
+<div>
+<div class="text-xs font-bold text-slate-800">Laboratory Hour Standard</div>
+<div class="text-[11px] text-[#3b6fa0]">1 Lab Unit = 1.5 Contact Hours/Week</div>
+</div>
+</div>
+<div class="bg-white p-3 rounded-xl border border-slate-200 flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-800 font-bold flex items-center justify-center text-xs">SHR</div>
+<div>
+<div class="text-xs font-bold text-slate-800">Shared Faculty Indicator</div>
+<div class="text-[11px] text-[#3b6fa0]">Multi-department trainers marked with blue tag</div>
+</div>
+</div>
+</div>
+<!-- Weekly Timetable Grid Table -->
+<div class="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+<div class="p-3 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-blue-600"></span>
+<span class="text-xs font-bold text-slate-800" id="currentTimetableHeading">DCMT - Year 1, Semester 1 Master Schedule Matrix</span>
+</div>
+<span class="text-[11px] text-slate-500 font-mono">Monday to Friday | 8:00 AM - 5:00 PM</span>
+</div>
+<div class="overflow-x-auto custom-scroll">
+<table class="w-full text-left text-xs border-collapse min-w-[850px]">
+<thead>
+<tr class="bg-slate-100/90 text-slate-700 border-b border-slate-200 font-bold uppercase text-[10px] tracking-wide">
+<th class="py-2.5 px-3 w-32 border-r border-slate-200 text-center">Time Slot</th>
+<th class="py-2.5 px-3 border-r border-slate-200 w-1/5 text-center">Monday</th>
+<th class="py-2.5 px-3 border-r border-slate-200 w-1/5 text-center">Tuesday</th>
+<th class="py-2.5 px-3 border-r border-slate-200 w-1/5 text-center">Wednesday</th>
+<th class="py-2.5 px-3 border-r border-slate-200 w-1/5 text-center">Thursday</th>
+<th class="py-2.5 px-3 w-1/5 text-center">Friday</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-200" id="timetableBody"><tr class="hover:bg-slate-50/70 transition border-b border-slate-200"><td class="py-3 px-3 font-mono text-[11px] font-bold text-slate-600 bg-slate-50 border-r border-slate-200 text-center">8:00 AM - 9:00 AM</td><td colspan="5" class="py-3 px-4 bg-[#bfdbfe] border-r border-slate-200 text-center shadow-inner">
+            <div class="flex items-center justify-center gap-2 text-blue-950 font-extrabold text-xs tracking-wide">
+              <span class="material-symbols-outlined text-blue-800 text-base">lock</span>
+              <span>BLOCKED - STAFF MEETING (MANDATORY ADMINISTRATIVE PERIOD - NO CLASSES PERMITTED)</span>
+              <span class="text-[10px] bg-blue-300 text-blue-900 px-2 py-0.5 rounded font-mono font-bold uppercase">RESERVED</span>
+            </div>
+          </td></tr><tr class="hover:bg-slate-50/70 transition border-b border-slate-200"><td class="py-3 px-3 font-mono text-[11px] font-bold text-slate-600 bg-slate-50 border-r border-slate-200 text-center">9:00 AM - 10:00 AM</td><td colspan="5" class="py-3 px-4 bg-[#bfdbfe] border-r border-slate-200 text-center shadow-inner">
+            <div class="flex items-center justify-center gap-2 text-blue-950 font-extrabold text-xs tracking-wide">
+              <span class="material-symbols-outlined text-blue-800 text-base">lock</span>
+              <span>BLOCKED - STAFF MEETING (MANDATORY ADMINISTRATIVE PERIOD - NO CLASSES PERMITTED)</span>
+              <span class="text-[10px] bg-blue-300 text-blue-900 px-2 py-0.5 rounded font-mono font-bold uppercase">RESERVED</span>
+            </div>
+          </td></tr><tr class="hover:bg-slate-50/70 transition border-b border-slate-200"><td class="py-3 px-3 font-mono text-[11px] font-bold text-slate-600 bg-slate-50 border-r border-slate-200 text-center">10:00 AM - 11:30 AM</td><td class="py-2 px-2 border-r border-slate-200 align-top text-xs">
+                <div class="bg-blue-50/90 border border-blue-200 rounded-lg p-2.5 shadow-2xs hover:shadow-xs transition hover:border-blue-400">
+                  <div class="flex items-center justify-between gap-1">
+                    <span class="font-extrabold text-[#1d4ed8] text-xs font-mono">CRP 121</span>
+                    <span class="text-[10px] px-1.5 py-0.2 bg-blue-100 text-blue-800 rounded font-bold">Lec/Lab</span>
+                  </div>
+                  <div class="text-[11px] font-bold text-slate-800 mt-1 leading-snug line-clamp-1">Carpentry NC II</div>
+                  <div class="mt-1.5 pt-1 border-t border-blue-100 flex items-center justify-between">
+                    <button onclick="openTrainerModalByName('Alexander O. Dagohoy')" class="text-[10px] font-semibold text-[#2563eb] hover:underline text-left flex items-center gap-1 group">
+                      <span class="material-symbols-outlined text-[13px] text-blue-600 group-hover:scale-110 transition">person</span>
+                      <span class="truncate max-w-[110px]">Alexander O. Dagohoy</span>
+                    </button>
+                    <span class="text-[9px] bg-blue-200 text-blue-900 px-1 py-0.2 rounded font-bold" title="Multi-department shared trainer">Shared</span>
+                  </div>
+                  <div class="text-[10px] text-[#3b6fa0] font-mono mt-1 font-medium">
+                    4 Units (2L/2L) | 5.0 hrs/wk
+                  </div>
+                </div>
+              </td><td class="py-2 px-2 border-r border-slate-200 align-top text-xs">
+                <div class="bg-blue-50/90 border border-blue-200 rounded-lg p-2.5 shadow-2xs hover:shadow-xs transition hover:border-blue-400">
+                  <div class="flex items-center justify-between gap-1">
+                    <span class="font-extrabold text-[#1d4ed8] text-xs font-mono">CAD 122</span>
+                    <span class="text-[10px] px-1.5 py-0.2 bg-blue-100 text-blue-800 rounded font-bold">Lab</span>
+                  </div>
+                  <div class="text-[11px] font-bold text-slate-800 mt-1 leading-snug line-clamp-1">Computer-Aided Drafting</div>
+                  <div class="mt-1.5 pt-1 border-t border-blue-100 flex items-center justify-between">
+                    <button onclick="openTrainerModalByName('Haitham Jenor L. Sedomar')" class="text-[10px] font-semibold text-[#2563eb] hover:underline text-left flex items-center gap-1 group">
+                      <span class="material-symbols-outlined text-[13px] text-blue-600 group-hover:scale-110 transition">person</span>
+                      <span class="truncate max-w-[110px]">Haitham Jenor L. Sedomar</span>
+                    </button>
+                    <span class="text-[9px] bg-blue-200 text-blue-900 px-1 py-0.2 rounded font-bold" title="Multi-department shared trainer">Shared</span>
+                  </div>
+                  <div class="text-[10px] text-[#3b6fa0] font-mono mt-1 font-medium">
+                    2 Lab Units | 3.0 hrs/wk
+                  </div>
+                </div>
+              </td><td class="py-2 px-2 border-r border-slate-200 align-top text-xs"><span class="text-[11px] text-slate-300 italic block text-center py-3 font-mono">- Open -</span></td><td class="py-2 px-2 border-r border-slate-200 align-top text-xs"><span class="text-[11px] text-slate-300 italic block text-center py-3 font-mono">- Open -</span></td><td class="py-2 px-2 border-r border-slate-200 align-top text-xs"><span class="text-[11px] text-slate-300 italic block text-center py-3 font-mono">- Open -</span></td></tr><tr class="hover:bg-slate-50/70 transition border-b border-slate-200"><td class="py-3 px-3 font-mono text-[11px] font-bold text-slate-600 bg-slate-50 border-r border-slate-200 text-center">11:30 AM - 1:00 PM</td><td class="py-2 px-2 border-r border-slate-200 align-top text-xs"><span class="text-[11px] text-slate-300 italic block text-center py-3 font-mono">- Open -</span></td><td class="py-2 px-2 border-r border-slate-200 align-top text-xs"><span class="text-[11px] text-slate-300 italic block text-center py-3 font-mono">- Open -</span></td><td class="py-2 px-2 border-r border-slate-200 align-top text-xs">
+                <div class="bg-blue-50/90 border border-blue-200 rounded-lg p-2.5 shadow-2xs hover:shadow-xs transition hover:border-blue-400">
+                  <div class="flex items-center justify-between gap-1">
+                    <span class="font-extrabold text-[#1d4ed8] text-xs font-mono">PLM 211</span>
+                    <span class="text-[10px] px-1.5 py-0.2 bg-blue-100 text-blue-800 rounded font-bold">Lec/Lab</span>
+                  </div>
+                  <div class="text-[11px] font-bold text-slate-800 mt-1 leading-snug line-clamp-1">Plumbing NC II</div>
+                  <div class="mt-1.5 pt-1 border-t border-blue-100 flex items-center justify-between">
+                    <button onclick="openTrainerModalByName('Haitham Jenor L. Sedomar')" class="text-[10px] font-semibold text-[#2563eb] hover:underline text-left flex items-center gap-1 group">
+                      <span class="material-symbols-outlined text-[13px] text-blue-600 group-hover:scale-110 transition">person</span>
+                      <span class="truncate max-w-[110px]">Haitham Jenor L. Sedomar</span>
+                    </button>
+                    <span class="text-[9px] bg-blue-200 text-blue-900 px-1 py-0.2 rounded font-bold" title="Multi-department shared trainer">Shared</span>
+                  </div>
+                  <div class="text-[10px] text-[#3b6fa0] font-mono mt-1 font-medium">
+                    3 Units (1L/2L) | 4.0 hrs/wk
+                  </div>
+                </div>
+              </td><td class="py-2 px-2 border-r border-slate-200 align-top text-xs"><span class="text-[11px] text-slate-300 italic block text-center py-3 font-mono">- Open -</span></td><td class="py-2 px-2 border-r border-slate-200 align-top text-xs"><span class="text-[11px] text-slate-300 italic block text-center py-3 font-mono">- Open -</span></td></tr><tr class="hover:bg-slate-50/70 transition border-b border-slate-200"><td class="py-3 px-3 font-mono text-[11px] font-bold text-slate-600 bg-slate-50 border-r border-slate-200 text-center">1:00 PM - 2:30 PM</td><td class="py-2 px-2 border-r border-slate-200 align-top text-xs"><span class="text-[11px] text-slate-300 italic block text-center py-3 font-mono">- Open -</span></td><td class="py-2 px-2 border-r border-slate-200 align-top text-xs"><span class="text-[11px] text-slate-300 italic block text-center py-3 font-mono">- Open -</span></td><td class="py-2 px-2 border-r border-slate-200 align-top text-xs"><span class="text-[11px] text-slate-300 italic block text-center py-3 font-mono">- Open -</span></td><td class="py-2 px-2 border-r border-slate-200 align-top text-xs">
+                <div class="bg-blue-50/90 border border-blue-200 rounded-lg p-2.5 shadow-2xs hover:shadow-xs transition hover:border-blue-400">
+                  <div class="flex items-center justify-between gap-1">
+                    <span class="font-extrabold text-[#1d4ed8] text-xs font-mono">MAS 212</span>
+                    <span class="text-[10px] px-1.5 py-0.2 bg-blue-100 text-blue-800 rounded font-bold">Lec/Lab</span>
+                  </div>
+                  <div class="text-[11px] font-bold text-slate-800 mt-1 leading-snug line-clamp-1">Masonry NC II</div>
+                  <div class="mt-1.5 pt-1 border-t border-blue-100 flex items-center justify-between">
+                    <button onclick="openTrainerModalByName('Alexander O. Dagohoy')" class="text-[10px] font-semibold text-[#2563eb] hover:underline text-left flex items-center gap-1 group">
+                      <span class="material-symbols-outlined text-[13px] text-blue-600 group-hover:scale-110 transition">person</span>
+                      <span class="truncate max-w-[110px]">Alexander O. Dagohoy</span>
+                    </button>
+                    <span class="text-[9px] bg-blue-200 text-blue-900 px-1 py-0.2 rounded font-bold" title="Multi-department shared trainer">Shared</span>
+                  </div>
+                  <div class="text-[10px] text-[#3b6fa0] font-mono mt-1 font-medium">
+                    3 Units (1L/2L) | 4.0 hrs/wk
+                  </div>
+                </div>
+              </td><td class="py-2 px-2 border-r border-slate-200 align-top text-xs"><span class="text-[11px] text-slate-300 italic block text-center py-3 font-mono">- Open -</span></td></tr><tr class="hover:bg-slate-50/70 transition border-b border-slate-200"><td class="py-3 px-3 font-mono text-[11px] font-bold text-slate-600 bg-slate-50 border-r border-slate-200 text-center">2:30 PM - 4:00 PM</td><td class="py-2 px-2 border-r border-slate-200 align-top text-xs"><span class="text-[11px] text-slate-300 italic block text-center py-3 font-mono">- Open -</span></td><td class="py-2 px-2 border-r border-slate-200 align-top text-xs"><span class="text-[11px] text-slate-300 italic block text-center py-3 font-mono">- Open -</span></td><td class="py-2 px-2 border-r border-slate-200 align-top text-xs"><span class="text-[11px] text-slate-300 italic block text-center py-3 font-mono">- Open -</span></td><td class="py-2 px-2 border-r border-slate-200 align-top text-xs"><span class="text-[11px] text-slate-300 italic block text-center py-3 font-mono">- Open -</span></td><td class="py-2 px-2 border-r border-slate-200 align-top text-xs"><span class="text-[11px] text-slate-300 italic block text-center py-3 font-mono">- Open -</span></td></tr><tr class="hover:bg-slate-50/70 transition border-b border-slate-200"><td class="py-3 px-3 font-mono text-[11px] font-bold text-slate-600 bg-slate-50 border-r border-slate-200 text-center">4:00 PM - 5:00 PM</td><td class="py-2 px-2 border-r border-slate-200 align-top text-xs"><span class="text-[11px] text-slate-300 italic block text-center py-3 font-mono">- Open -</span></td><td class="py-2 px-2 border-r border-slate-200 align-top text-xs"><span class="text-[11px] text-slate-300 italic block text-center py-3 font-mono">- Open -</span></td><td class="py-2 px-2 border-r border-slate-200 align-top text-xs"><span class="text-[11px] text-slate-300 italic block text-center py-3 font-mono">- Open -</span></td><td class="py-2 px-2 border-r border-slate-200 align-top text-xs"><span class="text-[11px] text-slate-300 italic block text-center py-3 font-mono">- Open -</span></td><td class="py-2 px-2 border-r border-slate-200 align-top text-xs"><span class="text-[11px] text-slate-300 italic block text-center py-3 font-mono">- Open -</span></td></tr></tbody>
+</table>
+</div>
+</div>
+</section>
+<!-- ======================================================== -->
+<!-- VIEW 3: FACULTY DATABASE                                 -->
+<!-- ======================================================== -->
+<section class="space-y-4 animate-fade-in hidden" id="view-faculty">
+<!-- Faculty Control Bar -->
+<div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-3">
+<div>
+<div class="flex items-center gap-2">
+<h3 class="text-base font-bold text-[#1d4ed8]">Faculty &amp; Trainer Database</h3>
+<span class="bg-emerald-100 text-emerald-800 text-[11px] font-bold px-2 py-0.5 rounded">Synced with Sheet DB</span>
+</div>
+<p class="text-xs text-[#3b6fa0] mt-0.5">
+              Live Google Sheets tabular mirror with shared multi-department assignment tracking.
+            </p>
+</div>
+<!-- Actions -->
+<div class="flex items-center flex-wrap gap-2">
+<button class="bg-[#2563eb] hover:bg-blue-700 text-white text-xs font-semibold px-3 py-2 rounded-lg flex items-center gap-1.5 shadow-xs transition" id="facultyAddButton" onclick="openFacultyModal('add')">
+<span class="material-symbols-outlined text-sm">person_add</span>
+<span class="">Add Faculty</span>
+</button>
+<button class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold px-3 py-2 rounded-lg border border-slate-300 flex items-center gap-1.5 transition" onclick="showToast('Exported active faculty dataset to Google Sheets CSV.')">
+<span class="material-symbols-outlined text-sm">file_download</span>
+<span class="">Export Sheet</span>
+</button>
+</div>
+</div>
+<!-- Filter and Search Row -->
+<div class="bg-white p-3 rounded-xl border border-slate-200 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+<div class="flex items-center gap-2 w-full sm:w-72 bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs">
+<span class="material-symbols-outlined text-slate-400 text-base">search</span>
+<input class="bg-transparent border-none outline-none w-full text-slate-700 placeholder-slate-400 p-0 text-xs" id="facultySearchInput" oninput="handleFacultySearch()" placeholder="Search trainer, qualification, email..." type="text">
+</div>
+<div class="flex items-center gap-1.5 overflow-x-auto text-xs">
+<span class="text-slate-500 font-semibold text-[11px] whitespace-nowrap">Filter Dept:</span>
+<button class="faculty-chip px-2.5 py-1 rounded-md bg-[#1e3a5f] text-white font-medium" data-dept="all" onclick="filterFaculty('all')">All (4)</button>
+<button class="faculty-chip px-2.5 py-1 rounded-md bg-white border border-slate-300 text-slate-700 hover:bg-blue-50 font-medium" data-dept="shared" onclick="filterFaculty('shared')">★ Shared Faculty (3)</button>
+<button class="faculty-chip px-2.5 py-1 rounded-md bg-white border border-slate-300 text-slate-700 hover:bg-blue-50 font-medium" data-dept="DCET" onclick="filterFaculty('DCET')">DCET</button>
+<button class="faculty-chip px-2.5 py-1 rounded-md bg-white border border-slate-300 text-slate-700 hover:bg-blue-50 font-medium" data-dept="DWT" onclick="filterFaculty('DWT')">DWT</button>
+</div>
+</div>
+<!-- Google Sheets Dense Table -->
+<div class="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+<div class="overflow-x-auto custom-scroll">
+<table class="w-full text-left text-xs border-collapse min-w-[980px]">
+<thead>
+<tr class="bg-slate-100 text-slate-700 border-b border-slate-300 font-bold uppercase text-[10px] tracking-wide">
+<th class="py-2.5 px-3 border-r border-slate-200">Last Name</th>
+<th class="py-2.5 px-3 border-r border-slate-200">First Name</th>
+<th class="py-2.5 px-2 border-r border-slate-200 text-center w-12">M.I.</th>
+<th class="py-2.5 px-3 border-r border-slate-200">Department</th>
+<th class="py-2.5 px-3 border-r border-slate-200">Role</th>
+<th class="py-2.5 px-3 border-r border-slate-200">Qualifications</th>
+<th class="py-2.5 px-3 border-r border-slate-200">Mobile Number</th>
+<th class="py-2.5 px-3 border-r border-slate-200">Contact Email</th>
+<th class="py-2.5 px-3 text-center">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-200 font-sans text-xs" id="facultyTableBody"><tr class="hover:bg-[#eff6ff] transition border-b border-slate-200">
+          <td class="py-2.5 px-3 font-bold text-slate-800 border-r border-slate-200">Dagohoy</td>
+          <td class="py-2.5 px-3 text-slate-700 border-r border-slate-200">Alexander</td>
+          <td class="py-2.5 px-2 text-center text-slate-500 font-mono border-r border-slate-200">O.</td>
+          <td class="py-2.5 px-3 border-r border-slate-200">
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <span class="font-bold text-slate-900">DCET</span>
+              
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#bfdbfe] text-[#1e3a5f] border border-blue-300">
+                  <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
+                  SHARED FACULTY
+                </span>
+              
+              
+            </div>
+          </td>
+          <td class="py-2.5 px-3 border-r border-slate-200 font-medium">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700">
+              JO
+            </span>
+          </td>
+          <td class="py-2.5 px-3 text-slate-600 border-r border-slate-200 max-w-xs truncate" title="Masonry NC II">Masonry NC II</td>
+          <td class="py-2.5 px-3 text-slate-700 border-r border-slate-200 font-mono text-[11px]">9307603532</td>
+          <td class="py-2.5 px-3 text-[#2563eb] border-r border-slate-200 font-mono text-[11px] hover:underline cursor-pointer">alexanderdagohoy7@gmail.com</td>
+          <td class="py-2.5 px-3 text-center">
+            <div class="flex items-center justify-center gap-1">
+              <button onclick="openFacultyModal('add')" class="px-2 py-1 rounded bg-slate-100 text-slate-700 hover:bg-slate-200 text-[10px] font-bold transition">
+                Add
+              </button>
+              <button onclick="openFacultyModal('edit', 1)" class="px-2 py-1 rounded bg-slate-100 text-slate-700 hover:bg-slate-200 text-[10px] font-bold transition">
+                Edit
+              </button>
+              <button onclick="openTrainerModalById(1)" class="px-2.5 py-1 rounded bg-blue-100 text-[#1d4ed8] hover:bg-blue-200 text-[10px] font-extrabold transition shadow-2xs">
+                View Load
+              </button>
+            </div>
+          </td>
+        </tr><tr class="hover:bg-[#eff6ff] transition border-b border-slate-200">
+          <td class="py-2.5 px-3 font-bold text-slate-800 border-r border-slate-200">Sedomar</td>
+          <td class="py-2.5 px-3 text-slate-700 border-r border-slate-200">Haitham Jenor</td>
+          <td class="py-2.5 px-2 text-center text-slate-500 font-mono border-r border-slate-200">L.</td>
+          <td class="py-2.5 px-3 border-r border-slate-200">
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <span class="font-bold text-slate-900">DCET</span>
+              
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#bfdbfe] text-[#1e3a5f] border border-blue-300">
+                  <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
+                  SHARED FACULTY
+                </span>
+              
+              
+            </div>
+          </td>
+          <td class="py-2.5 px-3 border-r border-slate-200 font-medium">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700">
+              JO
+            </span>
+          </td>
+          <td class="py-2.5 px-3 text-slate-600 border-r border-slate-200 max-w-xs truncate" title="Civil Engineering Orientation, Hydraulics, Physics for Engineers">Civil Engineering Orientation, Hydraulics, Physics for Engineers</td>
+          <td class="py-2.5 px-3 text-slate-700 border-r border-slate-200 font-mono text-[11px]">9162655967</td>
+          <td class="py-2.5 px-3 text-[#2563eb] border-r border-slate-200 font-mono text-[11px] hover:underline cursor-pointer">haithamibnsajid@gmail.com</td>
+          <td class="py-2.5 px-3 text-center">
+            <div class="flex items-center justify-center gap-1">
+              <button onclick="openFacultyModal('add')" class="px-2 py-1 rounded bg-slate-100 text-slate-700 hover:bg-slate-200 text-[10px] font-bold transition">
+                Add
+              </button>
+              <button onclick="openFacultyModal('edit', 2)" class="px-2 py-1 rounded bg-slate-100 text-slate-700 hover:bg-slate-200 text-[10px] font-bold transition">
+                Edit
+              </button>
+              <button onclick="openTrainerModalById(2)" class="px-2.5 py-1 rounded bg-blue-100 text-[#1d4ed8] hover:bg-blue-200 text-[10px] font-extrabold transition shadow-2xs">
+                View Load
+              </button>
+            </div>
+          </td>
+        </tr><tr class="hover:bg-[#eff6ff] transition border-b border-slate-200">
+          <td class="py-2.5 px-3 font-bold text-slate-800 border-r border-slate-200">Dacoco</td>
+          <td class="py-2.5 px-3 text-slate-700 border-r border-slate-200">Belinda</td>
+          <td class="py-2.5 px-2 text-center text-slate-500 font-mono border-r border-slate-200">C.</td>
+          <td class="py-2.5 px-3 border-r border-slate-200">
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <span class="font-bold text-slate-900">DWT</span>
+              
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#bfdbfe] text-[#1e3a5f] border border-blue-300">
+                  <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
+                  SHARED FACULTY
+                </span>
+              
+              
+            </div>
+          </td>
+          <td class="py-2.5 px-3 border-r border-slate-200 font-medium">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700">
+              JO
+            </span>
+          </td>
+          <td class="py-2.5 px-3 text-slate-600 border-r border-slate-200 max-w-xs truncate" title="SMAW, FCAW, GMAW, GTAW, NC I and II">SMAW, FCAW, GMAW, GTAW, NC I and II</td>
+          <td class="py-2.5 px-3 text-slate-700 border-r border-slate-200 font-mono text-[11px]">9955220861</td>
+          <td class="py-2.5 px-3 text-[#2563eb] border-r border-slate-200 font-mono text-[11px] hover:underline cursor-pointer">bcdadacs55@gmail.com</td>
+          <td class="py-2.5 px-3 text-center">
+            <div class="flex items-center justify-center gap-1">
+              <button onclick="openFacultyModal('add')" class="px-2 py-1 rounded bg-slate-100 text-slate-700 hover:bg-slate-200 text-[10px] font-bold transition">
+                Add
+              </button>
+              <button onclick="openFacultyModal('edit', 3)" class="px-2 py-1 rounded bg-slate-100 text-slate-700 hover:bg-slate-200 text-[10px] font-bold transition">
+                Edit
+              </button>
+              <button onclick="openTrainerModalById(3)" class="px-2.5 py-1 rounded bg-blue-100 text-[#1d4ed8] hover:bg-blue-200 text-[10px] font-extrabold transition shadow-2xs">
+                View Load
+              </button>
+            </div>
+          </td>
+        </tr><tr class="hover:bg-[#eff6ff] transition border-b border-slate-200">
+          <td class="py-2.5 px-3 font-bold text-slate-800 border-r border-slate-200">Bravo Jr.</td>
+          <td class="py-2.5 px-3 text-slate-700 border-r border-slate-200">Albert</td>
+          <td class="py-2.5 px-2 text-center text-slate-500 font-mono border-r border-slate-200">B.</td>
+          <td class="py-2.5 px-3 border-r border-slate-200">
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <span class="font-bold text-slate-900">DCET</span>
+              
+              
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
+                  Lead Instructor
+                </span>
+              
+            </div>
+          </td>
+          <td class="py-2.5 px-3 border-r border-slate-200 font-medium">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-100 text-purple-900">
+              TESD Specialist II
+            </span>
+          </td>
+          <td class="py-2.5 px-3 text-slate-600 border-r border-slate-200 max-w-xs truncate" title="MAED Language Teaching">MAED Language Teaching</td>
+          <td class="py-2.5 px-3 text-slate-700 border-r border-slate-200 font-mono text-[11px]">9078670778</td>
+          <td class="py-2.5 px-3 text-[#2563eb] border-r border-slate-200 font-mono text-[11px] hover:underline cursor-pointer">albertbravojr28@gmail.com</td>
+          <td class="py-2.5 px-3 text-center">
+            <div class="flex items-center justify-center gap-1">
+              <button onclick="openFacultyModal('add')" class="px-2 py-1 rounded bg-slate-100 text-slate-700 hover:bg-slate-200 text-[10px] font-bold transition">
+                Add
+              </button>
+              <button onclick="openFacultyModal('edit', 4)" class="px-2 py-1 rounded bg-slate-100 text-slate-700 hover:bg-slate-200 text-[10px] font-bold transition">
+                Edit
+              </button>
+              <button onclick="openTrainerModalById(4)" class="px-2.5 py-1 rounded bg-blue-100 text-[#1d4ed8] hover:bg-blue-200 text-[10px] font-extrabold transition shadow-2xs">
+                View Load
+              </button>
+            </div>
+          </td>
+        </tr></tbody>
+</table>
+</div>
+</div>
+</section>
+<!-- ======================================================== -->
+<!-- VIEW 4: CURRICULUM CENTRAL REGISTRY                      -->
+<!-- ======================================================== -->
+<section class="hidden space-y-4 animate-fade-in" id="view-curriculum">
+<!-- Top Toolbar -->
+<div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+<div>
+<div class="flex items-center gap-2">
+<h3 class="text-base font-bold text-[#1d4ed8]">Curriculum Central Registry</h3>
+<span class="bg-blue-100 text-[#1d4ed8] text-[11px] font-bold px-2 py-0.5 rounded">Official TESDA Syllabi</span>
+</div>
+<p class="text-xs text-[#3b6fa0] mt-0.5">
+                Standardized course breakdowns, prerequisite validation, and resultant National Certificate qualifications.
+              </p>
+</div>
+<!-- Actions Bar -->
+<div class="flex items-center flex-wrap gap-2">
+<button class="bg-[#2563eb] hover:bg-blue-700 text-white text-xs font-semibold px-3 py-2 rounded-lg flex items-center gap-1.5 shadow-xs transition" id="curriculumAddButton" onclick="openAddCurriculumModal()">
+<span class="material-symbols-outlined text-sm">add</span>
+<span class="">Add Course / Diploma</span>
+</button>
+<button class="bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold px-2.5 py-2 rounded-lg border border-slate-300 flex items-center gap-1.5 transition" onclick="showToast('Exporting circular catalog to official PDF document...')">
+<span class="material-symbols-outlined text-sm text-rose-600">picture_as_pdf</span>
+<span class="">Export to PDF</span>
+</button>
+<button class="bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold px-2.5 py-2 rounded-lg border border-slate-300 flex items-center gap-1.5 transition" onclick="window.print()">
+<span class="material-symbols-outlined text-sm text-slate-600">print</span>
+<span class="">Print</span>
+</button>
+<button class="bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold px-2.5 py-2 rounded-lg border border-slate-300 flex items-center gap-1.5 transition" onclick="showToast('Curriculum circular synced to TESDA Google Drive repository.')">
+<span class="material-symbols-outlined text-sm text-blue-600">cloud_upload</span>
+<span class="">Upload to Drive</span>
+</button>
+</div>
+</div>
+<!-- Dropdown Filter Toolbar -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-3">
+<div>
+<label class="block text-[11px] font-bold text-[#3b6fa0] uppercase tracking-wider mb-1">Name of Diploma</label>
+<select class="w-full text-xs bg-slate-50 border border-slate-300 rounded-lg p-2 font-semibold text-slate-700 focus:border-blue-500 focus:bg-white transition" id="curriculumDiplomaSelect" onchange="renderCurriculumSections()">
+<option value="ALL">Show All Approved Diplomas</option>
+</select>
+</div>
+<div>
+<label class="block text-[11px] font-bold text-[#3b6fa0] uppercase tracking-wider mb-1">Year Level</label>
+<select class="w-full text-xs bg-slate-50 border border-slate-300 rounded-lg p-2 font-semibold text-slate-700 focus:border-blue-500 focus:bg-white transition" id="curriculumYearSelect" onchange="renderCurriculumSections()">
+<option value="ALL">All Year Levels</option>
+<option value="1">First Year</option>
+<option value="2">Second Year</option>
+<option value="3">Third Year</option>
+</select>
+</div>
+</div>
+</div>
+<!-- Curriculum Table Container -->
+<div class="space-y-4" id="curriculumContainers"><div class="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+          <div class="bg-gradient-to-r from-slate-50 to-blue-50/60 p-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <span class="text-[10px] font-extrabold uppercase tracking-wider text-blue-800 bg-blue-100/90 px-2 py-0.5 rounded border border-blue-200">
+                First Year, Second Semester
+              </span>
+              <h4 class="text-sm font-bold text-[#1d4ed8] mt-1">DCMT - Diploma in Construction Management Technology</h4>
+            </div>
+            <div class="flex items-center gap-2 text-xs font-mono">
+              <span class="text-slate-600 bg-white px-2.5 py-1 rounded border border-slate-200 font-medium">Courses: 2</span>
+              <span class="text-blue-900 bg-blue-100/80 px-2.5 py-1 rounded font-bold border border-blue-200">Total: 6 Units</span>
+            </div>
+          </div>
+          <div class="overflow-x-auto custom-scroll">
+            <table class="w-full text-left text-xs border-collapse min-w-[780px]">
+              <thead>
+                <tr class="bg-slate-100 text-slate-700 border-b border-slate-200 text-[10px] font-bold uppercase tracking-wider">
+                  <th class="py-2.5 px-3 w-28 border-r border-slate-200">Course Code</th>
+                  <th class="py-2.5 px-3 border-r border-slate-200">Course Name</th>
+                  <th class="py-2.5 px-3 text-center w-24 border-r border-slate-200">Lec Units</th>
+                  <th class="py-2.5 px-3 text-center w-24 border-r border-slate-200">Lab Units</th>
+                  <th class="py-2.5 px-3 text-center w-24 border-r border-slate-200">Total Units</th>
+                  <th class="py-2.5 px-3 border-r border-slate-200 w-32">Pre-requisites</th>
+                  <th class="py-2.5 px-3">Resultant Qualification</th>
+                  <th class="py-2.5 px-3 text-center w-24">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-200">
+                
+                  <tr class="hover:bg-slate-50 transition border-b border-slate-200">
+                    <td class="py-2.5 px-3 font-mono font-bold text-[#1d4ed8] border-r border-slate-200">CRP 121</td>
+                    <td class="py-2.5 px-3 font-semibold text-slate-800 border-r border-slate-200">Carpentry NC II</td>
+                    <td class="py-2.5 px-3 text-center border-r border-slate-200 font-mono text-slate-600">2</td>
+                    <td class="py-2.5 px-3 text-center border-r border-slate-200 font-mono text-slate-600">2</td>
+                    <td class="py-2.5 px-3 text-center border-r border-slate-200 font-mono font-bold text-blue-700 bg-blue-50/50">4</td>
+                    <td class="py-2.5 px-3 border-r border-slate-200 font-mono text-slate-500 text-[11px]">None</td>
+                    <td class="py-2.5 px-3">
+                      <span class="inline-flex items-center gap-1 font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded text-[11px]">
+                        <span class="material-symbols-outlined text-[13px] text-emerald-600">verified</span>
+                        Carpentry NC II
+                      </span>
+                    </td>
+                    <td class="py-2.5 px-3 text-center">
+                      <button onclick="showToast('Syllabus breakdown for CRP 121 verified with TESDA National Standards.')" class="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold">
+                        Inspect
+                      </button>
+                    </td>
+                  </tr>
+                
+                  <tr class="hover:bg-slate-50 transition border-b border-slate-200">
+                    <td class="py-2.5 px-3 font-mono font-bold text-[#1d4ed8] border-r border-slate-200">CAD 122</td>
+                    <td class="py-2.5 px-3 font-semibold text-slate-800 border-r border-slate-200">Computer-Aided Drafting</td>
+                    <td class="py-2.5 px-3 text-center border-r border-slate-200 font-mono text-slate-600">0</td>
+                    <td class="py-2.5 px-3 text-center border-r border-slate-200 font-mono text-slate-600">2</td>
+                    <td class="py-2.5 px-3 text-center border-r border-slate-200 font-mono font-bold text-blue-700 bg-blue-50/50">2</td>
+                    <td class="py-2.5 px-3 border-r border-slate-200 font-mono text-slate-500 text-[11px]">DRAW 101</td>
+                    <td class="py-2.5 px-3">
+                      <span class="inline-flex items-center gap-1 font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded text-[11px]">
+                        <span class="material-symbols-outlined text-[13px] text-emerald-600">verified</span>
+                        Technical Drafting NC II
+                      </span>
+                    </td>
+                    <td class="py-2.5 px-3 text-center">
+                      <button onclick="showToast('Syllabus breakdown for CAD 122 verified with TESDA National Standards.')" class="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold">
+                        Inspect
+                      </button>
+                    </td>
+                  </tr>
+                
+              </tbody>
+            </table>
+          </div>
+        </div><div class="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+          <div class="bg-gradient-to-r from-slate-50 to-blue-50/60 p-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <span class="text-[10px] font-extrabold uppercase tracking-wider text-blue-800 bg-blue-100/90 px-2 py-0.5 rounded border border-blue-200">
+                Second Year, First Semester
+              </span>
+              <h4 class="text-sm font-bold text-[#1d4ed8] mt-1">DCMT - Diploma in Construction Management Technology</h4>
+            </div>
+            <div class="flex items-center gap-2 text-xs font-mono">
+              <span class="text-slate-600 bg-white px-2.5 py-1 rounded border border-slate-200 font-medium">Courses: 2</span>
+              <span class="text-blue-900 bg-blue-100/80 px-2.5 py-1 rounded font-bold border border-blue-200">Total: 6 Units</span>
+            </div>
+          </div>
+          <div class="overflow-x-auto custom-scroll">
+            <table class="w-full text-left text-xs border-collapse min-w-[780px]">
+              <thead>
+                <tr class="bg-slate-100 text-slate-700 border-b border-slate-200 text-[10px] font-bold uppercase tracking-wider">
+                  <th class="py-2.5 px-3 w-28 border-r border-slate-200">Course Code</th>
+                  <th class="py-2.5 px-3 border-r border-slate-200">Course Name</th>
+                  <th class="py-2.5 px-3 text-center w-24 border-r border-slate-200">Lec Units</th>
+                  <th class="py-2.5 px-3 text-center w-24 border-r border-slate-200">Lab Units</th>
+                  <th class="py-2.5 px-3 text-center w-24 border-r border-slate-200">Total Units</th>
+                  <th class="py-2.5 px-3 border-r border-slate-200 w-32">Pre-requisites</th>
+                  <th class="py-2.5 px-3">Resultant Qualification</th>
+                  <th class="py-2.5 px-3 text-center w-24">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-200">
+                
+                  <tr class="hover:bg-slate-50 transition border-b border-slate-200">
+                    <td class="py-2.5 px-3 font-mono font-bold text-[#1d4ed8] border-r border-slate-200">PLM 211</td>
+                    <td class="py-2.5 px-3 font-semibold text-slate-800 border-r border-slate-200">Plumbing NC II</td>
+                    <td class="py-2.5 px-3 text-center border-r border-slate-200 font-mono text-slate-600">1</td>
+                    <td class="py-2.5 px-3 text-center border-r border-slate-200 font-mono text-slate-600">2</td>
+                    <td class="py-2.5 px-3 text-center border-r border-slate-200 font-mono font-bold text-blue-700 bg-blue-50/50">3</td>
+                    <td class="py-2.5 px-3 border-r border-slate-200 font-mono text-slate-500 text-[11px]">None</td>
+                    <td class="py-2.5 px-3">
+                      <span class="inline-flex items-center gap-1 font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded text-[11px]">
+                        <span class="material-symbols-outlined text-[13px] text-emerald-600">verified</span>
+                        Plumbing NC II
+                      </span>
+                    </td>
+                    <td class="py-2.5 px-3 text-center">
+                      <button onclick="showToast('Syllabus breakdown for PLM 211 verified with TESDA National Standards.')" class="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold">
+                        Inspect
+                      </button>
+                    </td>
+                  </tr>
+                
+                  <tr class="hover:bg-slate-50 transition border-b border-slate-200">
+                    <td class="py-2.5 px-3 font-mono font-bold text-[#1d4ed8] border-r border-slate-200">MAS 212</td>
+                    <td class="py-2.5 px-3 font-semibold text-slate-800 border-r border-slate-200">Masonry NC II</td>
+                    <td class="py-2.5 px-3 text-center border-r border-slate-200 font-mono text-slate-600">1</td>
+                    <td class="py-2.5 px-3 text-center border-r border-slate-200 font-mono text-slate-600">2</td>
+                    <td class="py-2.5 px-3 text-center border-r border-slate-200 font-mono font-bold text-blue-700 bg-blue-50/50">3</td>
+                    <td class="py-2.5 px-3 border-r border-slate-200 font-mono text-slate-500 text-[11px]">None</td>
+                    <td class="py-2.5 px-3">
+                      <span class="inline-flex items-center gap-1 font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded text-[11px]">
+                        <span class="material-symbols-outlined text-[13px] text-emerald-600">verified</span>
+                        Masonry NC II
+                      </span>
+                    </td>
+                    <td class="py-2.5 px-3 text-center">
+                      <button onclick="showToast('Syllabus breakdown for MAS 212 verified with TESDA National Standards.')" class="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold">
+                        Inspect
+                      </button>
+                    </td>
+                  </tr>
+                
+              </tbody>
+            </table>
+          </div>
+        </div><div class="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+          <div class="bg-gradient-to-r from-slate-50 to-blue-50/60 p-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <span class="text-[10px] font-extrabold uppercase tracking-wider text-blue-800 bg-blue-100/90 px-2 py-0.5 rounded border border-blue-200">
+                Repackaged 2025 - Second Year, First Semester
+              </span>
+              <h4 class="text-sm font-bold text-[#1d4ed8] mt-1">DEMT - Diploma in Electro-Mechatronics Technology</h4>
+            </div>
+            <div class="flex items-center gap-2 text-xs font-mono">
+              <span class="text-slate-600 bg-white px-2.5 py-1 rounded border border-slate-200 font-medium">Courses: 2</span>
+              <span class="text-blue-900 bg-blue-100/80 px-2.5 py-1 rounded font-bold border border-blue-200">Total: 7 Units</span>
+            </div>
+          </div>
+          <div class="overflow-x-auto custom-scroll">
+            <table class="w-full text-left text-xs border-collapse min-w-[780px]">
+              <thead>
+                <tr class="bg-slate-100 text-slate-700 border-b border-slate-200 text-[10px] font-bold uppercase tracking-wider">
+                  <th class="py-2.5 px-3 w-28 border-r border-slate-200">Course Code</th>
+                  <th class="py-2.5 px-3 border-r border-slate-200">Course Name</th>
+                  <th class="py-2.5 px-3 text-center w-24 border-r border-slate-200">Lec Units</th>
+                  <th class="py-2.5 px-3 text-center w-24 border-r border-slate-200">Lab Units</th>
+                  <th class="py-2.5 px-3 text-center w-24 border-r border-slate-200">Total Units</th>
+                  <th class="py-2.5 px-3 border-r border-slate-200 w-32">Pre-requisites</th>
+                  <th class="py-2.5 px-3">Resultant Qualification</th>
+                  <th class="py-2.5 px-3 text-center w-24">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-200">
+                
+                  <tr class="hover:bg-slate-50 transition border-b border-slate-200">
+                    <td class="py-2.5 px-3 font-mono font-bold text-[#1d4ed8] border-r border-slate-200">EIM 211</td>
+                    <td class="py-2.5 px-3 font-semibold text-slate-800 border-r border-slate-200">Electrical Installation and Maintenance NCII</td>
+                    <td class="py-2.5 px-3 text-center border-r border-slate-200 font-mono text-slate-600">2</td>
+                    <td class="py-2.5 px-3 text-center border-r border-slate-200 font-mono text-slate-600">2</td>
+                    <td class="py-2.5 px-3 text-center border-r border-slate-200 font-mono font-bold text-blue-700 bg-blue-50/50">4</td>
+                    <td class="py-2.5 px-3 border-r border-slate-200 font-mono text-slate-500 text-[11px]">None</td>
+                    <td class="py-2.5 px-3">
+                      <span class="inline-flex items-center gap-1 font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded text-[11px]">
+                        <span class="material-symbols-outlined text-[13px] text-emerald-600">verified</span>
+                        Electrical Installation and Maintenance NCII
+                      </span>
+                    </td>
+                    <td class="py-2.5 px-3 text-center">
+                      <button onclick="showToast('Syllabus breakdown for EIM 211 verified with TESDA National Standards.')" class="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold">
+                        Inspect
+                      </button>
+                    </td>
+                  </tr>
+                
+                  <tr class="hover:bg-slate-50 transition border-b border-slate-200">
+                    <td class="py-2.5 px-3 font-mono font-bold text-[#1d4ed8] border-r border-slate-200">MCT 212</td>
+                    <td class="py-2.5 px-3 font-semibold text-slate-800 border-r border-slate-200">Mechatronics Servicing NCIII</td>
+                    <td class="py-2.5 px-3 text-center border-r border-slate-200 font-mono text-slate-600">1</td>
+                    <td class="py-2.5 px-3 text-center border-r border-slate-200 font-mono text-slate-600">2</td>
+                    <td class="py-2.5 px-3 text-center border-r border-slate-200 font-mono font-bold text-blue-700 bg-blue-50/50">3</td>
+                    <td class="py-2.5 px-3 border-r border-slate-200 font-mono text-slate-500 text-[11px]">EMR 122</td>
+                    <td class="py-2.5 px-3">
+                      <span class="inline-flex items-center gap-1 font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded text-[11px]">
+                        <span class="material-symbols-outlined text-[13px] text-emerald-600">verified</span>
+                        Mechatronics Servicing NCIII
+                      </span>
+                    </td>
+                    <td class="py-2.5 px-3 text-center">
+                      <button onclick="showToast('Syllabus breakdown for MCT 212 verified with TESDA National Standards.')" class="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold">
+                        Inspect
+                      </button>
+                    </td>
+                  </tr>
+                
+              </tbody>
+            </table>
+          </div>
+        </div></div>
+</section>
+</main>
+</div>
+<!-- ======================================================== -->
+<!-- MODAL: TRAINER TEACHING LOAD DETAIL                      -->
+<!-- ======================================================== -->
+<div class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4" id="trainerModal">
+<div class="bg-white rounded-2xl max-w-lg w-full border border-slate-200 shadow-2xl overflow-hidden animate-fade-in">
+<div class="bg-gradient-to-r from-[#1e3a5f] to-[#152d4a] text-white p-4 flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<div class="w-10 h-10 rounded-full bg-blue-600/70 flex items-center justify-center font-bold text-white border border-blue-400" id="modalTrainerAvatar">
+            AD
+          </div>
+<div>
+<h4 class="text-sm font-bold text-white leading-tight" id="modalTrainerFullName">Alexander O. Dagohoy</h4>
+<p class="text-[11px] text-blue-200" id="modalTrainerDepartment">DCET / DCMT (Shared Faculty)</p>
+</div>
+</div>
+<button class="text-blue-200 hover:text-white p-1 rounded-md hover:bg-white/10" onclick="closeTrainerModal()">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div class="p-5 space-y-4 text-xs">
+<div class="flex items-center justify-between pb-2 border-b border-slate-200">
+<span class="font-bold text-slate-700">Calculated Semester Teaching Load</span>
+<span class="font-bold text-blue-800 bg-blue-100 px-2.5 py-1 rounded-md" id="modalTrainerHoursBadge">
+            Total: 10.0 Weekly Contact Hrs
+          </span>
+</div>
+<div class="space-y-2" id="modalTrainerCourseList">
+<!-- Injected via JavaScript -->
+</div>
+<div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-[11px] space-y-1.5">
+<div class="flex justify-between">
+<span class="text-slate-500 font-medium">Calculation Rule:</span>
+<span class="font-semibold text-slate-800 font-mono">Lec x 1.0 hr + Lab x 1.5 hrs</span>
+</div>
+<div class="flex justify-between">
+<span class="text-slate-500 font-medium">Contact Phone:</span>
+<span class="font-semibold font-mono text-slate-800" id="modalTrainerPhone">9307603532</span>
+</div>
+<div class="flex justify-between">
+<span class="text-slate-500 font-medium">Verified Email:</span>
+<span class="font-semibold font-mono text-[#2563eb]" id="modalTrainerEmail">alexanderdagohoy7@gmail.com</span>
+</div>
+</div>
+<div class="pt-2 flex justify-end gap-2 border-t border-slate-100">
+<button class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700" onclick="closeTrainerModal()">
+            Close
+          </button>
+<button class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-[#2563eb] hover:bg-blue-700 text-white shadow-xs flex items-center gap-1" onclick="jumpToFacultyFromModal()">
+<span class="">Open in Faculty Database</span>
+<span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- ======================================================== -->
+<!-- MODAL: ADD / EDIT FACULTY FORM                           -->
+<!-- ======================================================== -->
+<div class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4" id="facultyFormModal">
+<div class="bg-white rounded-2xl max-w-md w-full border border-slate-200 shadow-2xl overflow-hidden">
+<div class="bg-[#1e3a5f] text-white p-4 flex items-center justify-between">
+<h4 class="text-sm font-bold" id="facultyFormTitle">Add Faculty Member</h4>
+<button class="text-blue-200 hover:text-white" onclick="closeFacultyFormModal()">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<form class="p-4 space-y-3 text-xs" onsubmit="handleSaveFaculty(event)">
+<div class="grid grid-cols-2 gap-2">
+<div>
+<label class="block font-bold text-slate-700 mb-1">Last Name</label>
+<input class="w-full p-2 border border-slate-300 rounded-lg text-xs" id="facLastName" placeholder="e.g. Dagohoy" required="" type="text">
+</div>
+<div>
+<label class="block font-bold text-slate-700 mb-1">First Name</label>
+<input class="w-full p-2 border border-slate-300 rounded-lg text-xs" id="facFirstName" placeholder="e.g. Alexander" required="" type="text">
+</div>
+</div>
+<div class="grid grid-cols-2 gap-2">
+<div>
+<label class="block font-bold text-slate-700 mb-1">M.I.</label>
+<input class="w-full p-2 border border-slate-300 rounded-lg text-xs" id="facMI" maxlength="3" placeholder="e.g. O." type="text">
+</div>
+<div>
+<label class="block font-bold text-slate-700 mb-1">Role</label>
+<select class="w-full p-2 border border-slate-300 rounded-lg text-xs" id="facRole">
+<option value="JO">JO (Job Order)</option>
+<option value="TESD Specialist II">TESD Specialist II</option>
+<option value="Head Trainer">Head Trainer</option>
+<option value="Lead Instructor">Lead Instructor</option>
+<option value="Trainer">Trainer</option>
+</select>
+</div>
+</div>
+<div>
+<label class="block font-bold text-slate-700 mb-1">Department &amp; Shared Allocation</label>
+<select class="w-full p-2 border border-slate-300 rounded-lg text-xs" id="facDept">
+<option value="DCET / DCMT">DCET / DCMT (Shared Faculty)</option>
+<option value="DWT / DEMT">DWT / DEMT (Shared Faculty)</option>
+<option value="DCET">DCET</option>
+<option value="DCMT">DCMT</option>
+<option value="DEMT">DEMT</option>
+<option value="DWT">DWT</option>
+</select>
+</div>
+<div>
+<label class="block font-bold text-slate-700 mb-1">Qualifications / NC Certs</label>
+<input class="w-full p-2 border border-slate-300 rounded-lg text-xs" id="facQuals" placeholder="e.g. Masonry NC II, TM I" required="" type="text">
+</div>
+<div class="grid grid-cols-2 gap-2">
+<div>
+<label class="block font-bold text-slate-700 mb-1">Mobile Number</label>
+<input class="w-full p-2 border border-slate-300 rounded-lg text-xs" id="facMobile" placeholder="9307603532" required="" type="text">
+</div>
+<div>
+<label class="block font-bold text-slate-700 mb-1">Contact Email</label>
+<input class="w-full p-2 border border-slate-300 rounded-lg text-xs" id="facEmail" placeholder="name@gmail.com" required="" type="email">
+</div>
+</div>
+<div class="pt-2 flex justify-end gap-2 border-t border-slate-200">
+<button class="px-3 py-1.5 text-slate-600 bg-slate-100 rounded-lg font-semibold" onclick="closeFacultyFormModal()" type="button">Cancel</button>
+<button class="px-4 py-1.5 bg-[#2563eb] text-white rounded-lg font-semibold hover:bg-blue-700" type="submit">Save to Sheet DB</button>
+</div>
+</form>
+</div>
+</div>
+<!-- ======================================================== -->
+<!-- MODAL: ADD DIPLOMA / CURRICULUM COURSE                   -->
+<!-- ======================================================== -->
+<div class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4" id="addCurriculumModal">
+<div class="bg-white rounded-2xl max-w-md w-full border border-slate-200 shadow-2xl overflow-hidden">
+<div class="bg-[#1e3a5f] text-white p-4 flex items-center justify-between">
+<h4 class="text-sm font-bold" id="curriculumFormTitle">Add Course to Curriculum Registry</h4>
+<button class="text-blue-200 hover:text-white" onclick="closeAddCurriculumModal()">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<form class="p-4 space-y-3 text-xs" onsubmit="handleSaveCurriculum(event)">
+<div class="grid grid-cols-2 gap-2 rounded-lg bg-slate-100 p-1">
+<button class="rounded-md bg-white px-3 py-2 font-bold text-[#1d4ed8] shadow-xs transition" id="curriculumCourseModeButton" type="button" aria-pressed="true" onclick="setCurriculumFormMode('course')">Add a Course</button>
+<button class="rounded-md px-3 py-2 font-semibold text-slate-600 transition hover:bg-white/70" id="curriculumDiplomaModeButton" type="button" aria-pressed="false" onclick="setCurriculumFormMode('diploma')">Add a Diploma</button>
+</div>
+<div id="courseFormFields">
+<div>
+<label class="block font-bold text-slate-700 mb-1">Diploma Program</label>
+<select class="w-full p-2 border border-slate-300 rounded-lg text-xs" id="curricTargetDiploma">
+</select>
+</div>
+<div class="grid grid-cols-2 gap-2">
+<div>
+<label class="block font-bold text-slate-700 mb-1">Year Level</label>
+<select class="w-full p-2 border border-slate-300 rounded-lg text-xs" id="curricTargetYear">
+<option value="1">1st Year</option>
+<option value="2">2nd Year</option>
+<option value="3">3rd Year</option>
+</select>
+</div>
+<div>
+<label class="block font-bold text-slate-700 mb-1">Semester</label>
+<select class="w-full p-2 border border-slate-300 rounded-lg text-xs" id="curricTargetSem">
+<option value="1">1st Semester</option>
+<option value="2">2nd Semester</option>
+</select>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-2">
+<div>
+<label class="block font-bold text-slate-700 mb-1">Course Code</label>
+<input class="w-full p-2 border border-slate-300 rounded-lg text-xs" id="curricCourseCode" placeholder="e.g. CRP 121" required="" type="text">
+</div>
+<div>
+<label class="block font-bold text-slate-700 mb-1">Course Name</label>
+<input class="w-full p-2 border border-slate-300 rounded-lg text-xs" id="curricCourseName" placeholder="e.g. Carpentry NC II" required="" type="text">
+</div>
+</div>
+<div class="grid grid-cols-2 gap-2">
+<div>
+<label class="block font-bold text-slate-700 mb-1">Lec Units (1.0 hr/unit)</label>
+<input class="w-full p-2 border border-slate-300 rounded-lg text-xs" id="curricLecUnits" min="0" required="" type="number" value="2">
+</div>
+<div>
+<label class="block font-bold text-slate-700 mb-1">Lab Units (1.5 hrs/unit)</label>
+<input class="w-full p-2 border border-slate-300 rounded-lg text-xs" id="curricLabUnits" min="0" required="" type="number" value="2">
+</div>
+</div>
+<div class="grid grid-cols-2 gap-2">
+<div>
+<label class="block font-bold text-slate-700 mb-1">Pre-requisite</label>
+<input class="w-full p-2 border border-slate-300 rounded-lg text-xs" id="curricPrereq" type="text" value="None">
+</div>
+<div>
+<label class="block font-bold text-slate-700 mb-1">Resultant Qualification</label>
+<input class="w-full p-2 border border-slate-300 rounded-lg text-xs" id="curricQual" placeholder="e.g. Carpentry NC II" required="" type="text">
+</div>
+</div>
+</div>
+<div class="hidden space-y-3" id="diplomaFormFields">
+<div>
+<label class="block font-bold text-slate-700 mb-1" for="curricDiplomaCode">Diploma Code</label>
+<input class="w-full p-2 border border-slate-300 rounded-lg text-xs uppercase" id="curricDiplomaCode" placeholder="e.g. DCMT" required="" type="text">
+</div>
+<div>
+<label class="block font-bold text-slate-700 mb-1" for="curricDiplomaTitle">Diploma Name</label>
+<input class="w-full p-2 border border-slate-300 rounded-lg text-xs" id="curricDiplomaTitle" placeholder="e.g. Diploma in Construction Management Technology" required="" type="text">
+</div>
+<p class="text-[11px] text-[#3b6fa0]">After creating the diploma, you can add its courses and semester details.</p>
+</div>
+<div class="pt-2 flex justify-end gap-2 border-t border-slate-200">
+<button class="px-3 py-1.5 text-slate-600 bg-slate-100 rounded-lg font-semibold" onclick="closeAddCurriculumModal()" type="button">Cancel</button>
+<button class="px-4 py-1.5 bg-[#2563eb] text-white rounded-lg font-semibold hover:bg-blue-700" id="curriculumSubmitButton" type="submit">Add Course</button>
+</div>
+</form>
+</div>
+</div>
+<!-- TOAST NOTIFICATION CONTAINER -->
+<div class="fixed bottom-4 right-4 z-50 bg-[#1e3a5f] text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-lg border border-blue-400/40 flex items-center gap-2 transform translate-y-20 opacity-0 transition duration-300 pointer-events-none" id="toastNotification">
+<span class="material-symbols-outlined text-emerald-400 text-sm">check_circle</span>
+<span id="toastMessage" class="">Success</span>
+</div>
+<!-- ======================================================== -->
+<!-- JAVASCRIPT STATE ENGINE & MOCK DATA                      -->
+<!-- ======================================================== -->
+<script>
+    // --------------------------------------------------------
+    // APPLICATION STATE
+    // --------------------------------------------------------
+    let currentUserRole = 'head'; // 'head' (Head Trainer) or 'trainee' (Trainee Read-Only)
+    let currentView = 'schedule';
+    let selectedTrainerForModal = null;
+    let currentFacultyFilter = 'all';
+
+    // --------------------------------------------------------
+    // 4. FACULTY EXACT MOCK DATA
+    // --------------------------------------------------------
+    let facultyDatabase = [
+      {
+        id: 1,
+        lastName: "Dagohoy",
+        firstName: "Alexander",
+        mi: "O.",
+        dept: "DCET",
+        role: "JO",
+        quals: "Masonry NC II",
+        mobile: "9307603532",
+        email: "alexanderdagohoy7@gmail.com",
+        isShared: true,
+        sharedGroup: "DCET / DCMT",
+        courses: [
+          { code: "MAS 212", name: "Masonry NC II", lec: 1, lab: 2, total: 3 },
+          { code: "CRP 121", name: "Carpentry NC II", lec: 2, lab: 2, total: 4 }
+        ]
+      },
+      {
+        id: 2,
+        lastName: "Sedomar",
+        firstName: "Haitham Jenor",
+        mi: "L.",
+        dept: "DCET",
+        role: "JO",
+        quals: "Civil Engineering Orientation, Hydraulics, Physics for Engineers",
+        mobile: "9162655967",
+        email: "haithamibnsajid@gmail.com",
+        isShared: true,
+        sharedGroup: "DCET / DCMT",
+        courses: [
+          { code: "CAD 122", name: "Computer-Aided Drafting", lec: 0, lab: 2, total: 2 },
+          { code: "PLM 211", name: "Plumbing NC II", lec: 1, lab: 2, total: 3 }
+        ]
+      },
+      {
+        id: 3,
+        lastName: "Dacoco",
+        firstName: "Belinda",
+        mi: "C.",
+        dept: "DWT",
+        role: "JO",
+        quals: "SMAW, FCAW, GMAW, GTAW, NC I and II",
+        mobile: "9955220861",
+        email: "bcdadacs55@gmail.com",
+        isShared: true,
+        sharedGroup: "DWT / DEMT",
+        courses: [
+          { code: "EIM 211", name: "Electrical Installation & Maintenance NCII", lec: 2, lab: 2, total: 4 },
+          { code: "WLD 101", name: "Basic Welding Fusion", lec: 1, lab: 2, total: 3 }
+        ]
+      },
+      {
+        id: 4,
+        lastName: "Bravo Jr.",
+        firstName: "Albert",
+        mi: "B.",
+        dept: "DCET",
+        role: "TESD Specialist II",
+        quals: "MAED Language Teaching",
+        mobile: "9078670778",
+        email: "albertbravojr28@gmail.com",
+        isShared: false,
+        leadTag: "Lead Instructor",
+        courses: [
+          { code: "MCT 212", name: "Mechatronics Servicing NCIII", lec: 1, lab: 2, total: 3 },
+          { code: "ENG 101", name: "Technical Communication in TVET", lec: 3, lab: 0, total: 3 }
+        ]
+      }
+    ];
+
+    // --------------------------------------------------------
+    // 5. CURRICULUM CENTRAL REGISTRY DATA
+    // --------------------------------------------------------
+    let curriculumDiplomas = [
+      { code: "DCMT", title: "Diploma in Construction Management Technology" },
+      { code: "DEMT", title: "Diploma in Electro-Mechatronics Technology" },
+      { code: "DCET", title: "Diploma in Computer Engineering Technology" }
+    ];
+
+    let curriculumSections = [
+      {
+        id: "dcmt-y1-s2",
+        diploma: "DCMT",
+        diplomaTitle: "DCMT - Diploma in Construction Management Technology",
+        yearLevel: "1",
+        semester: "2",
+        yearRevision: "First Year, Second Semester",
+        courses: [
+          {
+            code: "CRP 121",
+            name: "Carpentry NC II",
+            lec: 2,
+            lab: 2,
+            total: 4,
+            prereq: "None",
+            qual: "Carpentry NC II",
+            trainerName: "Alexander O. Dagohoy"
+          },
+          {
+            code: "CAD 122",
+            name: "Computer-Aided Drafting",
+            lec: 0,
+            lab: 2,
+            total: 2,
+            prereq: "DRAW 101",
+            qual: "Technical Drafting NC II",
+            trainerName: "Haitham Jenor L. Sedomar"
+          }
+        ]
+      },
+      {
+        id: "dcmt-y2-s1",
+        diploma: "DCMT",
+        diplomaTitle: "DCMT - Diploma in Construction Management Technology",
+        yearLevel: "2",
+        semester: "1",
+        yearRevision: "Second Year, First Semester",
+        courses: [
+          {
+            code: "PLM 211",
+            name: "Plumbing NC II",
+            lec: 1,
+            lab: 2,
+            total: 3,
+            prereq: "None",
+            qual: "Plumbing NC II",
+            trainerName: "Haitham Jenor L. Sedomar"
+          },
+          {
+            code: "MAS 212",
+            name: "Masonry NC II",
+            lec: 1,
+            lab: 2,
+            total: 3,
+            prereq: "None",
+            qual: "Masonry NC II",
+            trainerName: "Alexander O. Dagohoy"
+          }
+        ]
+      },
+      {
+        id: "demt-y2-s1",
+        diploma: "DEMT",
+        diplomaTitle: "DEMT - Diploma in Electro-Mechatronics Technology",
+        yearLevel: "2",
+        semester: "1",
+        yearRevision: "Repackaged 2025 - Second Year, First Semester",
+        courses: [
+          {
+            code: "EIM 211",
+            name: "Electrical Installation and Maintenance NCII",
+            lec: 2,
+            lab: 2,
+            total: 4,
+            prereq: "None",
+            qual: "Electrical Installation and Maintenance NCII",
+            trainerName: "Belinda C. Dacoco"
+          },
+          {
+            code: "MCT 212",
+            name: "Mechatronics Servicing NCIII",
+            lec: 1,
+            lab: 2,
+            total: 3,
+            prereq: "EMR 122",
+            qual: "Mechatronics Servicing NCIII",
+            trainerName: "Albert B. Bravo Jr."
+          }
+        ]
+      }
+    ];
+
+    // --------------------------------------------------------
+    // TOAST SYSTEM
+    // --------------------------------------------------------
+    function showToast(msg) {
+      const toast = document.getElementById('toastNotification');
+      const text = document.getElementById('toastMessage');
+      text.innerText = msg;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 2800);
+    }
+
+    // --------------------------------------------------------
+    // VIEW NAVIGATION LOGIC
+    // --------------------------------------------------------
+    function switchView(target) {
+      currentView = target;
+      const views = ['login', 'schedule', 'faculty', 'curriculum'];
+
+      views.forEach(v => {
+        const el = document.getElementById(`view-${v}`);
+        const navBtn = document.getElementById(`sidebar-nav-${v}`);
+
+        if (el) {
+          if (v === target) {
+            el.classList.remove('hidden');
+          } else {
+            el.classList.add('hidden');
+          }
+        }
+
+        if (navBtn) {
+          const icon = navBtn.querySelector('.material-symbols-outlined');
+          if (v === target) {
+            navBtn.className = "w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg font-bold text-white bg-[#2563eb] shadow-sm transition text-left";
+            if (icon) icon.className = "material-symbols-outlined text-white";
+          } else {
+            navBtn.className = "w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg font-medium text-blue-200 hover:text-white hover:bg-white/10 transition text-left";
+            if (icon) icon.className = "material-symbols-outlined text-blue-300";
+          }
+        }
+      });
+
+      // Update Header Text dynamically
+      const titleEl = document.getElementById('topHeaderTitle');
+      const subEl = document.getElementById('topHeaderSubtitle');
+      const actionText = document.getElementById('quickActionButtonText');
+
+      if (target === 'login') {
+        titleEl.innerText = "Institutional Login Gateway";
+        subEl.innerText = "Role-based authorization and session credential verifier.";
+        actionText.innerText = "Sign In Now";
+      } else if (target === 'schedule') {
+        titleEl.innerText = "Master Schedule & Timetable Matrix";
+        subEl.innerText = "Fixed matrix curriculum scheduling with automatic faculty load mapping.";
+        actionText.innerText = "New Timetable Entry";
+        renderTimetable();
+      } else if (target === 'faculty') {
+        titleEl.innerText = "Faculty & Trainer Directory";
+        subEl.innerText = "Dense Google Sheets-style directory with cross-discipline shared tagging.";
+        actionText.innerText = "Add Faculty Member";
+        renderFacultyTable(getVisibleFaculty());
+      } else if (target === 'curriculum') {
+        titleEl.innerText = "Curriculum Central Registry";
+        subEl.innerText = "Official TESDA circular syllabi, credit units, and qualifications.";
+        actionText.innerText = "Add Course / Diploma";
+        renderCurriculumSections();
+      }
+
+      updateRolePermissions();
+    }
+
+    function handleQuickAddAction() {
+      if (currentUserRole !== 'head' && currentView !== 'schedule') return;
+
+      if (currentView === 'schedule') {
+        alert("Schedule Editor: All time matrix positions locked under Fixed Matrix Protocol. Faculty assignments mapped via Curriculum Registry.");
+      } else if (currentView === 'faculty') {
+        openFacultyModal('add');
+      } else if (currentView === 'curriculum') {
+        openAddCurriculumModal();
+      } else {
+        switchView('schedule');
+      }
+    }
+
+    function updateRolePermissions() {
+      const isHeadTrainer = currentUserRole === 'head';
+      document.getElementById('facultyAddButton').classList.toggle('hidden', !isHeadTrainer);
+      document.getElementById('curriculumAddButton').classList.toggle('hidden', !isHeadTrainer);
+      document.getElementById('quickActionButton').classList.toggle(
+        'hidden',
+        !isHeadTrainer && currentView !== 'schedule'
+      );
+
+      if (!isHeadTrainer) {
+        document.getElementById('facultyFormModal').classList.add('hidden');
+        document.getElementById('addCurriculumModal').classList.add('hidden');
+      }
+
+      if (currentView === 'faculty') {
+        renderFacultyTable(getVisibleFaculty());
+      }
+    }
+
+    // --------------------------------------------------------
+    // USER ROLE & LOGIN SIMULATION
+    // --------------------------------------------------------
+    function setAuthRole(role) {
+      currentUserRole = role;
+      const headCard = document.getElementById('authCardHead');
+      const traineeCard = document.getElementById('authCardTrainee');
+
+      if (role === 'head') {
+        headCard.className = "flex items-center justify-between p-3.5 rounded-xl border-2 border-blue-600 bg-blue-50/70 cursor-pointer transition";
+        traineeCard.className = "flex items-center justify-between p-3.5 rounded-xl border border-slate-200 hover:border-blue-300 hover:bg-slate-50 cursor-pointer transition";
+      } else {
+        headCard.className = "flex items-center justify-between p-3.5 rounded-xl border border-slate-200 hover:border-blue-300 hover:bg-slate-50 cursor-pointer transition";
+        traineeCard.className = "flex items-center justify-between p-3.5 rounded-xl border-2 border-amber-600 bg-amber-50/70 cursor-pointer transition";
+      }
+    }
+
+    function toggleUserRoleSimulation() {
+      const nextRole = currentUserRole === 'head' ? 'trainee' : 'head';
+      loginAs(nextRole);
+    }
+
+    function loginAs(role) {
+      currentUserRole = role;
+      const avatar = document.getElementById('sidebarUserAvatar');
+      const name = document.getElementById('sidebarUserName');
+      const roleBadge = document.getElementById('sidebarUserRoleBadge');
+
+      if (role === 'head') {
+        avatar.innerText = "RM";
+        avatar.className = "w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-xs font-bold text-white shadow-xs";
+        name.innerText = "Engr. Ramon Morales";
+        roleBadge.innerText = "Head Trainer Admin";
+        roleBadge.className = "inline-block mt-0.5 text-[9px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 px-1.5 py-0.2 rounded";
+        showToast("Authenticated as Head Trainer Engr. Ramon Morales (Full Admin Access)");
+      } else {
+        avatar.innerText = "MS";
+        avatar.className = "w-8 h-8 rounded-lg bg-amber-600 flex items-center justify-center text-xs font-bold text-white shadow-xs";
+        name.innerText = "Maria Santos";
+        roleBadge.innerText = "Trainee Read-Only";
+        roleBadge.className = "inline-block mt-0.5 text-[9px] font-semibold bg-amber-500/20 text-amber-300 border border-amber-400/30 px-1.5 py-0.2 rounded";
+        showToast("Authenticated as Maria Santos (Trainee Read-Only Timetable Mode)");
+      }
+
+      updateRolePermissions();
+      switchView('schedule');
+    }
+
+    function executeGoogleLogin() {
+      loginAs(currentUserRole);
+    }
+
+    // --------------------------------------------------------
+    // 3. MASTER SCHEDULE TIMETABLE LOGIC
+    // --------------------------------------------------------
+    function renderTimetable() {
+      const diploma = document.getElementById('schedDiplomaFilter').value;
+      const sem = document.getElementById('schedSemFilter').value;
+      const year = document.getElementById('schedYearFilter').value;
+
+      document.getElementById('currentTimetableHeading').innerText =
+        `${diploma} - Year ${year}, Semester ${sem} Master Schedule Matrix`;
+
+      const tbody = document.getElementById('timetableBody');
+      tbody.innerHTML = '';
+
+      // Required Time Slots
+      const timeSlots = [
+        { time: "8:00 AM - 9:00 AM", isBlocked: true },
+        { time: "9:00 AM - 10:00 AM", isBlocked: true },
+        { time: "10:00 AM - 11:30 AM", slotKey: "morning" },
+        { time: "11:30 AM - 1:00 PM", slotKey: "midday" },
+        { time: "1:00 PM - 2:30 PM", slotKey: "afternoon1" },
+        { time: "2:30 PM - 4:00 PM", slotKey: "afternoon2" },
+        { time: "4:00 PM - 5:00 PM", slotKey: "late" }
+      ];
+
+      timeSlots.forEach(slot => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50/70 transition border-b border-slate-200";
+
+        // Time Column
+        const tdTime = document.createElement('td');
+        tdTime.className = "py-3 px-3 font-mono text-[11px] font-bold text-slate-600 bg-slate-50 border-r border-slate-200 text-center";
+        tdTime.innerText = slot.time;
+        tr.appendChild(tdTime);
+
+        // Strict 8:00 AM - 10:00 AM Locked Staff Meeting
+        if (slot.isBlocked) {
+          const tdBlocked = document.createElement('td');
+          tdBlocked.colSpan = 5;
+          tdBlocked.className = "py-3 px-4 bg-[#bfdbfe] border-r border-slate-200 text-center shadow-inner";
+          tdBlocked.innerHTML = `
+            <div class="flex items-center justify-center gap-2 text-blue-950 font-extrabold text-xs tracking-wide">
+              <span class="material-symbols-outlined text-blue-800 text-base">lock</span>
+              <span>BLOCKED - STAFF MEETING (MANDATORY ADMINISTRATIVE PERIOD - NO CLASSES PERMITTED)</span>
+              <span class="text-[10px] bg-blue-300 text-blue-900 px-2 py-0.5 rounded font-mono font-bold uppercase">RESERVED</span>
+            </div>
+          `;
+          tr.appendChild(tdBlocked);
+        } else {
+          // Mon - Fri Course Mapping
+          const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+          days.forEach(day => {
+            const td = document.createElement('td');
+            td.className = "py-2 px-2 border-r border-slate-200 align-top text-xs";
+
+            const course = getTimetableCard(diploma, sem, year, day, slot.slotKey);
+            if (course) {
+              td.innerHTML = `
+                <div class="bg-blue-50/90 border border-blue-200 rounded-lg p-2.5 shadow-2xs hover:shadow-xs transition hover:border-blue-400">
+                  <div class="flex items-center justify-between gap-1">
+                    <span class="font-extrabold text-[#1d4ed8] text-xs font-mono">${course.code}</span>
+                    <span class="text-[10px] px-1.5 py-0.2 bg-blue-100 text-blue-800 rounded font-bold">${course.type}</span>
+                  </div>
+                  <div class="text-[11px] font-bold text-slate-800 mt-1 leading-snug line-clamp-1">${course.title}</div>
+                  <div class="mt-1.5 pt-1 border-t border-blue-100 flex items-center justify-between">
+                    <button onclick="openTrainerModalByName('${course.trainer}')" class="text-[10px] font-semibold text-[#2563eb] hover:underline text-left flex items-center gap-1 group">
+                      <span class="material-symbols-outlined text-[13px] text-blue-600 group-hover:scale-110 transition">person</span>
+                      <span class="truncate max-w-[110px]">${course.trainer}</span>
+                    </button>
+                    ${course.isShared ? '<span class="text-[9px] bg-blue-200 text-blue-900 px-1 py-0.2 rounded font-bold" title="Multi-department shared trainer">Shared</span>' : ''}
+                  </div>
+                  <div class="text-[10px] text-[#3b6fa0] font-mono mt-1 font-medium">
+                    ${course.units} | ${course.hours}
+                  </div>
+                </div>
+              `;
+            } else {
+              td.innerHTML = `<span class="text-[11px] text-slate-300 italic block text-center py-3 font-mono">- Open -</span>`;
+            }
+            tr.appendChild(td);
+          });
+        }
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    function getTimetableCard(diploma, sem, year, day, slotKey) {
+      // Mock class mappings for DCMT
+      if (diploma === 'DCMT') {
+        if (day === 'Monday' && slotKey === 'morning') {
+          return {
+            code: "CRP 121",
+            title: "Carpentry NC II",
+            type: "Lec/Lab",
+            trainer: "Alexander O. Dagohoy",
+            units: "4 Units (2L/2L)",
+            hours: "5.0 hrs/wk",
+            isShared: true
+          };
+        }
+        if (day === 'Tuesday' && slotKey === 'morning') {
+          return {
+            code: "CAD 122",
+            title: "Computer-Aided Drafting",
+            type: "Lab",
+            trainer: "Haitham Jenor L. Sedomar",
+            units: "2 Lab Units",
+            hours: "3.0 hrs/wk",
+            isShared: true
+          };
+        }
+        if (day === 'Wednesday' && slotKey === 'midday') {
+          return {
+            code: "PLM 211",
+            title: "Plumbing NC II",
+            type: "Lec/Lab",
+            trainer: "Haitham Jenor L. Sedomar",
+            units: "3 Units (1L/2L)",
+            hours: "4.0 hrs/wk",
+            isShared: true
+          };
+        }
+        if (day === 'Thursday' && slotKey === 'afternoon1') {
+          return {
+            code: "MAS 212",
+            title: "Masonry NC II",
+            type: "Lec/Lab",
+            trainer: "Alexander O. Dagohoy",
+            units: "3 Units (1L/2L)",
+            hours: "4.0 hrs/wk",
+            isShared: true
+          };
+        }
+      } else if (diploma === 'DEMT') {
+        if (day === 'Monday' && slotKey === 'morning') {
+          return {
+            code: "EIM 211",
+            title: "Electrical Installation & Maintenance NCII",
+            type: "Lec/Lab",
+            trainer: "Belinda C. Dacoco",
+            units: "4 Units (2L/2L)",
+            hours: "5.0 hrs/wk",
+            isShared: true
+          };
+        }
+        if (day === 'Wednesday' && slotKey === 'morning') {
+          return {
+            code: "MCT 212",
+            title: "Mechatronics Servicing NCIII",
+            type: "Lec/Lab",
+            trainer: "Albert B. Bravo Jr.",
+            units: "3 Units (1L/2L)",
+            hours: "4.0 hrs/wk",
+            isShared: false
+          };
+        }
+      } else {
+        // DCET default
+        if (day === 'Tuesday' && slotKey === 'midday') {
+          return {
+            code: "CAD 122",
+            title: "Computer-Aided Drafting",
+            type: "Lab",
+            trainer: "Haitham Jenor L. Sedomar",
+            units: "2 Lab Units",
+            hours: "3.0 hrs/wk",
+            isShared: true
+          };
+        }
+      }
+      return null;
+    }
+
+    // --------------------------------------------------------
+    // 4. FACULTY DATABASE LOGIC
+    // --------------------------------------------------------
+    function getVisibleFaculty() {
+      const query = document.getElementById('facultySearchInput').value.toLowerCase();
+      let list = facultyDatabase;
+
+      if (currentFacultyFilter === 'shared') {
+        list = list.filter(f => f.isShared);
+      } else if (currentFacultyFilter !== 'all') {
+        list = list.filter(f =>
+          f.dept === currentFacultyFilter ||
+          (f.sharedGroup && f.sharedGroup.includes(currentFacultyFilter))
+        );
+      }
+
+      return list.filter(f =>
+        f.lastName.toLowerCase().includes(query) ||
+        f.firstName.toLowerCase().includes(query) ||
+        f.quals.toLowerCase().includes(query) ||
+        f.email.toLowerCase().includes(query)
+      );
+    }
+
+    function renderFacultyTable(list) {
+      const tbody = document.getElementById('facultyTableBody');
+      tbody.innerHTML = '';
+
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" class="p-6 text-center text-slate-400 italic">No faculty records match the specified filter.</td></tr>`;
+        return;
+      }
+
+      list.forEach(f => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-[#eff6ff] transition border-b border-slate-200";
+
+        tr.innerHTML = `
+          <td class="py-2.5 px-3 font-bold text-slate-800 border-r border-slate-200">${f.lastName}</td>
+          <td class="py-2.5 px-3 text-slate-700 border-r border-slate-200">${f.firstName}</td>
+          <td class="py-2.5 px-2 text-center text-slate-500 font-mono border-r border-slate-200">${f.mi}</td>
+          <td class="py-2.5 px-3 border-r border-slate-200">
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <span class="font-bold text-slate-900">${f.dept}</span>
+              ${f.isShared ? `
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#bfdbfe] text-[#1e3a5f] border border-blue-300">
+                  <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
+                  SHARED FACULTY
+                </span>
+              ` : ''}
+              ${f.leadTag ? `
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
+                  ${f.leadTag}
+                </span>
+              ` : ''}
+            </div>
+          </td>
+          <td class="py-2.5 px-3 border-r border-slate-200 font-medium">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${f.role.includes('Specialist') ? 'bg-purple-100 text-purple-900' : 'bg-slate-100 text-slate-700'}">
+              ${f.role}
+            </span>
+          </td>
+          <td class="py-2.5 px-3 text-slate-600 border-r border-slate-200 max-w-xs truncate" title="${f.quals}">${f.quals}</td>
+          <td class="py-2.5 px-3 text-slate-700 border-r border-slate-200 font-mono text-[11px]">${f.mobile}</td>
+          <td class="py-2.5 px-3 text-[#2563eb] border-r border-slate-200 font-mono text-[11px] hover:underline cursor-pointer">${f.email}</td>
+          <td class="py-2.5 px-3 text-center">
+            <div class="flex items-center justify-center gap-1">
+              ${currentUserRole === 'head' ? `
+                <button onclick="openFacultyModal('add')" class="px-2 py-1 rounded bg-slate-100 text-slate-700 hover:bg-slate-200 text-[10px] font-bold transition">
+                  Add
+                </button>
+                <button onclick="openFacultyModal('edit', ${f.id})" class="px-2 py-1 rounded bg-slate-100 text-slate-700 hover:bg-slate-200 text-[10px] font-bold transition">
+                  Edit
+                </button>
+              ` : ''}
+              <button onclick="openTrainerModalById(${f.id})" class="px-2.5 py-1 rounded bg-blue-100 text-[#1d4ed8] hover:bg-blue-200 text-[10px] font-extrabold transition shadow-2xs">
+                View Load
+              </button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function handleFacultySearch() {
+      renderFacultyTable(getVisibleFaculty());
+    }
+
+    function filterFaculty(dept) {
+      currentFacultyFilter = dept;
+      document.querySelectorAll('.faculty-chip').forEach(c => {
+        if (c.getAttribute('data-dept') === dept) {
+          c.className = "faculty-chip px-2.5 py-1 rounded-md bg-[#1e3a5f] text-white font-medium";
+        } else {
+          c.className = "faculty-chip px-2.5 py-1 rounded-md bg-white border border-slate-300 text-slate-700 hover:bg-blue-50 font-medium";
+        }
+      });
+
+      renderFacultyTable(getVisibleFaculty());
+    }
+
+    // --------------------------------------------------------
+    // 5. CURRICULUM CENTRAL REGISTRY RENDERING
+    // --------------------------------------------------------
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, character => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      })[character]);
+    }
+
+    function refreshCurriculumDiplomaOptions() {
+      const filter = document.getElementById('curriculumDiplomaSelect');
+      const target = document.getElementById('curricTargetDiploma');
+      const selectedFilter = filter.value;
+      const selectedTarget = target.value;
+
+      filter.innerHTML = [
+        '<option value="ALL">Show All Approved Diplomas</option>',
+        ...curriculumDiplomas.map(diploma =>
+          `<option value="${escapeHtml(diploma.code)}">${escapeHtml(diploma.code)} - ${escapeHtml(diploma.title)}</option>`
+        )
+      ].join('');
+      target.innerHTML = curriculumDiplomas.map(diploma =>
+        `<option value="${escapeHtml(diploma.code)}">${escapeHtml(diploma.code)} - ${escapeHtml(diploma.title)}</option>`
+      ).join('');
+
+      filter.value = curriculumDiplomas.some(diploma => diploma.code === selectedFilter)
+        ? selectedFilter
+        : 'ALL';
+      target.value = curriculumDiplomas.some(diploma => diploma.code === selectedTarget)
+        ? selectedTarget
+        : (curriculumDiplomas[0]?.code || '');
+    }
+
+    function appendEmptyDiplomaCard(diploma, container) {
+      const card = document.createElement('div');
+      card.className = "bg-white rounded-xl border border-slate-200 shadow-xs p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3";
+
+      const details = document.createElement('div');
+      const name = document.createElement('h4');
+      name.className = "text-sm font-bold text-[#1d4ed8]";
+      name.textContent = `${diploma.code} - ${diploma.title}`;
+      const note = document.createElement('p');
+      note.className = "text-xs text-slate-500 mt-1";
+      note.textContent = "No curriculum sections yet. Add a course to create the first semester matrix.";
+      details.append(name, note);
+      card.appendChild(details);
+
+      if (currentUserRole === 'head') {
+        const addCourseButton = document.createElement('button');
+        addCourseButton.className = "bg-[#2563eb] hover:bg-blue-700 text-white text-xs font-semibold px-3 py-2 rounded-lg transition";
+        addCourseButton.textContent = "Add First Course";
+        addCourseButton.addEventListener('click', () => openAddCurriculumModal('course', diploma.code));
+        card.appendChild(addCourseButton);
+      }
+
+      container.appendChild(card);
+    }
+
+    function renderCurriculumSections() {
+      refreshCurriculumDiplomaOptions();
+      const diplomaFilter = document.getElementById('curriculumDiplomaSelect').value;
+      const yearFilter = document.getElementById('curriculumYearSelect').value;
+      const container = document.getElementById('curriculumContainers');
+      container.innerHTML = '';
+
+      let matching = curriculumSections.filter(sec => {
+        const dipMatch = (diplomaFilter === 'ALL' || sec.diploma === diplomaFilter);
+        const yrMatch = (yearFilter === 'ALL' || sec.yearLevel === yearFilter);
+        return dipMatch && yrMatch;
+      });
+
+      const emptyDiplomas = curriculumDiplomas.filter(diploma =>
+        !curriculumSections.some(section => section.diploma === diploma.code) &&
+        (diplomaFilter === 'ALL' || diploma.code === diplomaFilter)
+      );
+
+      if (matching.length === 0) {
+        if (emptyDiplomas.length > 0) {
+          emptyDiplomas.forEach(diploma => appendEmptyDiplomaCard(diploma, container));
+          return;
+        }
+        container.innerHTML = `<div class="bg-white p-8 rounded-xl border border-slate-200 text-center text-slate-400">No curriculum matrices match the specified criteria.</div>`;
+        return;
+      }
+
+      matching.forEach(sec => {
+        const wrap = document.createElement('div');
+        wrap.className = "bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden";
+
+        const totalCourses = sec.courses.length;
+        const totalUnits = sec.courses.reduce((sum, c) => sum + c.total, 0);
+
+        wrap.innerHTML = `
+          <div class="bg-gradient-to-r from-slate-50 to-blue-50/60 p-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <span class="text-[10px] font-extrabold uppercase tracking-wider text-blue-800 bg-blue-100/90 px-2 py-0.5 rounded border border-blue-200">
+                ${escapeHtml(sec.yearRevision)}
+              </span>
+              <h4 class="text-sm font-bold text-[#1d4ed8] mt-1">${escapeHtml(sec.diplomaTitle)}</h4>
+            </div>
+            <div class="flex items-center gap-2 text-xs font-mono">
+              <span class="text-slate-600 bg-white px-2.5 py-1 rounded border border-slate-200 font-medium">Courses: ${totalCourses}</span>
+              <span class="text-blue-900 bg-blue-100/80 px-2.5 py-1 rounded font-bold border border-blue-200">Total: ${totalUnits} Units</span>
+            </div>
+          </div>
+          <div class="overflow-x-auto custom-scroll">
+            <table class="w-full text-left text-xs border-collapse min-w-[780px]">
+              <thead>
+                <tr class="bg-slate-100 text-slate-700 border-b border-slate-200 text-[10px] font-bold uppercase tracking-wider">
+                  <th class="py-2.5 px-3 w-28 border-r border-slate-200">Course Code</th>
+                  <th class="py-2.5 px-3 border-r border-slate-200">Course Name</th>
+                  <th class="py-2.5 px-3 text-center w-24 border-r border-slate-200">Lec Units</th>
+                  <th class="py-2.5 px-3 text-center w-24 border-r border-slate-200">Lab Units</th>
+                  <th class="py-2.5 px-3 text-center w-24 border-r border-slate-200">Total Units</th>
+                  <th class="py-2.5 px-3 border-r border-slate-200 w-32">Pre-requisites</th>
+                  <th class="py-2.5 px-3">Resultant Qualification</th>
+                  <th class="py-2.5 px-3 text-center w-24">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-200">
+                ${sec.courses.map(c => `
+                  <tr class="hover:bg-slate-50 transition border-b border-slate-200">
+                    <td class="py-2.5 px-3 font-mono font-bold text-[#1d4ed8] border-r border-slate-200">${escapeHtml(c.code)}</td>
+                    <td class="py-2.5 px-3 font-semibold text-slate-800 border-r border-slate-200">${escapeHtml(c.name)}</td>
+                    <td class="py-2.5 px-3 text-center border-r border-slate-200 font-mono text-slate-600">${c.lec}</td>
+                    <td class="py-2.5 px-3 text-center border-r border-slate-200 font-mono text-slate-600">${c.lab}</td>
+                    <td class="py-2.5 px-3 text-center border-r border-slate-200 font-mono font-bold text-blue-700 bg-blue-50/50">${c.total}</td>
+                    <td class="py-2.5 px-3 border-r border-slate-200 font-mono text-slate-500 text-[11px]">${escapeHtml(c.prereq)}</td>
+                    <td class="py-2.5 px-3">
+                      <span class="inline-flex items-center gap-1 font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded text-[11px]">
+                        <span class="material-symbols-outlined text-[13px] text-emerald-600">verified</span>
+                        ${escapeHtml(c.qual)}
+                      </span>
+                    </td>
+                    <td class="py-2.5 px-3 text-center">
+                      <button onclick="showToast('Syllabus breakdown verified with TESDA National Standards.')" class="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold">
+                        Inspect
+                      </button>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+        container.appendChild(wrap);
+      });
+
+      emptyDiplomas.forEach(diploma => appendEmptyDiplomaCard(diploma, container));
+    }
+
+    // --------------------------------------------------------
+    // TRAINER MODAL & WORKLOAD ENGINE
+    // --------------------------------------------------------
+    function openTrainerModalByName(name) {
+      const match = facultyDatabase.find(f =>
+        `${f.firstName} ${f.lastName}`.toLowerCase().includes(name.toLowerCase()) ||
+        name.toLowerCase().includes(f.lastName.toLowerCase())
+      );
+      if (match) {
+        openTrainerModalById(match.id);
+      } else {
+        openTrainerModalById(1);
+      }
+    }
+
+    function openTrainerModalById(id) {
+      const trainer = facultyDatabase.find(f => f.id === id) || facultyDatabase[0];
+      selectedTrainerForModal = trainer;
+
+      const modal = document.getElementById('trainerModal');
+      document.getElementById('modalTrainerFullName').innerText = `${trainer.firstName} ${trainer.mi} ${trainer.lastName}`;
+      document.getElementById('modalTrainerAvatar').innerText = `${trainer.firstName[0]}${trainer.lastName[0]}`;
+      document.getElementById('modalTrainerDepartment').innerText = `${trainer.dept} ${trainer.isShared ? '(Shared: ' + trainer.sharedGroup + ')' : ''}`;
+      document.getElementById('modalTrainerPhone').innerText = trainer.mobile;
+      document.getElementById('modalTrainerEmail').innerText = trainer.email;
+
+      const courseContainer = document.getElementById('modalTrainerCourseList');
+      courseContainer.innerHTML = '';
+
+      let totalCalculatedHours = 0;
+      let totalUnits = 0;
+
+      trainer.courses.forEach(c => {
+        // Calculation Formula: Lecture x 1.0 hr + Lab x 1.5 hrs
+        const hours = (c.lec * 1.0) + (c.lab * 1.5);
+        totalCalculatedHours += hours;
+        totalUnits += c.total;
+
+        const row = document.createElement('div');
+        row.className = "flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs";
+        row.innerHTML = `
+          <div>
+            <div class="font-bold text-[#1d4ed8] font-mono">${c.code}</div>
+            <div class="text-[11px] text-slate-700 font-medium">${c.name}</div>
+          </div>
+          <div class="text-right font-mono">
+            <span class="font-bold text-slate-800">${c.total} Units</span>
+            <span class="text-[10px] text-[#3b6fa0] block font-semibold">${hours.toFixed(1)} Contact Hrs/Wk</span>
+          </div>
+        `;
+        courseContainer.appendChild(row);
+      });
+
+      document.getElementById('modalTrainerHoursBadge').innerText =
+        `Total: ${totalUnits} Units (${totalCalculatedHours.toFixed(1)} Weekly Contact Hrs)`;
+
+      modal.classList.remove('hidden');
+    }
+
+    function closeTrainerModal() {
+      document.getElementById('trainerModal').classList.add('hidden');
+    }
+
+    function jumpToFacultyFromModal() {
+      closeTrainerModal();
+      switchView('faculty');
+      if (selectedTrainerForModal) {
+        document.getElementById('facultySearchInput').value = selectedTrainerForModal.lastName;
+        handleFacultySearch();
+      }
+    }
+
+    // --------------------------------------------------------
+    // FACULTY ADD / EDIT MODAL
+    // --------------------------------------------------------
+    let currentEditFacultyId = null;
+
+    function openFacultyModal(mode, id = null) {
+      if (currentUserRole !== 'head') {
+        showToast("Only the Head Trainer can add or edit faculty records.");
+        return;
+      }
+
+      currentEditFacultyId = id;
+      const modal = document.getElementById('facultyFormModal');
+      const title = document.getElementById('facultyFormTitle');
+
+      if (mode === 'edit' && id) {
+        title.innerText = "Edit Faculty Record";
+        const f = facultyDatabase.find(item => item.id === id);
+        if (f) {
+          document.getElementById('facLastName').value = f.lastName;
+          document.getElementById('facFirstName').value = f.firstName;
+          document.getElementById('facMI').value = f.mi;
+          document.getElementById('facRole').value = f.role;
+          document.getElementById('facDept').value = f.isShared ? f.sharedGroup : f.dept;
+          document.getElementById('facQuals').value = f.quals;
+          document.getElementById('facMobile').value = f.mobile;
+          document.getElementById('facEmail').value = f.email;
+        }
+      } else {
+        title.innerText = "Add Faculty Member";
+        document.getElementById('facLastName').value = "";
+        document.getElementById('facFirstName').value = "";
+        document.getElementById('facMI').value = "";
+        document.getElementById('facQuals').value = "";
+        document.getElementById('facMobile').value = "9";
+        document.getElementById('facEmail').value = "";
+      }
+      modal.classList.remove('hidden');
+    }
+
+    function closeFacultyFormModal() {
+      document.getElementById('facultyFormModal').classList.add('hidden');
+    }
+
+    function handleSaveFaculty(e) {
+      e.preventDefault();
+      if (currentUserRole !== 'head') {
+        showToast("Only the Head Trainer can add or edit faculty records.");
+        return;
+      }
+
+      const lastName = document.getElementById('facLastName').value;
+      const firstName = document.getElementById('facFirstName').value;
+      const mi = document.getElementById('facMI').value;
+      const role = document.getElementById('facRole').value;
+      const deptValue = document.getElementById('facDept').value;
+      const quals = document.getElementById('facQuals').value;
+      const mobile = document.getElementById('facMobile').value;
+      const email = document.getElementById('facEmail').value;
+
+      const isShared = deptValue.includes('/');
+      const baseDept = isShared ? deptValue.split('/')[0].trim() : deptValue;
+
+      if (currentEditFacultyId) {
+        const item = facultyDatabase.find(f => f.id === currentEditFacultyId);
+        if (item) {
+          item.lastName = lastName;
+          item.firstName = firstName;
+          item.mi = mi;
+          item.role = role;
+          item.dept = baseDept;
+          item.isShared = isShared;
+          item.sharedGroup = deptValue;
+          item.quals = quals;
+          item.mobile = mobile;
+          item.email = email;
+        }
+        showToast(`Faculty record for ${firstName} ${lastName} updated.`);
+      } else {
+        const newId = facultyDatabase.length + 1;
+        facultyDatabase.push({
+          id: newId,
+          lastName,
+          firstName,
+          mi,
+          dept: baseDept,
+          role,
+          quals,
+          mobile,
+          email,
+          isShared,
+          sharedGroup: deptValue,
+          courses: [{ code: "GEN 101", name: "Institutional Orientation", lec: 1, lab: 0, total: 1 }]
+        });
+        showToast(`New faculty ${firstName} ${lastName} added and synced with Google Sheet DB.`);
+      }
+
+      closeFacultyFormModal();
+      renderFacultyTable(facultyDatabase);
+    }
+
+    // --------------------------------------------------------
+    // CURRICULUM ADD MODAL
+    // --------------------------------------------------------
+    let curriculumFormMode = 'course';
+
+    function openAddCurriculumModal(mode = 'course', diplomaCode = '') {
+      if (currentUserRole !== 'head') {
+        showToast("Only the Head Trainer can add courses or diplomas.");
+        return;
+      }
+
+      refreshCurriculumDiplomaOptions();
+      document.querySelector('#addCurriculumModal form').reset();
+      setCurriculumFormMode(mode);
+      if (diplomaCode) {
+        document.getElementById('curricTargetDiploma').value = diplomaCode;
+      }
+      document.getElementById('addCurriculumModal').classList.remove('hidden');
+    }
+
+    function setCurriculumFormMode(mode) {
+      curriculumFormMode = mode;
+      const isDiplomaMode = mode === 'diploma';
+      const courseFields = document.getElementById('courseFormFields');
+      const diplomaFields = document.getElementById('diplomaFormFields');
+      const courseButton = document.getElementById('curriculumCourseModeButton');
+      const diplomaButton = document.getElementById('curriculumDiplomaModeButton');
+
+      courseFields.classList.toggle('hidden', isDiplomaMode);
+      diplomaFields.classList.toggle('hidden', !isDiplomaMode);
+      courseFields.querySelectorAll('input, select').forEach(field => {
+        field.disabled = isDiplomaMode;
+      });
+      diplomaFields.querySelectorAll('input').forEach(field => {
+        field.disabled = !isDiplomaMode;
+      });
+      courseButton.className = isDiplomaMode
+        ? "rounded-md px-3 py-2 font-semibold text-slate-600 transition hover:bg-white/70"
+        : "rounded-md bg-white px-3 py-2 font-bold text-[#1d4ed8] shadow-xs transition";
+      diplomaButton.className = isDiplomaMode
+        ? "rounded-md bg-white px-3 py-2 font-bold text-[#1d4ed8] shadow-xs transition"
+        : "rounded-md px-3 py-2 font-semibold text-slate-600 transition hover:bg-white/70";
+      courseButton.setAttribute('aria-pressed', String(!isDiplomaMode));
+      diplomaButton.setAttribute('aria-pressed', String(isDiplomaMode));
+      document.getElementById('curriculumFormTitle').innerText = isDiplomaMode
+        ? "Add a Diploma to the Registry"
+        : "Add Course to Curriculum Registry";
+      document.getElementById('curriculumSubmitButton').innerText = isDiplomaMode
+        ? "Add Diploma"
+        : "Add Course";
+    }
+
+    function closeAddCurriculumModal() {
+      document.getElementById('addCurriculumModal').classList.add('hidden');
+    }
+
+    function handleSaveCurriculum(e) {
+      e.preventDefault();
+      if (currentUserRole !== 'head') {
+        showToast("Only the Head Trainer can add courses or diplomas.");
+        return;
+      }
+
+      if (curriculumFormMode === 'diploma') {
+        const code = document.getElementById('curricDiplomaCode').value.trim().toUpperCase();
+        const title = document.getElementById('curricDiplomaTitle').value.trim();
+        if (!code || !title) {
+          showToast("Enter both a diploma code and a diploma name.");
+          return;
+        }
+
+        const duplicate = curriculumDiplomas.some(diploma =>
+          diploma.code.toLowerCase() === code.toLowerCase() ||
+          diploma.title.toLowerCase() === title.toLowerCase()
+        );
+
+        if (duplicate) {
+          showToast("That diploma code or name is already in the registry.");
+          return;
+        }
+
+        curriculumDiplomas.push({ code, title });
+        refreshCurriculumDiplomaOptions();
+        document.getElementById('curriculumDiplomaSelect').value = code;
+        document.getElementById('curricTargetDiploma').value = code;
+        closeAddCurriculumModal();
+        renderCurriculumSections();
+        showToast(`${code} - ${title} added to the diploma registry.`);
+        return;
+      }
+
+      const diploma = document.getElementById('curricTargetDiploma').value;
+      const year = document.getElementById('curricTargetYear').value;
+      const sem = document.getElementById('curricTargetSem').value;
+      const code = document.getElementById('curricCourseCode').value;
+      const name = document.getElementById('curricCourseName').value;
+      const lec = parseInt(document.getElementById('curricLecUnits').value, 10);
+      const lab = parseInt(document.getElementById('curricLabUnits').value, 10);
+      const prereq = document.getElementById('curricPrereq').value;
+      const qual = document.getElementById('curricQual').value;
+
+      // Find or create target section
+      let targetSec = curriculumSections.find(s => s.diploma === diploma && s.yearLevel === year && s.semester === sem);
+      if (!targetSec) {
+        const diplomaInfo = curriculumDiplomas.find(item => item.code === diploma);
+        targetSec = {
+          id: `${diploma.toLowerCase()}-y${year}-s${sem}`,
+          diploma: diploma,
+          diplomaTitle: `${diploma} - ${diplomaInfo.title}`,
+          yearLevel: year,
+          semester: sem,
+          yearRevision: `Year ${year}, Semester ${sem} Matrix`,
+          courses: []
+        };
+        curriculumSections.push(targetSec);
+      }
+
+      targetSec.courses.push({
+        code,
+        name,
+        lec,
+        lab,
+        total: (lec + lab),
+        prereq,
+        qual,
+        trainerName: "Alexander O. Dagohoy"
+      });
+
+      closeAddCurriculumModal();
+      renderCurriculumSections();
+      showToast(`Course ${code} added to ${diploma} curriculum registry.`);
+    }
+
+    // --------------------------------------------------------
+    // INITIALIZATION
+    // --------------------------------------------------------
+    window.addEventListener('DOMContentLoaded', () => {
+      renderTimetable();
+      renderFacultyTable(facultyDatabase);
+      renderCurriculumSections();
+    });
+  </script>
+
+
+
+
+</body></html>

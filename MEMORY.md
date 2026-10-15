@@ -1,0 +1,1 @@
+- [Dashboard Recreation and Code Export](memory/dashboard-recreation-code-export.md) — Created a modular dashboard structure with Tailwind design system and component breakdown.
