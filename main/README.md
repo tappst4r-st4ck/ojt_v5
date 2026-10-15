@@ -48,3 +48,4 @@ Deploy the `main` folder as the Vercel project root and configure the same serve
 The application and API must be deployed together. GitHub Pages cannot host the Next.js API routes or protect the Google credentials. Deployment and live Google Sheets verification require the Google Cloud project, spreadsheet, and Vercel environment to be configured by the project owner.
 
 Before deployment, revoke or rotate any API key that was previously committed to Git history. Do not reuse the exposed key.
+   

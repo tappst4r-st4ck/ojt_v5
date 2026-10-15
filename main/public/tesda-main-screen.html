@@ -1965,8 +1965,9 @@
       curriculumSections = [];
       scheduleEntries = [];
       setAuthenticatedUser(null);
-      switchView('schedule');
+      switchView('login');
       document.body.removeAttribute('data-loading');
+      initializeGoogleIdentity();
       try {
         await refreshDashboardData();
       } catch (error) {
