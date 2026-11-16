@@ -21,7 +21,25 @@
     "afterFiles": [],
     "fallback": []
   },
-  "dynamicRoutes": [],
+  "dynamicRoutes": [
+    {
+      "page": "/api/records/[collection]",
+      "regex": "^/api/records/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPcollection": "nxtPcollection"
+      },
+      "namedRegex": "^/api/records/(?<nxtPcollection>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/api/records/[collection]/[id]",
+      "regex": "^/api/records/([^/]+?)/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPcollection": "nxtPcollection",
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/records/(?<nxtPcollection>[^/]+?)/(?<nxtPid>[^/]+?)(?:/)?$"
+    }
+  ],
   "staticRoutes": [
     {
       "page": "/",
@@ -40,6 +58,66 @@
       "regex": "^/_not\\-found(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/_not\\-found(?:/)?$"
+    },
+    {
+      "page": "/api/auth/config",
+      "regex": "^/api/auth/config(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/auth/config(?:/)?$"
+    },
+    {
+      "page": "/api/auth/login",
+      "regex": "^/api/auth/login(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/auth/login(?:/)?$"
+    },
+    {
+      "page": "/api/auth/logout",
+      "regex": "^/api/auth/logout(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/auth/logout(?:/)?$"
+    },
+    {
+      "page": "/api/auth/me",
+      "regex": "^/api/auth/me(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/auth/me(?:/)?$"
+    },
+    {
+      "page": "/api/data",
+      "regex": "^/api/data(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/data(?:/)?$"
+    },
+    {
+      "page": "/api/drive/curriculum",
+      "regex": "^/api/drive/curriculum(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/drive/curriculum(?:/)?$"
+    },
+    {
+      "page": "/api/drive/files",
+      "regex": "^/api/drive/files(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/drive/files(?:/)?$"
+    },
+    {
+      "page": "/api/drive/folders",
+      "regex": "^/api/drive/folders(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/drive/folders(?:/)?$"
+    },
+    {
+      "page": "/api/import/sheet",
+      "regex": "^/api/import/sheet(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/import/sheet(?:/)?$"
+    },
+    {
+      "page": "/api/setup",
+      "regex": "^/api/setup(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/setup(?:/)?$"
     }
   ],
   "dataRoutes": [],

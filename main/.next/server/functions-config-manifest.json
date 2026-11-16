@@ -1,4 +1,15 @@
 {
   "version": 1,
-  "functions": {}
+  "functions": {
+    "/api/auth/login": {},
+    "/api/auth/me": {},
+    "/api/data": {},
+    "/api/drive/curriculum": {},
+    "/api/drive/files": {},
+    "/api/drive/folders": {},
+    "/api/import/sheet": {},
+    "/api/records/[collection]": {},
+    "/api/records/[collection]/[id]": {},
+    "/api/setup": {}
+  }
 }

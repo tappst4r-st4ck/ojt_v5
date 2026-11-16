@@ -1,10 +1,11 @@
 const requiredFields = {
-  Diplomas: ["id", "code", "name"],
+  Diplomas: ["id", "code", "name", "durationYears"],
   "Master Schedule": ["id", "diplomaCode", "diplomaName", "courseCode", "courseName", "scheduledTime", "assignedTrainer", "day", "schoolYear"],
   Faculty: ["id", "lastName", "firstName", "department", "role", "qualifications", "mobileNumber", "email"],
   Courses: ["id", "diplomaCode", "diplomaName", "diplomaYear", "semester", "code", "name", "qualification"],
 };
 const numericFields = {
+  Diplomas: ["durationYears"],
   "Master Schedule": ["diplomaYear", "semester", "lectureUnits", "labUnits"],
   Courses: ["diplomaYear", "semester", "lecUnits", "labUnits", "totalUnits"],
 };
@@ -24,6 +25,9 @@ export function validateRecord(collection, record, { requireId = true } = {}) {
     if (record[field] !== undefined && (!Number.isFinite(Number(record[field])) || Number(record[field]) < 0)) {
       return `${field} must be a non-negative number.`;
     }
+  }
+  if (collection === "Diplomas" && (!Number.isInteger(Number(record.durationYears)) || Number(record.durationYears) < 1 || Number(record.durationYears) > 6)) {
+    return "durationYears must be a whole number between 1 and 6.";
   }
   if (collection === "Faculty" && !/^\+63\d{10}$/.test(String(record.mobileNumber))) {
     return "Mobile numbers must use +63 followed by ten digits.";

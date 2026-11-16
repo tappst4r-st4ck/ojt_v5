@@ -82,6 +82,16 @@ test("course numeric fields reject invalid and negative values", () => {
   assert.match(validateRecord("Courses", { ...course, labUnits: -1 }), /non-negative/);
 });
 
+test("Diploma Years must be a whole number from one through six", () => {
+  const diploma = { id: "diploma-1", code: "TEST", name: "Test Diploma", durationYears: 3 };
+  assert.equal(validateRecord("Diplomas", diploma), null);
+  assert.equal(validateRecord("Diplomas", { ...diploma, durationYears: 1 }), null);
+  assert.equal(validateRecord("Diplomas", { ...diploma, durationYears: 6 }), null);
+  assert.match(validateRecord("Diplomas", { ...diploma, durationYears: 0 }), /whole number between 1 and 6/);
+  assert.match(validateRecord("Diplomas", { ...diploma, durationYears: 2.5 }), /whole number between 1 and 6/);
+  assert.match(validateRecord("Diplomas", { ...diploma, durationYears: 7 }), /whole number between 1 and 6/);
+});
+
 test("schedule slots conflict only when all slot coordinates match", () => {
   const record = {
     id: "schedule-1",

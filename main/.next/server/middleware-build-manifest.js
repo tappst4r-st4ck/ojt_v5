@@ -7,14 +7,14 @@ globalThis.__BUILD_MANIFEST = {
     "static/chunks/0cz1d0mv5g_q7.js"
   ],
   "lowPriorityFiles": [
-    "static/wEwRsx18Jk937rz5LRrWh/_buildManifest.js",
-    "static/wEwRsx18Jk937rz5LRrWh/_ssgManifest.js",
-    "static/wEwRsx18Jk937rz5LRrWh/_clientMiddlewareManifest.js"
+    "static/rmMMevLbhiIgK94nvUQCt/_buildManifest.js",
+    "static/rmMMevLbhiIgK94nvUQCt/_ssgManifest.js",
+    "static/rmMMevLbhiIgK94nvUQCt/_clientMiddlewareManifest.js"
   ],
   "rootMainFiles": [
     "static/chunks/3cfn99dbrcvvp.js",
-    "static/chunks/3c4xol65z2da2.js",
-    "static/chunks/3dmm3v_fq28gc.js",
+    "static/chunks/26wdxk9btpf-5.js",
+    "static/chunks/2a7f-0nu82odg.js",
     "static/chunks/turbopack-3-ry682tkyiqk.js"
   ],
   "rootMainFilesTree": {},
@@ -22,8 +22,8 @@ globalThis.__BUILD_MANIFEST = {
     "/page": {
       "otherChunks": [
         "static/chunks/3cfn99dbrcvvp.js",
-        "static/chunks/3c4xol65z2da2.js",
-        "static/chunks/3dmm3v_fq28gc.js"
+        "static/chunks/26wdxk9btpf-5.js",
+        "static/chunks/2a7f-0nu82odg.js"
       ],
       "runtimeModuleIds": [
         94553
@@ -32,8 +32,8 @@ globalThis.__BUILD_MANIFEST = {
     "/_not-found/page": {
       "otherChunks": [
         "static/chunks/3cfn99dbrcvvp.js",
-        "static/chunks/3c4xol65z2da2.js",
-        "static/chunks/3dmm3v_fq28gc.js"
+        "static/chunks/26wdxk9btpf-5.js",
+        "static/chunks/2a7f-0nu82odg.js"
       ],
       "runtimeModuleIds": [
         94553
@@ -42,8 +42,8 @@ globalThis.__BUILD_MANIFEST = {
     "/_global-error/page": {
       "otherChunks": [
         "static/chunks/3cfn99dbrcvvp.js",
-        "static/chunks/3c4xol65z2da2.js",
-        "static/chunks/3dmm3v_fq28gc.js"
+        "static/chunks/26wdxk9btpf-5.js",
+        "static/chunks/2a7f-0nu82odg.js"
       ],
       "runtimeModuleIds": [
         94553

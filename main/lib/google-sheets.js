@@ -2,7 +2,7 @@ import "server-only";
 import { google } from "googleapis";
 
 export const sheetDefinitions = {
-  Diplomas: ["Diploma ID", "Diploma Code", "Diploma Name"],
+  Diplomas: ["Diploma ID", "Diploma Code", "Diploma Name", "Diploma Years"],
   "Master Schedule": [
     "Schedule ID",
     "Diploma Code",
@@ -45,12 +45,13 @@ export const sheetDefinitions = {
   ],
 };
 
-const numericFields = new Set(["diplomaYear", "semester", "lectureUnits", "labUnits", "lecUnits", "totalUnits"]);
+const numericFields = new Set(["durationYears", "diplomaYear", "semester", "lectureUnits", "labUnits", "lecUnits", "totalUnits"]);
 const fieldHeaders = {
   Diplomas: {
     id: "Diploma ID",
     code: "Diploma Code",
     name: "Diploma Name",
+    durationYears: "Diploma Years",
   },
   "Master Schedule": {
     id: "Schedule ID",
@@ -126,6 +127,7 @@ function toRecord(tab, row, rowNumber) {
   for (const [field, header] of Object.entries(headers)) {
     const index = sheetDefinitions[tab].indexOf(header);
     let value = row[index] ?? "";
+    if (field === "durationYears" && value === "") value = 3;
     if (numericFields.has(field) && value !== "") value = Number(value);
     record[field] = value;
   }
@@ -155,6 +157,7 @@ export async function listRecords(tab) {
 
 export async function appendRecord(tab, record) {
   const sheets = await getSheetsClient();
+  if (tab === "Diplomas") await ensureDiplomaDurationHeader(sheets, process.env.GOOGLE_SHEETS_ID);
   const result = await sheets.spreadsheets.values.append({
     spreadsheetId: process.env.GOOGLE_SHEETS_ID,
     range: `${rangeFor(tab)}!A:${String.fromCharCode(64 + sheetDefinitions[tab].length)}`,
@@ -226,6 +229,7 @@ export async function initializeSpreadsheet({ seedData }) {
 
   const results = {};
   for (const [tab, headers] of Object.entries(sheetDefinitions)) {
+    if (tab === "Diplomas") await ensureDiplomaDurationHeader(sheets, spreadsheetId);
     const current = await sheets.spreadsheets.values.get({
       spreadsheetId,
       range: `${rangeFor(tab)}!A1:${String.fromCharCode(64 + headers.length)}1`,
@@ -261,5 +265,78 @@ export async function initializeSpreadsheet({ seedData }) {
       results[tab] = records.length > 0 ? `${records.length} existing records preserved` : "initialized";
     }
   }
+  return results;
+}
+
+async function ensureDiplomaDurationHeader(sheets, spreadsheetId) {
+  const headers = sheetDefinitions.Diplomas;
+  const response = await sheets.spreadsheets.values.get({
+    spreadsheetId,
+    range: `${rangeFor("Diplomas")}!A1:${String.fromCharCode(64 + headers.length)}1`,
+  });
+  const current = response.data.values?.[0] ?? [];
+  if (current.length === 0 || current.join("\u0000") === headers.join("\u0000")) return;
+
+  const legacyHeaders = headers.slice(0, -1);
+  if (current.join("\u0000") !== legacyHeaders.join("\u0000")) {
+    throw new Error("The Diplomas worksheet headers do not match the required schema.");
+  }
+
+  await sheets.spreadsheets.values.update({
+    spreadsheetId,
+    range: `${rangeFor("Diplomas")}!D1`,
+    valueInputOption: "RAW",
+    requestBody: { values: [[headers[headers.length - 1]]] },
+  });
+}
+
+export async function importFromSheet(sourceSpreadsheetId) {
+  const sheets = await getSheetsClient();
+  const targetSpreadsheetId = process.env.GOOGLE_SHEETS_ID;
+
+  const results = { imported: {}, errors: [] };
+
+  for (const tab of Object.keys(sheetDefinitions)) {
+    try {
+      const response = await sheets.spreadsheets.values.get({
+        spreadsheetId: sourceSpreadsheetId,
+        range: `'${tab.replace(/'/g, "''")}'`,
+      });
+
+      const rows = response.data.values ?? [];
+      if (rows.length <= 1) {
+        results.imported[tab] = 0;
+        continue;
+      }
+
+      const headers = rows[0];
+      const expectedHeaders = sheetDefinitions[tab];
+      if (headers.join("\u0000") !== expectedHeaders.join("\u0000")) {
+        results.errors.push(`${tab}: header mismatch`);
+        continue;
+      }
+
+      let imported = 0;
+      for (let i = 1; i < rows.length; i++) {
+        const record = toRecord(tab, rows[i], i + 1);
+        if (!record.id) continue;
+
+        const existingRecords = await listRecords(tab);
+        const exists = existingRecords.some(r => String(r.id) === String(record.id));
+
+        if (exists) {
+          const existing = existingRecords.find(r => String(r.id) === String(record.id));
+          await updateRecord(tab, existing.rowNumber, record);
+        } else {
+          await appendRecord(tab, record);
+        }
+        imported++;
+      }
+      results.imported[tab] = imported;
+    } catch (error) {
+      results.errors.push(`${tab}: ${error.message}`);
+    }
+  }
+
   return results;
 }

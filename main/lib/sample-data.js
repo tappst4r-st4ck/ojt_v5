@@ -1,8 +1,8 @@
 export const sampleData = {
   diplomas: [
-    { id: "diploma-dcmt", code: "DCMT", name: "Diploma in Construction Management Technology" },
-    { id: "diploma-demt", code: "DEMT", name: "Diploma in Electro-Mechatronics Technology" },
-    { id: "diploma-dcet", code: "DCET", name: "Diploma in Computer Engineering Technology" },
+    { id: "diploma-dcmt", code: "DCMT", name: "Diploma in Construction Management Technology", durationYears: 3 },
+    { id: "diploma-demt", code: "DEMT", name: "Diploma in Electro-Mechatronics Technology", durationYears: 3 },
+    { id: "diploma-dcet", code: "DCET", name: "Diploma in Computer Engineering Technology", durationYears: 3 },
   ],
   faculty: [
     {

@@ -334,10 +334,10 @@ self.__SERVER_FILES_MANIFEST={
     "htmlLimitedBots": "[\\w-]+-Google|Google-[\\w-]+|Chrome-Lighthouse|Slurp|DuckDuckBot|baiduspider|yandex|sogou|bitlybot|tumblr|vkShare|quora link preview|redditbot|ia_archiver|Bingbot|BingPreview|applebot|facebookexternalhit|facebookcatalog|Twitterbot|LinkedInBot|Slackbot|Discordbot|WhatsApp|SkypeUriPreview|Yeti|googleweblight",
     "bundlePagesRouterDependencies": false,
     "configFileName": "next.config.mjs",
-    "repoRoot": "D:\\User Files\\Desktop\\School\\3rd Term\\Practicium (OJT)\\OJT Project\\ojt_v5\\main",
     "turbopack": {
       "root": "D:\\User Files\\Desktop\\School\\3rd Term\\Practicium (OJT)\\OJT Project\\ojt_v5\\main"
     },
+    "repoRoot": "D:\\User Files\\Desktop\\School\\3rd Term\\Practicium (OJT)\\OJT Project\\ojt_v5\\main",
     "distDirRoot": ".next"
   },
   "appDir": "D:\\User Files\\Desktop\\School\\3rd Term\\Practicium (OJT)\\OJT Project\\ojt_v5\\main",

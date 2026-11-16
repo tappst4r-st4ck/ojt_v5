@@ -56,6 +56,14 @@
     body[data-loading="true"] #contentArea {
       visibility: hidden;
     }
+    #contentArea.login-active {
+      padding: 0;
+      background-color: #152d4a;
+    }
+    .login-grid {
+      background-image: radial-gradient(rgba(147, 197, 253, 0.13) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
   </style>
 </head>
 <body class="h-full flex overflow-hidden bg-[#f0f4f8] text-slate-800 antialiased select-none" data-loading="true">
@@ -71,7 +79,7 @@
 </div>
 <div class="overflow-hidden">
 <div class="flex items-center gap-1.5">
-<span class="text-[10px] font-extrabold tracking-wider uppercase text-blue-300">TESDA REGION X</span>
+<span class="text-[10px] font-extrabold tracking-wider uppercase text-blue-300">TESDA REGION XI</span>
 <span class="bg-blue-400/20 text-blue-200 text-[9px] px-1.5 py-0.2 rounded font-mono border border-blue-300/30">PoC</span>
 </div>
 <h1 class="text-xs font-bold text-white tracking-tight leading-tight truncate mt-0.5">TESDA Regional Operations Hub</h1>
@@ -139,50 +147,52 @@
 <!-- ======================================================== -->
 <!-- VIEW 1: LOGIN GATEWAY                                    -->
 <!-- ======================================================== -->
-<section class="max-w-xl mx-auto py-8 animate-fade-in hidden" id="view-login">
-<div class="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
-<!-- Banner -->
-<div class="bg-gradient-to-r from-[#1e3a5f] to-[#152d4a] p-6 text-center text-white relative">
-<div class="w-14 h-14 mx-auto mb-3 rounded-2xl bg-white/10 p-2 backdrop-blur border border-blue-300/30 shadow-lg flex items-center justify-center">
-<span class="material-symbols-outlined text-3xl text-blue-300">verified_user</span>
+<section class="relative isolate flex min-h-full w-full flex-col bg-[#152d4a] text-[#eff6ff] hidden" id="view-login">
+<div class="login-grid pointer-events-none absolute inset-0 opacity-40"></div>
+<header class="relative z-10 flex flex-wrap items-center justify-between gap-3 border-b border-blue-300/15 bg-[#1e3a5f]/80 px-4 py-3 text-xs sm:px-8">
+<span class="inline-flex items-center gap-2 rounded-md border border-blue-300/25 bg-[#152d4a] px-2.5 py-1 font-mono text-[11px] font-semibold tracking-wider text-white">
+<span class="h-2 w-2 rounded-full bg-emerald-400"></span>
+TESDA SECURE GATEWAY - REGION XI
+</span>
+<span class="font-mono text-[11px] text-blue-200/80">INSTITUTIONAL GOOGLE WORKSPACE</span>
+</header>
+<main class="relative z-10 flex flex-1 items-center justify-center px-4 py-8 sm:py-10">
+<div class="relative w-full max-w-[520px] overflow-hidden rounded-2xl border border-blue-300/25 bg-[#1e3a5f]/95 p-6 shadow-[0_20px_55px_-15px_rgba(5,18,38,0.8)] sm:p-8">
+<div class="absolute inset-x-0 top-0 h-1 bg-[#60a5fa]"></div>
+<div class="flex flex-col items-center text-center">
+<img alt="TESDA seal" class="mb-4 h-[104px] w-[104px] rounded-full border border-blue-300/40 bg-white p-1 object-contain shadow-[0_0_24px_-8px_rgba(96,165,250,0.8)]" height="104" src="/tesda%20logo.jpg" width="104">
+<span class="mb-1 rounded-full border border-blue-300/25 bg-blue-400/10 px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-blue-200">Republic of the Philippines</span>
+<h2 class="mt-1 text-xl font-bold text-white sm:text-2xl">TESDA Operations Command Portal</h2>
+<p class="mt-1 max-w-md text-xs leading-relaxed text-blue-200 sm:text-sm">Automated Timetable, Faculty Loading &amp; TVET Curriculum Operations</p>
 </div>
-<span class="text-[10px] uppercase tracking-widest text-blue-300 font-bold">Technical Education and Skills Development Authority</span>
-<h2 class="text-xl font-bold tracking-tight text-white mt-1">Institutional Operations Portal</h2>
-<p class="text-xs text-blue-200/80 mt-1 max-w-md mx-auto">
-              Centralized course scheduling, faculty loading, and diploma curriculum registry gateway.
-            </p>
-</div>
-<!-- Body -->
-<div class="p-6 space-y-5">
-<!-- Informational Banner -->
-<div class="bg-[#eff6ff] border border-blue-200 rounded-xl p-4 text-xs text-[#1e3a5f] flex items-start gap-3">
-<span class="material-symbols-outlined text-[#2563eb] text-xl flex-shrink-0">info</span>
+<div class="mt-6 space-y-4">
+<div class="flex items-start gap-3 rounded-xl border border-blue-300/20 bg-[#152d4a]/80 p-3.5">
+<span class="material-symbols-outlined mt-0.5 text-[#60a5fa]">verified_user</span>
 <div>
-<p class="font-bold text-[#1d4ed8]">Role-based Access Verification</p>
-<p class="text-[#3b6fa0] mt-1 leading-relaxed">
-                  Role-based access verification against Google Sheet database. Head Trainers receive full schedule matrix editing &amp; faculty loading controls. Trainees receive read-only schedule visibility.
-                </p>
+<p class="text-xs font-bold text-white">Role-based access verification</p>
+<p class="mt-1 text-[11px] leading-relaxed text-blue-200/85">Sign in with the Google account listed in the Faculty Database. Your access level is verified against your current faculty role.</p>
 </div>
-</div>
-<div class="rounded-xl border border-blue-200 bg-blue-50 p-4 text-center">
-<p class="text-xs leading-relaxed text-[#3b6fa0]">Sign in with the Google account listed in the Faculty Database. Editing permissions are verified against the current faculty role.</p>
 </div>
 <div class="flex justify-center" id="googleIdentityButton"></div>
-<p class="hidden text-[11px] text-center text-rose-600" id="authMessage"></p>
-<div class="hidden space-y-3 rounded-xl border border-amber-300 bg-amber-50 p-4" id="rolePreviewControls">
-<p class="text-xs font-bold text-amber-900">Quick role preview</p>
-<p class="text-[11px] leading-relaxed text-amber-800">Preview the interface without signing in. This does not grant API access, and changes will not be saved.</p>
+<p aria-live="polite" class="hidden rounded-lg border border-rose-300/30 bg-rose-950/40 px-3 py-2 text-center text-[11px] text-rose-200" id="authMessage"></p>
+<div class="hidden space-y-3 rounded-xl border border-amber-300/30 bg-amber-950/25 p-4" id="rolePreviewControls">
+<p class="text-xs font-bold text-amber-200">Quick role preview</p>
+<p class="text-[11px] leading-relaxed text-amber-100/80">Preview the interface without signing in. This does not grant API access, and changes will not be saved.</p>
 <div class="grid grid-cols-2 gap-2">
-<button class="rounded-lg bg-blue-700 px-3 py-2 text-xs font-semibold text-white hover:bg-blue-800" onclick="startRolePreview('head')" type="button">Head Trainer View</button>
-<button class="rounded-lg bg-white px-3 py-2 text-xs font-semibold text-slate-700 border border-slate-300 hover:bg-slate-100" onclick="startRolePreview('trainee')" type="button">Trainee View</button>
+<button class="rounded-lg bg-blue-600 px-3 py-2 text-xs font-semibold text-white hover:bg-blue-500" onclick="startRolePreview('head')" type="button">Head Trainer View</button>
+<button class="rounded-lg border border-blue-200/20 bg-[#152d4a] px-3 py-2 text-xs font-semibold text-blue-100 hover:bg-[#24476f]" onclick="startRolePreview('trainee')" type="button">Trainee View</button>
 </div>
 </div>
-<button class="w-full rounded-lg bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-200" onclick="switchView('schedule')" type="button">Return to dashboard</button>
-<p class="text-[11px] text-center text-slate-400">
-              Public viewers can browse the schedule, faculty directory, and curriculum. Contact details require sign-in.
-            </p>
+<div class="flex items-center gap-3 py-1" aria-hidden="true"><span class="h-px flex-1 bg-blue-300/20"></span><span class="font-mono text-[10px] uppercase tracking-wider text-blue-200/60">Public access</span><span class="h-px flex-1 bg-blue-300/20"></span></div>
+<p class="text-center text-[11px] leading-relaxed text-blue-200/75">Browse the schedule, faculty directory, and curriculum without signing in. Contact details require an authorized account.</p>
+<button class="w-full rounded-lg border border-blue-200/20 bg-white/5 px-3 py-2.5 text-xs font-semibold text-blue-100 transition hover:bg-white/10" onclick="switchView('schedule')" type="button">Return to public dashboard</button>
 </div>
 </div>
+</main>
+<footer class="relative z-10 flex flex-col items-center justify-between gap-1.5 border-t border-blue-300/15 bg-[#152d4a]/95 px-4 py-3 text-center font-mono text-[10px] text-blue-200/65 sm:flex-row sm:px-8">
+<span>Protected under Republic Act 7796 - TESDA Regional Office XI</span>
+<span>Philippine Data Privacy Act of 2012 - RA 10173</span>
+</footer>
 </section>
 <!-- ======================================================== -->
 <!-- VIEW 2: MASTER SCHEDULE (TIMETABLE)                      -->
@@ -197,7 +207,7 @@
 <span class="bg-blue-100 text-[#1d4ed8] text-[11px] font-bold px-2 py-0.5 rounded">Fixed Matrix Protocol</span>
 </div>
 <p class="text-xs text-[#3b6fa0] mt-0.5">
-                Curriculum schedule generated automatically. Faculty allocations assigned post-generation without disrupting base matrices.
+                Curriculum schedule generated by Head Trainer. Faculty allocations assigned post-generation without disrupting base matrices.
               </p>
 </div>
 <div class="flex items-center gap-2">
@@ -382,6 +392,10 @@
 <span class="material-symbols-outlined text-sm">add</span>
 <span class="">Add Course / Diploma</span>
 </button>
+<button class="bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold px-2.5 py-2 rounded-lg border border-slate-300 flex items-center gap-1.5 transition" id="importSheetButton" onclick="openImportSheetModal()">
+<span class="material-symbols-outlined text-sm text-indigo-600">table_view</span>
+<span class="">Import from Sheet</span>
+</button>
 <button class="bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold px-2.5 py-2 rounded-lg border border-slate-300 flex items-center gap-1.5 transition" onclick="showToast('Exporting circular catalog to official PDF document...')">
 <span class="material-symbols-outlined text-sm text-rose-600">picture_as_pdf</span>
 <span class="">Export to PDF</span>
@@ -564,7 +578,7 @@
 <div id="courseFormFields">
 <div>
 <label class="block font-bold text-slate-700 mb-1">Diploma Program</label>
-<select class="w-full p-2 border border-slate-300 rounded-lg text-xs" id="curricTargetDiploma">
+<select class="w-full p-2 border border-slate-300 rounded-lg text-xs" id="curricTargetDiploma" onchange="updateTargetDiplomaYearOptions()">
 </select>
 </div>
 <div class="grid grid-cols-2 gap-2">
@@ -624,7 +638,12 @@
 <label class="block font-bold text-slate-700 mb-1" for="curricDiplomaTitle">Diploma Name</label>
 <input class="w-full p-2 border border-slate-300 rounded-lg text-xs" id="curricDiplomaTitle" placeholder="e.g. Diploma in Construction Management Technology" required="" type="text">
 </div>
-<p class="text-[11px] text-[#3b6fa0]">After creating the diploma, you can add its courses and semester details.</p>
+<div>
+<label class="block font-bold text-slate-700 mb-1" for="curricDiplomaYears">Diploma Years</label>
+<input class="w-full p-2 border border-slate-300 rounded-lg text-xs" id="curricDiplomaYears" min="1" max="6" required="" type="number" value="3">
+<p class="mt-1 text-[10px] text-slate-500">Number of year levels in this diploma program (1-6).</p>
+</div>
+<p class="text-[11px] text-[#3b6fa0]">Course and timetable year-level options will follow this program length.</p>
 </div>
 <div class="pt-2 flex justify-end gap-2 border-t border-slate-200">
 <button class="px-3 py-1.5 text-slate-600 bg-slate-100 rounded-lg font-semibold" onclick="closeAddCurriculumModal()" type="button">Cancel</button>
@@ -638,8 +657,35 @@
 <span class="material-symbols-outlined text-emerald-400 text-sm">check_circle</span>
 <span id="toastMessage" class="">Success</span>
 </div>
-<!-- ======================================================== -->
-<!-- JAVASCRIPT APPLICATION STATE                      -->
+
+<!-- MODAL: IMPORT FROM GOOGLE SHEET -->
+<div class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4" id="importSheetModal">
+<div class="bg-white rounded-2xl max-w-md w-full border border-slate-200 shadow-2xl overflow-hidden">
+<div class="bg-gradient-to-r from-[#1e3a5f] to-[#152d4a] text-white p-4 flex items-center justify-between">
+<h4 class="text-sm font-bold">Import from Google Sheet</h4>
+<button class="text-blue-200 hover:text-white" onclick="closeImportSheetModal()">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div class="p-5 space-y-4 text-xs">
+<div class="bg-blue-50 border border-blue-200 rounded-lg p-3 text-[11px] text-blue-900 space-y-1">
+<p class="font-semibold">Required Format</p>
+<p>Your Google Sheet must have these exact tab names and headers:</p>
+<ul class="list-disc pl-5 space-y-0.5 text-[10px]">
+<li><strong>Diplomas:</strong> Diploma ID, Diploma Code, Diploma Name, Diploma Years</li>
+<li><strong>Master Schedule:</strong> Schedule ID, Diploma Code, Diploma Name, Course Code, Course Name, Scheduled Time, Assigned Trainer, Lecture Units, Lab Units, Diploma Year, Semester, School Year, Day</li>
+<li><strong>Faculty:</strong> Faculty ID, Last Name, First Name, M.I., Department, Role, Qualifications, Mobile Number, Contact Email</li>
+<li><strong>Courses:</strong> Course ID, Diploma Code, Diploma Name, Diploma Year, Semester, Course Code, Course Name, Lec Units, Lab Units, Total Units, Pre-Requisites, Resultant Qualification</li>
+</ul>
+</div>
+<label class="block font-semibold text-slate-700">
+Google Sheet ID or URL
+<input class="mt-1 w-full rounded-lg border border-slate-300 p-2 font-mono text-[11px]" id="importSheetInput" placeholder="1AbC... or https://docs.google.com/spreadsheets/d/1AbC.../edit" type="text">
+</label>
+<p class="text-[11px] text-slate-500">Find the Sheet ID in the URL: <code class="font-mono bg-slate-100 px-1 rounded">docs.google.com/spreadsheets/d/<span class="text-indigo-600">SHEET_ID</span>/edit</code></p>
+<div class="pt-2 flex justify-end gap-2 border-t border-slate-200">
+<button class="px-3 py-1.5 text-slate-600 bg-slate-100 rounded-lg font-semibold" onclick="closeImportSheetModal()" type="button">Cancel</button>
+<button class="px-4 py-1.5 bg-[#2563eb] text-white rounded-lg font-semibold hover:bg-blue-700" id="importSheetSubmit" onclick="handleImportSheet()">Import</button>
 <!-- ======================================================== -->
 <script>
     // --------------------------------------------------------
@@ -654,6 +700,7 @@
     let editingScheduleId = null;
     let googleIdentityInitialized = false;
     let rolePreviewActive = false;
+    let rolePreviewEnabled = false;
 
     // --------------------------------------------------------
     let facultyDatabase = [];
@@ -729,7 +776,8 @@
       curriculumDiplomas = data.diplomas.map(record => ({
         id: record.id,
         code: record.code,
-        title: record.name
+        title: record.name,
+        durationYears: Number(record.durationYears) || 3
       }));
       scheduleEntries = data.schedule;
       const grouped = new Map();
@@ -775,6 +823,7 @@
       if (selectedSemester) document.getElementById('schedSemFilter').value = selectedSemester;
       if (selectedYear) document.getElementById('schedYearFilter').value = selectedYear;
       if (selectedSchoolYear) document.getElementById('schedSchoolYearFilter').value = selectedSchoolYear;
+      updateScheduleYearOptions();
 
       renderFacultyFilters();
       renderTimetable();
@@ -877,7 +926,8 @@
 
     async function initializeGoogleIdentity() {
       try {
-        const { googleClientId, rolePreviewEnabled } = await apiRequest('/api/auth/config');
+        const { googleClientId, rolePreviewEnabled: previewEnabled } = await apiRequest('/api/auth/config');
+        rolePreviewEnabled = previewEnabled;
         document.getElementById('rolePreviewControls').classList.toggle('hidden', !rolePreviewEnabled);
         if (!googleClientId) {
           throw new Error('Google sign-in is not configured on the server.');
@@ -968,8 +1018,8 @@
       const sidebar = document.getElementById('appSidebar');
       const content = document.getElementById('contentArea');
       sidebar.classList.toggle('hidden', target === 'login');
+      content.classList.toggle('login-active', target === 'login');
       content.classList.toggle('flex', target === 'login');
-      content.classList.toggle('items-center', target === 'login');
       content.classList.toggle('justify-center', target === 'login');
 
       views.forEach(v => {
@@ -1229,6 +1279,7 @@
     // --------------------------------------------------------
     function renderTimetable() {
       const diploma = document.getElementById('schedDiplomaFilter').value;
+      updateScheduleYearOptions();
       const sem = document.getElementById('schedSemFilter').value;
       const year = document.getElementById('schedYearFilter').value;
 
@@ -1453,6 +1504,47 @@
       })[character]);
     }
 
+    function getDiplomaDurationYears(diplomaCode) {
+      const duration = Number(curriculumDiplomas.find(diploma => diploma.code === diplomaCode)?.durationYears);
+      return Number.isInteger(duration) && duration >= 1 && duration <= 6 ? duration : 3;
+    }
+
+    function setYearLevelOptions(select, yearCount, selectedValue, includeAll = false) {
+      const yearNames = ['First', 'Second', 'Third', 'Fourth', 'Fifth', 'Sixth'];
+      const options = includeAll ? ['<option value="ALL">All Year Levels</option>'] : [];
+      for (let year = 1; year <= yearCount; year++) {
+        options.push(`<option value="${year}">${yearNames[year - 1]} Year</option>`);
+      }
+      select.innerHTML = options.join('');
+      const requested = String(selectedValue ?? '');
+      select.value = options.length && [...select.options].some(option => option.value === requested)
+        ? requested
+        : includeAll ? 'ALL' : '1';
+    }
+
+    function updateScheduleYearOptions() {
+      const diplomaCode = document.getElementById('schedDiplomaFilter').value;
+      const years = getDiplomaDurationYears(diplomaCode);
+      const select = document.getElementById('schedYearFilter');
+      setYearLevelOptions(select, years, select.value);
+    }
+
+    function updateTargetDiplomaYearOptions() {
+      const diplomaCode = document.getElementById('curricTargetDiploma').value;
+      const years = getDiplomaDurationYears(diplomaCode);
+      const select = document.getElementById('curricTargetYear');
+      setYearLevelOptions(select, years, select.value);
+    }
+
+    function updateCurriculumYearOptions() {
+      const diplomaCode = document.getElementById('curriculumDiplomaSelect').value;
+      const years = diplomaCode === 'ALL'
+        ? Math.max(1, ...curriculumDiplomas.map(diploma => getDiplomaDurationYears(diploma.code)))
+        : getDiplomaDurationYears(diplomaCode);
+      const select = document.getElementById('curriculumYearSelect');
+      setYearLevelOptions(select, years, select.value, true);
+    }
+
     function refreshCurriculumDiplomaOptions() {
       const filter = document.getElementById('curriculumDiplomaSelect');
       const target = document.getElementById('curricTargetDiploma');
@@ -1475,6 +1567,7 @@
       target.value = curriculumDiplomas.some(diploma => diploma.code === selectedTarget)
         ? selectedTarget
         : (curriculumDiplomas[0]?.code || '');
+      updateTargetDiplomaYearOptions();
     }
 
     function appendEmptyDiplomaCard(diploma, container) {
@@ -1487,7 +1580,7 @@
       name.textContent = `${diploma.code} - ${diploma.title}`;
       const note = document.createElement('p');
       note.className = "text-xs text-slate-500 mt-1";
-      note.textContent = "No curriculum sections yet. Add a course to create the first semester matrix.";
+      note.textContent = `${getDiplomaDurationYears(diploma.code)}-year program. No curriculum sections yet.`;
       details.append(name, note);
       card.appendChild(details);
 
@@ -1504,6 +1597,7 @@
 
     function renderCurriculumSections() {
       refreshCurriculumDiplomaOptions();
+      updateCurriculumYearOptions();
       const diplomaFilter = document.getElementById('curriculumDiplomaSelect').value;
       const yearFilter = document.getElementById('curriculumYearSelect').value;
       const container = document.getElementById('curriculumContainers');
@@ -1794,10 +1888,12 @@
 
       refreshCurriculumDiplomaOptions();
       document.querySelector('#addCurriculumModal form').reset();
+      document.getElementById('curricDiplomaYears').value = '3';
       setCurriculumFormMode(mode);
       if (diplomaCode) {
         document.getElementById('curricTargetDiploma').value = diplomaCode;
       }
+      updateTargetDiplomaYearOptions();
       if (mode === 'edit-course') {
         const section = curriculumSections.find(item => item.id === editingCurriculumCourse?.sectionId);
         const course = section?.courses[editingCurriculumCourse?.courseIndex];
@@ -1862,6 +1958,63 @@
       setCurriculumFormMode('course');
     }
 
+    // Import Sheet Modal Functions
+    function openImportSheetModal() {
+      if (currentUserRole !== 'head') {
+        showToast('Only the Head Trainer can import from Google Sheets.');
+        return;
+      }
+      document.getElementById('importSheetInput').value = '';
+      document.getElementById('importSheetModal').classList.remove('hidden');
+    }
+
+    function closeImportSheetModal() {
+      document.getElementById('importSheetModal').classList.add('hidden');
+    }
+
+    async function handleImportSheet() {
+      if (currentUserRole !== 'head') return;
+
+      const input = document.getElementById('importSheetInput').value.trim();
+      if (!input) {
+        showToast('Enter a Google Sheet ID or URL.');
+        return;
+      }
+
+      // Extract Sheet ID from URL if full URL provided
+      const match = input.match(/\/d\/([a-zA-Z0-9-_]+)/);
+      const sheetId = match ? match[1] : input;
+
+      const submitBtn = document.getElementById('importSheetSubmit');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = 'Importing...';
+
+      try {
+        const result = await apiRequest('/api/import/sheet', {
+          method: 'POST',
+          body: JSON.stringify({ spreadsheetId: sheetId })
+        });
+
+        if (result.ok) {
+          const imported = result.result.imported;
+          const errors = result.result.errors;
+          let msg = `Imported: `;
+          msg += Object.entries(imported).map(([tab, count]) => `${tab}: ${count}`).join(', ');
+          if (errors.length) msg += ` | Errors: ${errors.join(', ')}`;
+          showToast(msg);
+          closeImportSheetModal();
+          await refreshDashboardData();
+        } else {
+          showToast(result.error || 'Import failed.');
+        }
+      } catch (error) {
+        showToast(error.message);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Import';
+      }
+    }
+
     function openEditCurriculumCourse(sectionId, courseIndex) {
       if (currentUserRole !== 'head') {
         showToast("Only the Head Trainer can edit curriculum courses.");
@@ -1889,8 +2042,13 @@
       if (curriculumFormMode === 'diploma') {
         const code = document.getElementById('curricDiplomaCode').value.trim().toUpperCase();
         const title = document.getElementById('curricDiplomaTitle').value.trim();
+        const durationYears = Number(document.getElementById('curricDiplomaYears').value);
         if (!code || !title) {
           showToast("Enter both a diploma code and a diploma name.");
+          return;
+        }
+        if (!Number.isInteger(durationYears) || durationYears < 1 || durationYears > 6) {
+          showToast("Diploma Years must be a whole number between 1 and 6.");
           return;
         }
 
@@ -1907,7 +2065,7 @@
         try {
           await apiRequest('/api/records/Diplomas', {
             method: 'POST',
-            body: JSON.stringify({ id: crypto.randomUUID(), code, name: title })
+            body: JSON.stringify({ id: crypto.randomUUID(), code, name: title, durationYears })
           });
           await refreshDashboardData();
           document.getElementById('curriculumDiplomaSelect').value = code;
@@ -2009,7 +2167,7 @@
       setAuthenticatedUser(null);
       switchView('login');
       document.body.removeAttribute('data-loading');
-      initializeGoogleIdentity();
+      const identityInitialization = initializeGoogleIdentity();
       try {
         await refreshDashboardData();
       } catch (error) {
@@ -2017,6 +2175,8 @@
         status.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span>Unavailable`;
         showToast(error.message);
       }
+      await identityInitialization;
+      if (rolePreviewEnabled) await startRolePreview('head');
     });
   </script>
 
