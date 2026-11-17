@@ -1,3 +1,4 @@
+import { NextResponse } from "next/server";
 import { createSessionFromGoogleCredential, setSessionCookie, isSameOriginMutation } from "../../../../lib/auth";
 import { rateLimit, rateLimitHeaders, rateLimitResponse } from "../../../../lib/rate-limit.mjs";
 import { recordFailedAttempt, recordSuccess, checkLockout } from "../../../../lib/account-lockout.mjs";
@@ -37,7 +38,7 @@ export async function POST(request) {
 
     const session = await createSessionFromGoogleCredential(body.credential);
     await recordSuccess(request);
-    const response = Response.json(
+    const response = NextResponse.json(
       { user: session.user },
       { headers: { "Cache-Control": "private, no-store", Vary: "Cookie", ...rlHeaders } }
     );

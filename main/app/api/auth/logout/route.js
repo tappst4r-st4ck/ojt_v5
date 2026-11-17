@@ -1,3 +1,4 @@
+import { NextResponse } from "next/server";
 import { clearSessionCookie, isSameOriginMutation } from "../../../../lib/auth";
 import { rateLimit, rateLimitHeaders, rateLimitResponse } from "../../../../lib/rate-limit.mjs";
 
@@ -10,7 +11,7 @@ export async function POST(request) {
     return Response.json({ error: "Cross-origin sign-out requests are not allowed." }, { status: 403, headers: rlHeaders });
   }
 
-  const response = Response.json(
+  const response = NextResponse.json(
     { ok: true },
     { headers: { "Cache-Control": "private, no-store", Vary: "Cookie", ...rlHeaders } }
   );
