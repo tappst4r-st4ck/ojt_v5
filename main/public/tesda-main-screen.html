@@ -249,10 +249,14 @@ TESDA SECURE GATEWAY - REGION XI
 <option>SY 2025-2026</option>
 </select>
 </div>
-<div class="col-span-2 flex justify-start pt-3 md:col-span-4">
+<div class="col-span-2 flex justify-start gap-2 pt-3 md:col-span-4">
 <button class="bg-[#2563eb] hover:bg-blue-700 text-white text-xs font-semibold px-3 py-2 rounded-lg flex items-center gap-1.5 shadow-xs transition" id="quickActionButton" onclick="handleQuickAddAction()">
 <span class="material-symbols-outlined text-sm">add_circle</span>
 <span>New Timetable Entry</span>
+</button>
+<button class="bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold px-3 py-2 rounded-lg border border-slate-300 flex items-center gap-1.5 shadow-xs transition" id="facultyLoadingReportButton" onclick="printFacultyLoadingReport()" type="button">
+<span class="material-symbols-outlined text-sm text-[#1d4ed8]">description</span>
+<span>Faculty Loading Report</span>
 </button>
 </div>
 </div>
@@ -1067,6 +1071,7 @@ Google Sheet ID or URL
       document.getElementById('facultyAddButton').classList.toggle('hidden', !isHeadTrainer);
       document.getElementById('curriculumAddButton').classList.toggle('hidden', !isHeadTrainer);
       document.getElementById('quickActionButton').classList.toggle('hidden', !isHeadTrainer);
+      document.getElementById('facultyLoadingReportButton').classList.toggle('hidden', !isHeadTrainer);
 
       if (!isHeadTrainer) {
         document.getElementById('facultyFormModal').classList.add('hidden');
@@ -1076,6 +1081,215 @@ Google Sheet ID or URL
       if (currentView === 'faculty') {
         renderFacultyTable(getVisibleFaculty());
       }
+    }
+
+    function printFacultyLoadingReport() {
+      if (currentUserRole !== 'head') {
+        showToast('Only the Head Trainer can generate the Faculty Loading Report.');
+        return;
+      }
+
+      const diplomaCode = document.getElementById('schedDiplomaFilter').value;
+      const diploma = curriculumDiplomas.find(item => item.code === diplomaCode);
+      const diplomaYear = document.getElementById('schedYearFilter').value;
+      const semester = document.getElementById('schedSemFilter').value;
+      const schoolYear = document.getElementById('schedSchoolYearFilter').value;
+      const selectedSchedule = scheduleEntries.filter(record =>
+        record.diplomaCode === diplomaCode &&
+        String(record.diplomaYear) === String(diplomaYear) &&
+        String(record.semester) === String(semester) &&
+        String(record.schoolYear) === String(schoolYear)
+      );
+
+      if (selectedSchedule.length === 0) {
+        showToast('No scheduled course rows match the selected filters.');
+        return;
+      }
+
+      const normalizeName = value => String(value || '').replace(/\s+/g, ' ').trim().toLowerCase();
+      const dayOrder = { monday: 0, tuesday: 1, wednesday: 2, thursday: 3, friday: 4 };
+      const dayLabel = { monday: 'Mon', tuesday: 'Tue', wednesday: 'Wed', thursday: 'Thu', friday: 'Fri' };
+      const timeValue = value => {
+        const match = String(value || '').match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+        if (!match) return Number.MAX_SAFE_INTEGER;
+        const hour = Number(match[1]) % 12 + (match[3].toUpperCase() === 'PM' ? 12 : 0);
+        return hour * 60 + Number(match[2]);
+      };
+      const rows = selectedSchedule.map(record => {
+        const trainerKey = normalizeName(record.assignedTrainer);
+        const faculty = facultyDatabase.find(person =>
+          normalizeName(`${person.firstName} ${person.mi || ''} ${person.lastName}`) === trainerKey
+        );
+        const lectureUnits = Number(record.lectureUnits || 0);
+        const labUnits = Number(record.labUnits || 0);
+        return {
+          facultyKey: faculty?.id || trainerKey || 'unassigned',
+          facultyName: faculty
+            ? `${faculty.firstName} ${faculty.mi || ''} ${faculty.lastName}`.replace(/\s+/g, ' ').trim()
+            : (record.assignedTrainer || 'Unassigned'),
+          role: faculty?.role || 'Unlisted',
+          department: faculty?.department || 'Unlisted',
+          courseCode: record.courseCode || '',
+          courseName: record.courseName || '',
+          type: lectureUnits && labUnits ? 'Lec-Lab' : (lectureUnits ? 'Lec' : 'Lab'),
+          lectureUnits,
+          labUnits,
+          totalUnits: lectureUnits + labUnits / 3,
+          contactHours: lectureUnits + labUnits * 1.5,
+          day: record.day || '',
+          timeSlot: record.scheduledTime || '',
+        };
+      }).sort((left, right) =>
+        left.facultyName.localeCompare(right.facultyName, undefined, { sensitivity: 'base' }) ||
+        (dayOrder[String(left.day).toLowerCase()] ?? 99) - (dayOrder[String(right.day).toLowerCase()] ?? 99) ||
+        timeValue(left.timeSlot) - timeValue(right.timeSlot) ||
+        left.timeSlot.localeCompare(right.timeSlot)
+      );
+
+      const facultyGroups = new Map();
+      for (const row of rows) {
+        if (!facultyGroups.has(row.facultyKey)) facultyGroups.set(row.facultyKey, []);
+        facultyGroups.get(row.facultyKey).push(row);
+      }
+
+      let rowNumber = 0;
+      const tableRows = [];
+      let grandUnits = 0;
+      let grandContactHours = 0;
+      for (const groupRows of facultyGroups.values()) {
+        let facultyUnits = 0;
+        let facultyContactHours = 0;
+        for (const row of groupRows) {
+          rowNumber++;
+          facultyUnits += row.totalUnits;
+          facultyContactHours += row.contactHours;
+          tableRows.push(`<tr>
+            <td>${rowNumber}</td>
+            <td>${escapeHtml(row.facultyName)}</td>
+            <td>${escapeHtml(row.role)}</td>
+            <td>${escapeHtml(row.department)}</td>
+            <td>${escapeHtml(row.courseCode)}</td>
+            <td class="course-name">${escapeHtml(row.courseName)}</td>
+            <td>${row.type}</td>
+            <td>${row.lectureUnits}</td>
+            <td>${row.labUnits}</td>
+            <td>${row.totalUnits.toFixed(2)}</td>
+            <td>${row.contactHours.toFixed(1)}</td>
+            <td>${escapeHtml(dayLabel[String(row.day).toLowerCase()] || row.day)}</td>
+            <td>${escapeHtml(row.timeSlot)}</td>
+          </tr>`);
+        }
+        grandUnits += facultyUnits;
+        grandContactHours += facultyContactHours;
+        tableRows.push(`<tr class="subtotal">
+          <td colspan="9">Subtotal — ${escapeHtml(groupRows[0].facultyName)}</td>
+          <td>${facultyUnits.toFixed(2)}</td>
+          <td>${facultyContactHours.toFixed(1)}</td>
+          <td colspan="2"></td>
+        </tr>`);
+      }
+      tableRows.push(`<tr class="grand-total">
+        <td colspan="9">Grand Totals</td>
+        <td>${grandUnits.toFixed(2)}</td>
+        <td>${grandContactHours.toFixed(1)}</td>
+        <td colspan="2"></td>
+      </tr>`);
+
+      const generated = new Intl.DateTimeFormat('en-PH', {
+        year: 'numeric', month: 'long', day: 'numeric'
+      }).format(new Date());
+      const preparedBy = currentUser?.name || 'Head Trainer Preview';
+      const logoUrl = new URL('/tesda%20logo.jpg', window.location.href).href;
+      const reportWindow = window.open('', '_blank');
+      if (!reportWindow) {
+        showToast('Allow pop-ups to open the printable Faculty Loading Report.');
+        return;
+      }
+
+      const columns = [
+        '#', 'Faculty Name', 'Role', 'Dept', 'Course Code', 'Course Name', 'Type',
+        'Lec Units', 'Lab Units', 'Total Units', 'Contact Hrs <br>(Lec×1.0 + Lab×1.5)', 'Day', 'Time Slot'
+      ];
+      reportWindow.addEventListener('load', () => {
+        reportWindow.focus();
+        reportWindow.print();
+      }, { once: true });
+      reportWindow.document.open();
+      reportWindow.document.write(`<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Faculty Loading Report - ${escapeHtml(diplomaCode)}</title>
+<style>
+  @page {
+    size: A4 portrait;
+    margin: 9mm 6mm 13mm;
+    @bottom-right {
+      content: "Page " counter(page) " of " counter(pages);
+      color: #333;
+      font: 7pt Arial, sans-serif;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; color: #111; font: 8pt Arial, sans-serif; }
+  .report-header { display: grid; grid-template-columns: 19mm 1fr; align-items: center; gap: 4mm; border-bottom: 1.2pt solid #243b5a; padding-bottom: 3mm; }
+  .logo { width: 18mm; height: 18mm; object-fit: contain; }
+  .title-block { text-align: center; }
+  .region { margin: 0 0 1mm; color: #253f67; font-size: 8pt; font-weight: 700; text-transform: uppercase; }
+  h1 { margin: 0; font-size: 15pt; line-height: 1.1; }
+  .filters { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5mm 3mm; margin: 3mm 0 1.5mm; padding: 2mm; border: .6pt solid #555; }
+  .filter { white-space: nowrap; }
+  .generated { display: flex; justify-content: space-between; gap: 3mm; margin-bottom: 2.5mm; font-size: 7pt; }
+  table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 5.7pt; }
+  th, td { border: .45pt solid #333; padding: 1.05mm .55mm; text-align: center; vertical-align: middle; overflow-wrap: anywhere; }
+  th { background: #e8ebef; font-weight: 700; }
+  td.course-name { text-align: left; }
+  tr { break-inside: avoid; }
+  thead { display: table-header-group; }
+  tfoot { display: table-row-group; }
+  .subtotal td { background: #f1f1f1; font-weight: 700; }
+  .grand-total td { background: #dfe4ea; font-weight: 700; border-top: 1.2pt solid #111; }
+  .report-summary { margin-top: 2.5mm; padding: 2mm; border: .8pt solid #333; font-size: 7pt; font-weight: 700; text-align: center; }
+  .signatures { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8mm; margin-top: 10mm; text-align: center; font-size: 7pt; }
+  .signature-line { display: block; height: 8mm; margin-bottom: 1.5mm; border-bottom: .6pt solid #222; }
+  @media screen { body { padding: 8mm; background: #fff; } .report { max-width: 198mm; margin: 0 auto; } }
+</style>
+</head>
+<body>
+<main class="report">
+  <header class="report-header">
+    <img class="logo" src="${escapeHtml(logoUrl)}" alt="TESDA Region XI seal">
+    <div class="title-block">
+      <p class="region">TESDA Region XI</p>
+      <h1>FACULTY LOADING REPORT</h1>
+    </div>
+  </header>
+  <section class="filters" aria-label="Report filters">
+    <div class="filter"><strong>Diploma:</strong> ${escapeHtml(diplomaCode)}${diploma ? ` — ${escapeHtml(diploma.title)}` : ''}</div>
+    <div class="filter"><strong>Year:</strong> ${escapeHtml(diplomaYear)}</div>
+    <div class="filter"><strong>Semester:</strong> ${escapeHtml(semester)}</div>
+    <div class="filter"><strong>SY:</strong> ${escapeHtml(schoolYear.replace(/^SY\s*/i, ''))}</div>
+  </section>
+  <div class="generated">
+    <span><strong>Generated:</strong> ${escapeHtml(generated)}</span>
+    <span><strong>Prepared by:</strong> ${escapeHtml(preparedBy)}</span>
+  </div>
+  <table>
+    <colgroup><col style="width:3%"><col style="width:10%"><col style="width:7%"><col style="width:6%"><col style="width:7%"><col style="width:15%"><col style="width:6%"><col style="width:5%"><col style="width:5%"><col style="width:5%"><col style="width:9%"><col style="width:5%"><col style="width:12%"></colgroup>
+    <thead><tr>${columns.map(column => `<th scope="col">${column}</th>`).join('')}</tr></thead>
+    <tbody>${tableRows.join('')}</tbody>
+  </table>
+  <div class="report-summary">Total Faculty: ${facultyGroups.size} | Total Courses: ${rows.length} | Total Units: ${grandUnits.toFixed(2)} | Total Contact Hrs: ${grandContactHours.toFixed(1)}</div>
+  <footer class="signatures">
+    <div><span class="signature-line"></span>Prepared by</div>
+    <div><span class="signature-line"></span>Noted by</div>
+    <div><span class="signature-line"></span>Approved by</div>
+  </footer>
+</main>
+</body>
+</html>`);
+      reportWindow.document.close();
     }
 
     function getTimetableCard(diploma, sem, year, day, time) {
