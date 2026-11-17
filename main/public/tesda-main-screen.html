@@ -2176,7 +2176,7 @@ Google Sheet ID or URL
         showToast(error.message);
       }
       await identityInitialization;
-      if (rolePreviewEnabled) await startRolePreview('head');
+      // rolePreviewEnabled shows the buttons; do NOT auto-start — user picks role or signs in
     });
   </script>
 
