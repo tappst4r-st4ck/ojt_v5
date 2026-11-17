@@ -60,6 +60,12 @@
       "namedRegex": "^/_not\\-found(?:/)?$"
     },
     {
+      "page": "/api/add-dmet",
+      "regex": "^/api/add\\-dmet(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/add\\-dmet(?:/)?$"
+    },
+    {
       "page": "/api/auth/config",
       "regex": "^/api/auth/config(?:/)?$",
       "routeKeys": {},

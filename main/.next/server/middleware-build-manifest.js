@@ -7,23 +7,23 @@ globalThis.__BUILD_MANIFEST = {
     "static/chunks/0cz1d0mv5g_q7.js"
   ],
   "lowPriorityFiles": [
-    "static/rmMMevLbhiIgK94nvUQCt/_buildManifest.js",
-    "static/rmMMevLbhiIgK94nvUQCt/_ssgManifest.js",
-    "static/rmMMevLbhiIgK94nvUQCt/_clientMiddlewareManifest.js"
+    "static/ox3ljoj2TH04pJHkgEylk/_buildManifest.js",
+    "static/ox3ljoj2TH04pJHkgEylk/_ssgManifest.js",
+    "static/ox3ljoj2TH04pJHkgEylk/_clientMiddlewareManifest.js"
   ],
   "rootMainFiles": [
-    "static/chunks/3cfn99dbrcvvp.js",
-    "static/chunks/26wdxk9btpf-5.js",
-    "static/chunks/2a7f-0nu82odg.js",
-    "static/chunks/turbopack-3-ry682tkyiqk.js"
+    "static/chunks/0j1we3cwg31qe.js",
+    "static/chunks/1-5w9gp258ioz.js",
+    "static/chunks/04ec-xp3qpgl-.js",
+    "static/chunks/turbopack-2u1d16houkiyo.js"
   ],
   "rootMainFilesTree": {},
   "pagesChunkGroupBootstrapParams": {
     "/page": {
       "otherChunks": [
-        "static/chunks/3cfn99dbrcvvp.js",
-        "static/chunks/26wdxk9btpf-5.js",
-        "static/chunks/2a7f-0nu82odg.js"
+        "static/chunks/0j1we3cwg31qe.js",
+        "static/chunks/1-5w9gp258ioz.js",
+        "static/chunks/04ec-xp3qpgl-.js"
       ],
       "runtimeModuleIds": [
         94553
@@ -31,9 +31,9 @@ globalThis.__BUILD_MANIFEST = {
     },
     "/_not-found/page": {
       "otherChunks": [
-        "static/chunks/3cfn99dbrcvvp.js",
-        "static/chunks/26wdxk9btpf-5.js",
-        "static/chunks/2a7f-0nu82odg.js"
+        "static/chunks/0j1we3cwg31qe.js",
+        "static/chunks/1-5w9gp258ioz.js",
+        "static/chunks/04ec-xp3qpgl-.js"
       ],
       "runtimeModuleIds": [
         94553
@@ -41,9 +41,9 @@ globalThis.__BUILD_MANIFEST = {
     },
     "/_global-error/page": {
       "otherChunks": [
-        "static/chunks/3cfn99dbrcvvp.js",
-        "static/chunks/26wdxk9btpf-5.js",
-        "static/chunks/2a7f-0nu82odg.js"
+        "static/chunks/0j1we3cwg31qe.js",
+        "static/chunks/1-5w9gp258ioz.js",
+        "static/chunks/04ec-xp3qpgl-.js"
       ],
       "runtimeModuleIds": [
         94553

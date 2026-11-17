@@ -1,6 +1,7 @@
 {
   "version": 1,
   "functions": {
+    "/api/add-dmet": {},
     "/api/auth/login": {},
     "/api/auth/me": {},
     "/api/data": {},
