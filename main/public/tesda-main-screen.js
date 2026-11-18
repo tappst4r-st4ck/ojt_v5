@@ -343,6 +343,7 @@
   content.classList.toggle('login-active', target === 'login');
   content.classList.toggle('flex', target === 'login');
   content.classList.toggle('justify-center', target === 'login');
+  content.scrollTop = 0; // every view opens at the top, not where the previous one was scrolled
 
   views.forEach(v => {
     const el = document.getElementById(`view-${v}`);
