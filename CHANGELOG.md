@@ -31,7 +31,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Tailwind is compiled from `styles/tesda-main-screen.css` to `public/tesda-main-screen.css` by `npm run build:css` (runs automatically before `npm run dev` and `npm run build`). Uses the already-installed `@tailwindcss/postcss`; adds `@tailwindcss/forms` and `postcss` as dev dependencies. **Re-run `npm run build:css` after changing classes while the dev server is running.**
   - Tests fail if a script is inlined, an `on*=` handler returns, an action isn't allow-listed, or the compiled CSS is stale.
 
+### Added
+- **Dashboard → Master Schedule** — Each trainer in Faculty Workload has a "View schedule" action that opens the Master Schedule on that trainer's diploma, year and semester, outlines their classes and fades the rest. A chip by the heading shows the trainer; its × clears the highlight.
+
 ### Fixed
+- Opening Master Schedule now redraws the timetable, and opening Faculty Database redraws its table (the two branches in `switchView` were merged by mistake).
 - Dashboard alerts no longer crash when faculty exist (removed dead code referencing an undefined variable).
 
 ## [2.2.2] - 2026-11-17

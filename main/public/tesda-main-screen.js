@@ -6,6 +6,8 @@
     let currentView = 'schedule';
     let selectedTrainerForModal = null;
     let currentFacultyFilter = 'all';
+    let dashboardTrainerLinks = []; // rows of the dashboard workload table, for "View schedule"
+    let highlightedTrainer = ''; // normalized trainer name highlighted in the Master Schedule
     let scheduleEntries = [];
     let editingScheduleId = null;
     let googleIdentityInitialized = false;
@@ -372,6 +374,8 @@
   if (target === 'dashboard') {
     renderDashboard();
   } else if (target === 'schedule') {
+        renderTimetable();
+      } else if (target === 'faculty') {
         renderFacultyTable(getVisibleFaculty());
       } else if (target === 'curriculum') {
         renderCurriculumSections();
@@ -925,6 +929,7 @@
 
       document.getElementById('currentTimetableHeading').innerText =
         `${diploma} - Year ${year}, Semester ${sem} Master Schedule Matrix`;
+      document.getElementById('trainerHighlightChip').classList.toggle('hidden', !highlightedTrainer);
 
       const tbody = document.getElementById('timetableBody');
       tbody.innerHTML = '';
@@ -974,8 +979,10 @@
 
             const course = getTimetableCard(diploma, sem, year, day, slot.time);
             if (course) {
+              const highlight = !highlightedTrainer ? ''
+                : normalizeName(course.trainer) === highlightedTrainer ? 'ring-2 ring-blue-500' : 'opacity-40';
               td.innerHTML = `
-                <div class="rounded-lg border border-slate-200 border-l-[3px] border-l-blue-600 bg-white p-2.5 shadow-sm transition hover:border-slate-300 hover:border-l-blue-800 hover:shadow-md" draggable="true" data-schedule-id="${escapeHtml(course.scheduleRecord.id)}" data-day="${escapeHtml(day)}" data-time="${escapeHtml(slot.time)}">
+                <div class="rounded-lg border border-slate-200 border-l-[3px] border-l-blue-600 bg-white p-2.5 shadow-sm transition hover:border-slate-300 hover:border-l-blue-800 hover:shadow-md ${highlight}" draggable="true" data-schedule-id="${escapeHtml(course.scheduleRecord.id)}" data-day="${escapeHtml(day)}" data-time="${escapeHtml(slot.time)}">
                   <div class="flex items-center justify-between gap-1">
                     <span class="font-semibold text-blue-900 text-xs tabular-nums">${escapeHtml(course.code)}</span>
                     <span class="rounded-full bg-blue-50 px-1.5 py-0.5 text-[11px] font-semibold text-blue-700">${course.type}</span>
@@ -1192,7 +1199,9 @@
             loadingUnits: 0,
             contactHours: 0,
             courseCount: 0,
-            isUnassigned: !faculty
+            isUnassigned: !faculty,
+            trainer: record.assignedTrainer || '',
+            firstRecord: record
           });
         }
         const f = facultyMap.get(facultyKey);
@@ -1234,11 +1243,12 @@
       // Render Faculty Workload Table
       const tbody = document.getElementById('dashboardFacultyBody');
       tbody.innerHTML = '';
+      dashboardTrainerLinks = sortedFaculty;
 
       if (sortedFaculty.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-10 text-center text-[13px] text-slate-500">No faculty assignments match the selected filters.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="p-10 text-center text-[13px] text-slate-500">No faculty assignments match the selected filters.</td></tr>`;
       } else {
-        sortedFaculty.forEach(f => {
+        sortedFaculty.forEach((f, index) => {
           const tr = document.createElement('tr');
           tr.className = `transition ${f.isUnassigned ? 'bg-rose-50/60 hover:bg-rose-50' : 'hover:bg-slate-50'}`;
           tr.innerHTML = `
@@ -1251,6 +1261,11 @@
                 <span class="w-1.5 h-1.5 rounded-full ${f.isUnassigned ? 'bg-rose-500' : 'bg-emerald-500'}"></span>
                 ${f.isUnassigned ? 'Unassigned' : 'Assigned'}
               </span>
+            </td>
+            <td class="py-3 px-3 border-b border-slate-100 text-center">
+              <button class="inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-blue-700 hover:bg-blue-50 transition whitespace-nowrap" data-click="viewTrainerSchedule:${index}" title="Open the Master Schedule with ${escapeHtml(f.name)}'s classes highlighted" type="button">
+                <span class="material-symbols-outlined text-[16px]">calendar_view_week</span>View schedule
+              </button>
             </td>
           `;
           tbody.appendChild(tr);
@@ -1369,6 +1384,27 @@
       if (diplomaCode) document.getElementById('schedDiplomaFilter').value = diplomaCode;
       if (yearLevel) document.getElementById('schedYearFilter').value = yearLevel;
       if (semester) document.getElementById('schedSemFilter').value = semester;
+    }
+
+    // Dashboard quick action: open the Master Schedule on the trainer's first class and highlight all of theirs.
+    function viewTrainerSchedule(index) {
+      const row = dashboardTrainerLinks[Number(index)];
+      if (!row) return;
+      const record = row.firstRecord;
+      if (record.schoolYear) document.getElementById('schedSchoolYearFilter').value = record.schoolYear;
+      document.getElementById('schedDiplomaFilter').value = record.diplomaCode;
+      updateScheduleYearOptions();
+      document.getElementById('schedYearFilter').value = String(record.diplomaYear);
+      document.getElementById('schedSemFilter').value = String(record.semester);
+      highlightedTrainer = normalizeName(row.trainer);
+      document.getElementById('trainerHighlightName').textContent = row.name;
+      syncScheduleToDashboardFilters();
+      switchView('schedule');
+    }
+
+    function clearTrainerHighlight() {
+      highlightedTrainer = '';
+      renderTimetable();
     }
 
     function syncScheduleToDashboardFilters() {
@@ -2296,7 +2332,8 @@
       handleFacultySearch, filterFaculty, openFacultyModal, closeFacultyFormModal, handleSaveFaculty,
       openAddCurriculumModal, closeAddCurriculumModal, setCurriculumFormMode, handleSaveCurriculum,
       updateTargetDiplomaYearOptions, openImportSheetModal,
-      openCurriculumPdfModal, closeCurriculumPdfModal, updatePdfYearOptions, exportCurriculumPdf, closeImportSheetModal, handleImportSheet,
+      openCurriculumPdfModal, closeCurriculumPdfModal, updatePdfYearOptions, exportCurriculumPdf,
+      viewTrainerSchedule, clearTrainerHighlight, closeImportSheetModal, handleImportSheet,
       closeTrainerModal, jumpToFacultyFromModal, closeScheduleModal,
     };
 
