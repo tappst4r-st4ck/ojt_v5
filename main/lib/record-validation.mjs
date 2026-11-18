@@ -46,6 +46,43 @@ export function hasScheduleConflict(records, candidate, excludingId = "") {
   );
 }
 
+const sameText = (left, right) =>
+  String(left ?? "").trim().toLowerCase() === String(right ?? "").trim().toLowerCase();
+
+// Uniqueness rules shared by API writes and sheet imports. Returns an error message or null.
+export function findRecordConflict(collection, records, record, excludingId = "") {
+  const others = records.filter(item => String(item.id) !== String(excludingId));
+  if (collection === "Diplomas" && others.some(item => sameText(item.code, record.code) || sameText(item.name, record.name))) {
+    return "A diploma with this code or name already exists.";
+  }
+  if (collection === "Faculty" && others.some(item => sameText(item.email, record.email))) {
+    return "A faculty record with this email already exists.";
+  }
+  if (collection === "Courses" && others.some(item =>
+    String(item.diplomaCode) === String(record.diplomaCode) && sameText(item.code, record.code)
+  )) {
+    return "A course with this code already exists in the diploma.";
+  }
+  if (collection === "Master Schedule" && hasScheduleConflict(others, record)) {
+    return "That timetable slot is already assigned.";
+  }
+  return null;
+}
+
+// Google Drive / Sheets file IDs: letters, digits, "-" and "_" only.
+export function isDriveId(value) {
+  return typeof value === "string" && /^[A-Za-z0-9_-]{10,200}$/.test(value);
+}
+
+// CSV for Drive's CSV -> Google Sheets conversion. Text that starts like a formula
+// gets a leading ' so Sheets stores it as text instead of evaluating it.
+export function toCsv(rows) {
+  return rows.map(row => row.map(value => {
+    const text = typeof value === "number" ? String(value) : String(value ?? "").replace(/^[=+\-@\t\r]/, "'$&");
+    return `"${text.replace(/"/g, '""')}"`;
+  }).join(",")).join("\r\n");
+}
+
 export function redactFacultyContacts(records) {
   return records.map(({ mobileNumber, email, ...record }) => record);
 }

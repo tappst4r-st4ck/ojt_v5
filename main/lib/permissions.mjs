@@ -1,5 +1,4 @@
-const headTrainerRoles = new Set(["head trainer", "head trainer admin"]);
-
+// The school has a single editor role: the Head Trainer.
 export function isHeadTrainerRole(role) {
-  return headTrainerRoles.has(String(role ?? "").trim().toLowerCase());
+  return String(role ?? "").trim().toLowerCase() === "head trainer";
 }

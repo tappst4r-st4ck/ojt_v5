@@ -46,7 +46,10 @@ export async function POST(request) {
     return response;
   } catch (error) {
     console.error("Google sign-in failed:", error.code || "server error");
-    if (["INVALID_GOOGLE_CREDENTIAL", "FACULTY_ACCOUNT_REQUIRED"].includes(error.code)) {
+    // Only forged/expired tokens count toward the per-IP lockout. A genuine Google
+    // account that isn't on the faculty list is a common mistake on shared campus
+    // IPs and must not lock out everyone behind that IP.
+    if (error.code === "INVALID_GOOGLE_CREDENTIAL") {
       try {
         await recordFailedAttempt(request);
       } catch {

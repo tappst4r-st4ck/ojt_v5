@@ -1,4 +1,4 @@
-import { requireHeadTrainer } from "../../../../lib/auth";
+import { isSameOriginMutation, requireHeadTrainer } from "../../../../lib/auth";
 import { getPublicRecords } from "../../../../lib/api-data";
 import { ensureDiplomaFolderStructure } from "../../../../lib/google-drive";
 import { rateLimit, rateLimitHeaders, rateLimitResponse } from "../../../../lib/rate-limit.mjs";
@@ -9,6 +9,10 @@ export async function POST(request) {
   const rl = await rateLimit(request);
   const rlHeaders = rateLimitHeaders(rl);
   if (!rl.allowed) return rateLimitResponse(rl);
+
+  if (!isSameOriginMutation(request)) {
+    return Response.json({ error: "Cross-origin changes are not allowed." }, { status: 403, headers: rlHeaders });
+  }
 
   try {
     const { response } = await requireHeadTrainer();

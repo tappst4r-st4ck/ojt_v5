@@ -69,3 +69,10 @@ export function getLocalLockout(attempts, key, now) {
 export function clearLocalLockout(attempts, key) {
   attempts.delete(key);
 }
+
+// Runs fn after every earlier call with the same key has settled (single-process lock).
+export function runWithLocalLock(locks, key, fn) {
+  const result = (locks.get(key) ?? Promise.resolve()).then(fn);
+  locks.set(key, result.catch(() => {}));
+  return result;
+}

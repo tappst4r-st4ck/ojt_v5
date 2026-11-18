@@ -21,8 +21,10 @@ export function securityHeadersMiddleware(request, response) {
   // Content Security Policy
   const csp = [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' https://accounts.google.com https://apis.google.com https://cdn.tailwindcss.com",
-    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com https://accounts.google.com",
+    // No 'unsafe-inline' for scripts: the dashboard loads only /tesda-main-screen.js and
+    // Google sign-in. Styles keep 'unsafe-inline' for Google's button and the print frame.
+    "script-src 'self' https://accounts.google.com https://apis.google.com",
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com",
     "font-src 'self' https://fonts.gstatic.com",
     "img-src 'self' data:",
     "connect-src 'self' https://accounts.google.com https://www.googleapis.com",

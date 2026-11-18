@@ -1,5 +1,70 @@
 import "server-only";
+import { randomUUID } from "node:crypto";
 import { google } from "googleapis";
+import { getSharedRedis } from "./shared-redis.mjs";
+import { findRecordConflict, validateRecord } from "./record-validation.mjs";
+import { runWithLocalLock } from "./security-state.mjs";
+
+// Reads are cached briefly so page loads don't exhaust the Sheets read quota
+// (60 reads/min for the service account). Anything that writes reads fresh.
+const CACHE_TTL_SECONDS = 30;
+const LOCK_TTL_MS = 60_000;
+const localCache = new Map();
+const localLocks = new Map();
+const inflightReads = new Map();
+const RELEASE_LOCK_SCRIPT = `if redis.call("GET", KEYS[1]) == ARGV[1] then return redis.call("DEL", KEYS[1]) end return 0`;
+
+function sheetKey(kind, tab) {
+  return `tesda:${kind}:${process.env.GOOGLE_SHEETS_ID}:${tab}`;
+}
+
+async function readCachedRows(tab) {
+  const redis = getSharedRedis();
+  if (redis) {
+    try {
+      return await redis.get(sheetKey("sheet", tab));
+    } catch {
+      return null;
+    }
+  }
+  const entry = localCache.get(tab);
+  return entry && entry.expiresAt > Date.now() ? entry.rows : null;
+}
+
+async function writeCachedRows(tab, rows) {
+  const redis = getSharedRedis();
+  if (redis) {
+    await redis.set(sheetKey("sheet", tab), rows, { ex: CACHE_TTL_SECONDS }).catch(() => {});
+    return;
+  }
+  localCache.set(tab, { rows, expiresAt: Date.now() + CACHE_TTL_SECONDS * 1000 });
+}
+
+async function invalidateCachedRows(tab) {
+  localCache.delete(tab);
+  await getSharedRedis()?.del(sheetKey("sheet", tab)).catch(() => {});
+}
+
+// Serializes writes to one tab across all server instances, so row numbers
+// read inside fn stay valid until fn finishes.
+export async function withSheetLock(tab, fn) {
+  const redis = getSharedRedis();
+  if (!redis) return runWithLocalLock(localLocks, tab, fn);
+
+  const key = sheetKey("lock", tab);
+  const token = randomUUID();
+  for (let attempt = 0; attempt < 50; attempt++) {
+    if (await redis.set(key, token, { nx: true, px: LOCK_TTL_MS })) {
+      try {
+        return await fn();
+      } finally {
+        await redis.eval(RELEASE_LOCK_SCRIPT, [key], [token]).catch(() => {});
+      }
+    }
+    await new Promise(resolve => setTimeout(resolve, 100));
+  }
+  throw new Error(`The ${tab} sheet is busy with another change. Try again.`);
+}
 
 export const sheetDefinitions = {
   Diplomas: ["Diploma ID", "Diploma Code", "Diploma Name", "Diploma Years"],
@@ -145,13 +210,26 @@ function rangeFor(tab) {
   return `'${tab.replace(/'/g, "''")}'`;
 }
 
-export async function listRecords(tab) {
+async function fetchRows(tab) {
   const sheets = await getSheetsClient();
   const response = await sheets.spreadsheets.values.get({
     spreadsheetId: process.env.GOOGLE_SHEETS_ID,
     range: `${rangeFor(tab)}!A:${String.fromCharCode(64 + sheetDefinitions[tab].length)}`,
   });
   const rows = response.data.values ?? [];
+  await writeCachedRows(tab, rows);
+  return rows;
+}
+
+// fresh: true bypasses the cache; use it whenever row numbers will be written to.
+export async function listRecords(tab, { fresh = false } = {}) {
+  let rows = fresh ? await fetchRows(tab) : await readCachedRows(tab);
+  if (!rows) {
+    if (!inflightReads.has(tab)) {
+      inflightReads.set(tab, fetchRows(tab).finally(() => inflightReads.delete(tab)));
+    }
+    rows = await inflightReads.get(tab);
+  }
   return rows.slice(1).map((row, index) => toRecord(tab, row, index + 2));
 }
 
@@ -165,6 +243,7 @@ export async function appendRecord(tab, record) {
     insertDataOption: "INSERT_ROWS",
     requestBody: { values: [toValues(tab, record)] },
   });
+  await invalidateCachedRows(tab);
   return result.data;
 }
 
@@ -176,6 +255,7 @@ export async function updateRecord(tab, rowNumber, record) {
     valueInputOption: "RAW",
     requestBody: { values: [toValues(tab, record)] },
   });
+  await invalidateCachedRows(tab);
   return result.data;
 }
 
@@ -201,6 +281,7 @@ export async function deleteRecord(tab, rowNumber) {
       }],
     },
   });
+  await invalidateCachedRows(tab);
 }
 
 export async function initializeSpreadsheet({ seedData }) {
@@ -246,7 +327,7 @@ export async function initializeSpreadsheet({ seedData }) {
       throw new Error(`The ${tab} worksheet headers do not match the required schema.`);
     }
 
-    const records = await listRecords(tab);
+    const records = await listRecords(tab, { fresh: true });
     if (records.length === 0 && seedData[tab]) {
       const rows = seedData[tab].map(record => toValues(tab, record));
       if (rows.length > 0) {
@@ -257,6 +338,7 @@ export async function initializeSpreadsheet({ seedData }) {
           insertDataOption: "INSERT_ROWS",
           requestBody: { values: rows },
         });
+        await invalidateCachedRows(tab);
         results[tab] = `seeded ${rows.length} sample records`;
       } else {
         results[tab] = "initialized";
@@ -292,15 +374,13 @@ async function ensureDiplomaDurationHeader(sheets, spreadsheetId) {
 
 export async function importFromSheet(sourceSpreadsheetId) {
   const sheets = await getSheetsClient();
-  const targetSpreadsheetId = process.env.GOOGLE_SHEETS_ID;
-
   const results = { imported: {}, errors: [] };
 
   for (const tab of Object.keys(sheetDefinitions)) {
     try {
       const response = await sheets.spreadsheets.values.get({
         spreadsheetId: sourceSpreadsheetId,
-        range: `'${tab.replace(/'/g, "''")}'`,
+        range: rangeFor(tab),
       });
 
       const rows = response.data.values ?? [];
@@ -308,33 +388,44 @@ export async function importFromSheet(sourceSpreadsheetId) {
         results.imported[tab] = 0;
         continue;
       }
-
-      const headers = rows[0];
-      const expectedHeaders = sheetDefinitions[tab];
-      if (headers.join("\u0000") !== expectedHeaders.join("\u0000")) {
+      if (rows[0].join("\u0000") !== sheetDefinitions[tab].join("\u0000")) {
         results.errors.push(`${tab}: header mismatch`);
         continue;
       }
 
-      let imported = 0;
-      for (let i = 1; i < rows.length; i++) {
-        const record = toRecord(tab, rows[i], i + 1);
-        if (!record.id) continue;
+      // One fresh read per tab; imported rows get the same validation and
+      // uniqueness checks as edits made in the app.
+      results.imported[tab] = await withSheetLock(tab, async () => {
+        const existing = await listRecords(tab, { fresh: true });
+        let imported = 0;
+        for (let i = 1; i < rows.length; i++) {
+          const { rowNumber, ...record } = toRecord(tab, rows[i], i + 1);
+          if (!record.id) continue;
 
-        const existingRecords = await listRecords(tab);
-        const exists = existingRecords.some(r => String(r.id) === String(record.id));
-
-        if (exists) {
-          const existing = existingRecords.find(r => String(r.id) === String(record.id));
-          await updateRecord(tab, existing.rowNumber, record);
-        } else {
-          await appendRecord(tab, record);
+          const problem = validateRecord(tab, record) || findRecordConflict(tab, existing, record, record.id);
+          if (problem) {
+            results.errors.push(`${tab} row ${i + 1}: ${problem}`);
+            continue;
+          }
+          const match = existing.find(item => String(item.id) === String(record.id));
+          if (match && match.rowNumber === null) {
+            results.errors.push(`${tab} row ${i + 1}: duplicate ID in the source sheet.`);
+            continue;
+          }
+          if (match) {
+            await updateRecord(tab, match.rowNumber, record);
+            Object.assign(match, record);
+          } else {
+            await appendRecord(tab, record);
+            existing.push({ ...record, rowNumber: null });
+          }
+          imported++;
         }
-        imported++;
-      }
-      results.imported[tab] = imported;
+        return imported;
+      });
     } catch (error) {
-      results.errors.push(`${tab}: ${error.message}`);
+      console.error(`Importing ${tab} failed:`, error.message);
+      results.errors.push(`${tab}: could not be read or written.`);
     }
   }
 

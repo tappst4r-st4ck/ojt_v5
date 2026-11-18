@@ -5,6 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+- **UI redesign** — Clean bento layout for login, sidebar, dashboard KPIs, schedule, faculty and curriculum views (Tailwind CDN, Plus Jakarta Sans + Inter, Material Symbols).
+- **Faculty Loading Report** — Prints A4 landscape from an in-page frame (no pop-up); choose "Save as PDF" in the print dialog.
+- **Legibility** — Grey text darkened to meet WCAG AA contrast (slate-300/400 → slate-500; slate-600 on slate-100 backgrounds). Nothing is smaller than 11px, and body copy is at least 12px.
+- **Roles** — `Head Trainer` is the only editor role; the unused `Head Trainer Admin` role was removed.
+- **Curriculum Hub** — One collapsible panel per diploma with a single table split by year/semester (panels stay open across refreshes). Add Course / Add a Diploma switch slides between modes.
+- **Curriculum Print / Export to PDF** — Builds an A4 report for the diploma and year picked in the filters (one page per diploma when "All" is picked). Import from Sheet and Upload to Drive are hidden from read-only users.
+- **Upload to Drive** — Saves the picked diploma's curriculum (or every diploma) as a Google Sheet in its Drive folder (`POST /api/drive/curriculum` now takes `{ diplomaCode }`). Formula-like cells are neutralised. Set `GOOGLE_DRIVE_FOLDER_ID` to a Shared Drive folder: service accounts can't own uploaded files.
+
+### Security
+- **Removed `/api/add-dmet`** — It wrote to the Sheet with no sign-in, role, origin or rate-limit checks. Use `scripts/add-dmet.mjs` locally instead.
+- **CSRF** — `isSameOriginMutation()` now actually covers every write route (import, Drive folders, Drive curriculum were missing it). A test fails if a write route lacks it.
+- **Sheets quota** — Reads are cached for 30 s (Redis, or memory in dev) and concurrent reads of a tab are shared; one page load went from 6 Sheets reads to at most 4, usually 0.
+- **Concurrent edits** — Creates, updates, deletes and imports hold a per-tab lock and re-read rows fresh, so a row number can't shift to another record mid-write.
+- **Imports** — Imported rows now pass the same validation and duplicate/conflict checks as in-app edits, with one read per tab instead of one per row.
+- **Drive** — Folder and sheet IDs are validated and Drive queries are properly quoted (prevented query injection in `/api/drive/files`).
+- **Lockout** — Only forged/expired Google tokens count toward the per-IP lockout. Previously, faculty signing in with the wrong Google account could lock out a whole shared campus IP. (The 2.2.2 note below said lockout tracked IP + email; it only ever tracked IP.)
+- **Privacy** — Replaced real phone numbers and Gmail addresses in seed data and tests with placeholders.
+- **Strict CSP** — `script-src` no longer allows `'unsafe-inline'` or the Tailwind CDN, so injected inline scripts and `on*=` handlers are blocked by the browser.
+  - Dashboard JavaScript moved to `public/tesda-main-screen.js`; the 49 inline `onclick`/`onchange`/`oninput`/`onsubmit` handlers became `data-click`/`data-change`/`data-input`/`data-submit` actions dispatched from an allow-list (`pageActions`).
+  - Tailwind is compiled from `styles/tesda-main-screen.css` to `public/tesda-main-screen.css` by `npm run build:css` (runs automatically before `npm run dev` and `npm run build`). Uses the already-installed `@tailwindcss/postcss`; adds `@tailwindcss/forms` and `postcss` as dev dependencies. **Re-run `npm run build:css` after changing classes while the dev server is running.**
+  - Tests fail if a script is inlined, an `on*=` handler returns, an action isn't allow-listed, or the compiled CSS is stale.
+
+### Fixed
+- Dashboard alerts no longer crash when faculty exist (removed dead code referencing an undefined variable).
+
 ## [2.2.2] - 2026-11-17
 
 ### Added

@@ -1,6 +1,7 @@
-import { requireHeadTrainer } from "../../../../lib/auth";
+import { isSameOriginMutation, requireHeadTrainer } from "../../../../lib/auth";
 import { getPublicRecords } from "../../../../lib/api-data";
-import { uploadCurriculumSheetToDiplomaFolder, listDiplomaFolders, getDiplomaFolderFiles } from "../../../../lib/google-drive";
+import { uploadCurriculumCsv, listDiplomaFolders } from "../../../../lib/google-drive";
+import { toCsv } from "../../../../lib/record-validation.mjs";
 import { rateLimit, rateLimitHeaders, rateLimitResponse } from "../../../../lib/rate-limit.mjs";
 
 export const runtime = "nodejs";
@@ -27,6 +28,10 @@ export async function POST(request) {
   const rlHeaders = rateLimitHeaders(rl);
   if (!rl.allowed) return rateLimitResponse(rl);
 
+  if (!isSameOriginMutation(request)) {
+    return Response.json({ error: "Cross-origin changes are not allowed." }, { status: 403, headers: rlHeaders });
+  }
+
   try {
     const { response } = await requireHeadTrainer();
     if (response) return response;
@@ -36,21 +41,36 @@ export async function POST(request) {
       return Response.json({ error: "Invalid request body." }, { status: 400, headers: rlHeaders });
     }
 
-    const { diplomaCode, spreadsheetId, spreadsheetTitle } = body;
-    if (!diplomaCode || !spreadsheetId) {
-      return Response.json({ error: "diplomaCode and spreadsheetId are required." }, { status: 400, headers: rlHeaders });
+    // diplomaCode is a code from the Diplomas tab, or "ALL" for every diploma.
+    const { diplomaCode } = body;
+    if (typeof diplomaCode !== "string" || !diplomaCode) {
+      return Response.json({ error: "diplomaCode is required." }, { status: 400, headers: rlHeaders });
     }
 
-    const diplomas = await getPublicRecords("Diplomas");
-    const diploma = diplomas.find(d => d.code === diplomaCode);
-    if (!diploma) {
+    const [diplomas, courses] = await Promise.all([getPublicRecords("Diplomas"), getPublicRecords("Courses")]);
+    const targets = diplomaCode === "ALL" ? diplomas : diplomas.filter(d => d.code === diplomaCode);
+    if (targets.length === 0) {
       return Response.json({ error: "Diploma not found." }, { status: 404, headers: rlHeaders });
     }
 
-    const title = spreadsheetTitle || diploma.name;
-    const result = await uploadCurriculumSheetToDiplomaFolder(diplomaCode, spreadsheetId, title);
+    const uploaded = [];
+    for (const diploma of targets) {
+      const rows = courses
+        .filter(course => course.diplomaCode === diploma.code)
+        .sort((a, b) => a.diplomaYear - b.diplomaYear || a.semester - b.semester)
+        .map(c => [c.diplomaYear, c.semester, c.code, c.name, c.lecUnits, c.labUnits, c.totalUnits, c.prerequisites, c.qualification]);
+      if (rows.length === 0) continue;
+      const csv = toCsv([
+        ["Year", "Semester", "Course Code", "Course Name", "Lec Units", "Lab Units", "Total Units", "Pre-Requisites", "Resultant Qualification"],
+        ...rows,
+      ]);
+      uploaded.push(await uploadCurriculumCsv(diploma, csv));
+    }
+    if (uploaded.length === 0) {
+      return Response.json({ error: "The selected diploma has no courses to upload." }, { status: 404, headers: rlHeaders });
+    }
 
-    return Response.json({ ok: true, result }, { headers: rlHeaders });
+    return Response.json({ ok: true, uploaded }, { headers: rlHeaders });
   } catch (error) {
     console.error("Upload curriculum sheet failed:", error.message);
     return Response.json({ error: "Failed to upload curriculum sheet." }, { status: 503, headers: rlHeaders });

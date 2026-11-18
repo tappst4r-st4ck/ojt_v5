@@ -1,0 +1,35 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "gray-on-color",
+        "value": "*",
+        "files": [
+          "styles/tesda-main-screen.css"
+        ],
+        "createdAt": "2026-11-18T06:23:42.241Z",
+        "reason": "Claude triage: flagged line is .field-label (text-slate-500) with no background; the file's only backgrounds are white/slate-50/100 neutrals, not colored"
+      },
+      {
+        "rule": "overused-font",
+        "value": "Inter",
+        "files": [
+          "styles/tesda-main-screen.css"
+        ],
+        "createdAt": "2026-11-18T09:00:00.000Z",
+        "reason": "Sanctioned exception: the user's redesign brief specifies Inter for body text"
+      },
+      {
+        "rule": "overused-font",
+        "value": "Plus Jakarta Sans",
+        "files": [
+          "styles/tesda-main-screen.css"
+        ],
+        "createdAt": "2026-11-18T09:00:00.000Z",
+        "reason": "Sanctioned exception: the user's redesign brief specifies Plus Jakarta Sans for headings"
+      }
+    ]
+  }
+}
