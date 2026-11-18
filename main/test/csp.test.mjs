@@ -48,6 +48,7 @@ test("every declarative data-* action is registered", () => {
 
 test("compiled dashboard CSS is up to date with its sources", async () => {
   const { buildCss } = await import("../scripts/build-css.mjs");
-  assert.equal(read("public/tesda-main-screen.css"), await buildCss(),
+  const lf = text => text.replace(/\r\n/g, "\n"); // git may check the file out with CRLF on Windows
+  assert.equal(lf(read("public/tesda-main-screen.css")), lf(await buildCss()),
     "public/tesda-main-screen.css is stale. Run: npm run build:css");
 });
