@@ -30,7 +30,8 @@ test("same-origin mutation checks use forwarded request host and protocol", () =
 
 test("only approved Head Trainer roles grant editing access", () => {
   assert.equal(isHeadTrainerRole("Head Trainer"), true);
-  assert.equal(isHeadTrainerRole("head trainer admin"), true);
+  assert.equal(isHeadTrainerRole(" head trainer "), true);
+  assert.equal(isHeadTrainerRole("Head Trainer Admin"), false);
   assert.equal(isHeadTrainerRole("Lead Instructor"), false);
   assert.equal(isHeadTrainerRole(""), false);
 });
@@ -38,7 +39,7 @@ test("only approved Head Trainer roles grant editing access", () => {
 test("signed-out faculty results redact phone and email", () => {
   const [record] = redactFacultyContacts([{
     id: "faculty-1",
-    mobileNumber: "+639307603532",
+    mobileNumber: "+639000000001",
     email: "trainer@example.gov.ph",
     firstName: "Trainer",
   }]);
@@ -55,7 +56,7 @@ test("faculty records require +63 mobile format and a valid email", () => {
     department: "DCET",
     role: "Trainer",
     qualifications: "NC II",
-    mobileNumber: "+639307603532",
+    mobileNumber: "+639000000001",
     email: "trainer@example.gov.ph",
   };
   assert.equal(validateRecord("Faculty", faculty), null);

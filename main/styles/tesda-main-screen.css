@@ -1,0 +1,111 @@
+/*
+ * Tailwind source for public/tesda-main-screen.html.
+ * Build: npm run build:css  (also runs automatically before `npm run dev` and `npm run build`)
+ * Output: public/tesda-main-screen.css — generated, do not edit by hand.
+ */
+/* Google's icon stylesheet sets font-size: 24px. Loaded unlayered it would beat every
+   Tailwind utility (text-[14px] etc.), so it goes in the lowest cascade layer. */
+@layer google-fonts;
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap") layer(google-fonts);
+@import "tailwindcss" source(none);
+@source "../public/tesda-main-screen.html";
+@source "../public/tesda-main-screen.js";
+@plugin "@tailwindcss/forms";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Plus Jakarta Sans", "Inter", sans-serif;
+}
+
+@layer base {
+  /* Tailwind v3 defaults the page was designed against. */
+  *, ::after, ::before, ::backdrop, ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+  button:not(:disabled), [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  body {
+    font-family: "Inter", sans-serif;
+    background-color: #F8FAFC;
+    color: #0f172a;
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, h4 {
+    font-family: "Plus Jakarta Sans", "Inter", sans-serif;
+  }
+}
+
+@layer components {
+  .card { @apply bg-white rounded-2xl border border-slate-200 shadow-[0_1px_2px_rgba(15,23,42,0.04)]; }
+  .btn-primary { @apply inline-flex items-center justify-center gap-1.5 rounded-lg bg-blue-600 px-3.5 py-2 text-[13px] font-semibold text-white shadow-sm transition hover:bg-blue-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:opacity-60; }
+  .btn-secondary { @apply inline-flex items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-[13px] font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600; }
+  .btn-ghost { @apply inline-flex items-center justify-center gap-1.5 rounded-lg bg-slate-100 px-3 py-2 text-[13px] font-semibold text-slate-700 transition hover:bg-slate-200; }
+  .field-label { @apply mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-slate-500; }
+  .field { @apply w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-[13px] font-medium text-slate-800 shadow-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20; }
+  select.field { @apply pr-9; }
+  .pill { @apply inline-flex items-center gap-1 whitespace-nowrap rounded-full px-2.5 py-1 text-[11px] font-semibold; }
+  .th { @apply sticky top-0 z-10 whitespace-nowrap bg-slate-50 px-3 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500 shadow-[inset_0_-1px_0_#e2e8f0]; }
+  .modal-panel { @apply w-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl; }
+  .modal-head { @apply flex items-center justify-between gap-3 border-b border-slate-100 px-5 py-4; }
+  .modal-close { @apply rounded-lg p-1.5 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700; }
+
+  .custom-scroll::-webkit-scrollbar {
+    height: 8px;
+    width: 8px;
+  }
+  .custom-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scroll::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border: 2px solid #F8FAFC;
+    border-radius: 9999px;
+  }
+  .drag-over {
+    background: #eff6ff !important;
+    outline: 2px dashed #2563eb !important;
+    outline-offset: -4px;
+    border-radius: 8px;
+  }
+  .material-symbols-outlined {
+    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 20;
+    font-size: 18px;
+    line-height: 1;
+  }
+  .icon-fill {
+    font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 20;
+  }
+  .login-grid {
+    background-image: radial-gradient(rgba(30, 58, 138, 0.08) 1px, transparent 1px);
+    background-size: 22px 22px;
+    -webkit-mask-image: radial-gradient(ellipse at center, #000 30%, transparent 75%);
+    mask-image: radial-gradient(ellipse at center, #000 30%, transparent 75%);
+  }
+  .blocked-stripes {
+    background-image: repeating-linear-gradient(135deg, #f8fafc 0 10px, #f1f5f9 10px 20px);
+  }
+  .animate-fade-in {
+    animation: fade-in 0.2s ease-out;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .animate-fade-in { animation: none; }
+  }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Unlayered on purpose: these id rules must beat the p-4 / md:p-8 utilities. */
+body[data-loading="true"] #contentArea {
+  visibility: hidden;
+}
+#contentArea.login-active {
+  padding: 0;
+  background-color: #F8FAFC;
+}

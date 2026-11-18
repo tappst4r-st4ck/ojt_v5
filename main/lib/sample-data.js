@@ -14,8 +14,8 @@ export const sampleData = {
       department: "DCET / DCMT",
       role: "JO",
       qualifications: "Masonry NC II",
-      mobileNumber: "+639307603532",
-      email: "alexanderdagohoy7@gmail.com",
+      mobileNumber: "+639000000001",
+      email: "faculty1@example.com",
     },
     {
       id: "faculty-2",
@@ -25,8 +25,8 @@ export const sampleData = {
       department: "DCET / DCMT",
       role: "JO",
       qualifications: "Civil Engineering Orientation, Hydraulics, Physics for Engineers",
-      mobileNumber: "+639162655967",
-      email: "haithamibnsajid@gmail.com",
+      mobileNumber: "+639000000002",
+      email: "faculty2@example.com",
     },
     {
       id: "faculty-3",
@@ -36,8 +36,8 @@ export const sampleData = {
       department: "DWT / DEMT",
       role: "JO",
       qualifications: "SMAW, FCAW, GMAW, GTAW, NC I and II",
-      mobileNumber: "+639955220861",
-      email: "bcdadacs55@gmail.com",
+      mobileNumber: "+639000000003",
+      email: "faculty3@example.com",
     },
     {
       id: "faculty-4",
@@ -47,8 +47,8 @@ export const sampleData = {
       department: "DCET",
       role: "TESD Specialist II",
       qualifications: "MAED Language Teaching",
-      mobileNumber: "+639078670778",
-      email: "albertbravojr28@gmail.com",
+      mobileNumber: "+639000000004",
+      email: "faculty4@example.com",
     },
   ],
   courses: [

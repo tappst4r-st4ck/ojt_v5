@@ -6,7 +6,10 @@
     "node": ">=22.0.0"
   },
   "scripts": {
+    "build:css": "node scripts/build-css.mjs",
+    "predev": "npm run build:css",
     "dev": "next dev",
+    "prebuild": "npm run build:css",
     "build": "next build",
     "start": "next start",
     "test": "node --test"
@@ -21,7 +24,9 @@
     "react-dom": "^19.3.0"
   },
   "devDependencies": {
+    "@tailwindcss/forms": "0.5.10",
     "@tailwindcss/postcss": "^4.1.0",
+    "postcss": "^8.5.33",
     "tailwindcss": "^4.1.0"
   }
 }

@@ -1,0 +1,44 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "gray-on-color",
+        "value": "*",
+        "files": [
+          "styles/tesda-main-screen.css"
+        ],
+        "createdAt": "2026-11-18T06:23:42.241Z",
+        "reason": "Claude triage: flagged line is .field-label (text-slate-500) with no background; the file's only backgrounds are white/slate-50/100 neutrals, not colored"
+      },
+      {
+        "rule": "overused-font",
+        "value": "inter",
+        "files": [
+          "styles/tesda-main-screen.css"
+        ],
+        "createdAt": "2026-11-18T09:00:00.000Z",
+        "reason": "Sanctioned exception: the user's redesign brief specifies Inter for body text"
+      },
+      {
+        "rule": "overused-font",
+        "value": "plus jakarta sans",
+        "files": [
+          "styles/tesda-main-screen.css"
+        ],
+        "createdAt": "2026-11-18T09:00:00.000Z",
+        "reason": "Sanctioned exception: the user's redesign brief specifies Plus Jakarta Sans for headings"
+      },
+      {
+        "rule": "cramped-padding",
+        "value": "*",
+        "files": [
+          "public/tesda-main-screen.html"
+        ],
+        "createdAt": "2026-11-18T07:35:34.553Z",
+        "reason": "Claude triage: static file scan has no layout, so it reports every card/modal as flush. Measured in the rendered page (all views and modals) and via a live URL scan: no cramped padding."
+      }
+    ]
+  }
+}
