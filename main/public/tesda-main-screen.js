@@ -391,6 +391,7 @@
       document.getElementById('curriculumAddButton').classList.toggle('hidden', !isHeadTrainer);
       document.getElementById('importSheetButton').classList.toggle('hidden', !isHeadTrainer);
       document.getElementById('driveUploadButton').classList.toggle('hidden', !isHeadTrainer);
+      document.getElementById('pdfExportButton').classList.toggle('hidden', !isHeadTrainer);
       document.getElementById('quickActionButton').classList.toggle('hidden', !isHeadTrainer);
       document.getElementById('facultyLoadingReportButton').classList.toggle('hidden', !isHeadTrainer);
 
@@ -629,10 +630,10 @@
       document.body.appendChild(frame);
     }
 
-    // Curriculum report for the diploma/year picked in the Curriculum Hub filters.
-    function printCurriculumReport(mode) {
-      const diplomaFilter = document.getElementById('curriculumDiplomaSelect').value;
-      const yearFilter = document.getElementById('curriculumYearSelect').value;
+    // Curriculum report for the diploma/year picked in the Print dialog.
+    function printCurriculumReport() {
+      const diplomaFilter = document.getElementById('pdfDiplomaSelect').value;
+      const yearFilter = document.getElementById('pdfYearSelect').value;
       const sections = curriculumSections
         .filter(section => (diplomaFilter === 'ALL' || section.diploma === diplomaFilter) &&
           (yearFilter === 'ALL' || section.yearLevel === yearFilter))
@@ -713,9 +714,8 @@
   ${diplomaPages.join('')}
 </body>
 </html>`;
-      printReport(reportHtml, reportTitle, mode === 'pdf'
-        ? 'Choose "Save as PDF" as the destination to download the curriculum.'
-        : '');
+      closeCurriculumPdfModal();
+      printReport(reportHtml, reportTitle);
     }
 
     function getTimetableCard(diploma, sem, year, day, time) {
@@ -2040,28 +2040,104 @@
       }
     }
 
-    // Saves the picked diploma's curriculum (or all of them) as a Google Sheet in its Drive folder.
+    // Saves the picked diploma/year (or all of them) as Google Sheets in Drive: Diploma's / Year N.
     async function uploadCurriculumToDrive() {
       if (currentUserRole !== 'head') {
         showToast('Only the Head Trainer can upload to Google Drive.');
         return;
       }
       const diplomaCode = document.getElementById('curriculumDiplomaSelect').value;
+      const year = document.getElementById('curriculumYearSelect').value;
       const button = document.getElementById('driveUploadButton');
       button.disabled = true;
       showToast('Uploading curriculum to Google Drive...');
       try {
         const { uploaded } = await apiRequest('/api/drive/curriculum', {
           method: 'POST',
-          body: JSON.stringify({ diplomaCode })
+          body: JSON.stringify({ diplomaCode, year })
         });
         showToast(uploaded.length === 1
-          ? `Saved "${uploaded[0].fileName}" to the ${uploaded[0].diplomaCode} Drive folder.`
-          : `Saved ${uploaded.length} curriculum sheets to their Drive folders.`);
+          ? `Saved "${uploaded[0].fileName}" to Diploma's / Year ${uploaded[0].year} in Drive.`
+          : `Saved ${uploaded.length} curriculum sheets to Diploma's in Drive.`);
       } catch (error) {
         showToast(error.message);
       } finally {
         button.disabled = false;
+      }
+    }
+
+    // mode 'print' reuses this dialog to print locally (any role); otherwise it exports to Drive (Head only).
+    function openCurriculumPdfModal(mode) {
+      const print = mode === 'print';
+      if (!print && currentUserRole !== 'head') {
+        showToast('Only the Head Trainer can export to Google Drive.');
+        return;
+      }
+      const diplomaSelect = document.getElementById('pdfDiplomaSelect');
+      diplomaSelect.innerHTML = '<option value="ALL">All Diplomas</option>' + curriculumDiplomas.map(item =>
+        `<option value="${escapeHtml(item.code)}">${escapeHtml(item.code)} - ${escapeHtml(item.title)}</option>`).join('');
+      const picked = document.getElementById('curriculumDiplomaSelect').value;
+      diplomaSelect.value = [...diplomaSelect.options].some(option => option.value === picked) ? picked : 'ALL';
+      updatePdfYearOptions(document.getElementById('curriculumYearSelect').value);
+      const result = document.getElementById('pdfExportResult');
+      result.replaceChildren();
+      result.classList.add('hidden');
+      document.getElementById('pdfModalIcon').textContent = print ? 'print' : 'picture_as_pdf';
+      document.getElementById('pdfModalTitle').textContent = print ? 'Print Curriculum' : 'Export Curriculum to PDF';
+      document.getElementById('pdfModalNote').classList.toggle('hidden', print);
+      const submit = document.getElementById('pdfExportSubmit');
+      submit.textContent = print ? 'Print' : 'Export';
+      submit.dataset.click = print ? 'printCurriculumReport' : 'exportCurriculumPdf';
+      document.getElementById('curriculumPdfModal').classList.remove('hidden');
+    }
+
+    function closeCurriculumPdfModal() {
+      document.getElementById('curriculumPdfModal').classList.add('hidden');
+    }
+
+    function updatePdfYearOptions(selectedValue) {
+      const diplomaCode = document.getElementById('pdfDiplomaSelect').value;
+      const select = document.getElementById('pdfYearSelect');
+      const years = diplomaCode === 'ALL'
+        ? Math.max(1, ...curriculumDiplomas.map(diploma => getDiplomaDurationYears(diploma.code)))
+        : getDiplomaDurationYears(diplomaCode);
+      setYearLevelOptions(select, years, typeof selectedValue === 'string' ? selectedValue : select.value, true);
+    }
+
+    // Saves the picked diploma/year as Google Sheets, exports each to PDF in Drive, and lists the PDF links.
+    async function exportCurriculumPdf() {
+      if (currentUserRole !== 'head') return;
+      const button = document.getElementById('pdfExportSubmit');
+      const result = document.getElementById('pdfExportResult');
+      button.disabled = true;
+      button.textContent = 'Exporting...';
+      try {
+        const { uploaded } = await apiRequest('/api/drive/curriculum', {
+          method: 'POST',
+          body: JSON.stringify({
+            diplomaCode: document.getElementById('pdfDiplomaSelect').value,
+            year: document.getElementById('pdfYearSelect').value,
+            pdf: true
+          })
+        });
+        result.replaceChildren(...uploaded.map(file => {
+          const item = document.createElement('li');
+          const link = document.createElement('a');
+          link.textContent = `${file.fileName}.pdf`;
+          link.className = 'font-semibold text-blue-700 hover:underline';
+          link.target = '_blank';
+          link.rel = 'noopener';
+          if (/^https:\/\//.test(file.pdfLink || '')) link.href = file.pdfLink;
+          item.append(link);
+          return item;
+        }));
+        result.classList.remove('hidden');
+        showToast(`Exported ${uploaded.length} PDF${uploaded.length === 1 ? '' : 's'} to the Curriculum PDFs folder.`);
+      } catch (error) {
+        showToast(error.message);
+      } finally {
+        button.disabled = false;
+        button.textContent = 'Export';
       }
     }
 
@@ -2219,7 +2295,8 @@
       syncScheduleToDashboardFilters, syncDashboardToScheduleFilters,
       handleFacultySearch, filterFaculty, openFacultyModal, closeFacultyFormModal, handleSaveFaculty,
       openAddCurriculumModal, closeAddCurriculumModal, setCurriculumFormMode, handleSaveCurriculum,
-      updateTargetDiplomaYearOptions, openImportSheetModal, closeImportSheetModal, handleImportSheet,
+      updateTargetDiplomaYearOptions, openImportSheetModal,
+      openCurriculumPdfModal, closeCurriculumPdfModal, updatePdfYearOptions, exportCurriculumPdf, closeImportSheetModal, handleImportSheet,
       closeTrainerModal, jumpToFacultyFromModal, closeScheduleModal,
     };
 

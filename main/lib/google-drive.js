@@ -1,4 +1,5 @@
 import "server-only";
+import { Readable } from "node:stream";
 import { google } from "googleapis";
 import { isDriveId } from "./record-validation.mjs";
 
@@ -44,55 +45,62 @@ const ROOT_FOLDER_NAME = "TESDA Diploma Curriculum";
 
 // Service accounts can't own uploaded files (no storage quota). Point GOOGLE_DRIVE_FOLDER_ID
 // at a folder in a Shared Drive where the service account is a Content manager.
-async function getOrCreateRootFolder(drive) {
+function getOrCreateRootFolder(drive) {
+  return process.env.GOOGLE_DRIVE_FOLDER_ID ? getBaseFolder() : getOrCreateFolder(drive, "root", ROOT_FOLDER_NAME);
+}
+
+const FOLDER_MIME = "application/vnd.google-apps.folder";
+const SHEET_MIME = "application/vnd.google-apps.spreadsheet";
+const PDF_MIME = "application/pdf";
+const DIPLOMAS_FOLDER_NAME = "Diploma's";
+const PDF_FOLDER_NAME = "Curriculum PDFs";
+
+// Top of the curriculum tree: the Shared Drive folder when set, else the account's My Drive.
+function getBaseFolder() {
   const sharedRoot = process.env.GOOGLE_DRIVE_FOLDER_ID;
-  if (sharedRoot) {
-    assertDriveId(sharedRoot, "GOOGLE_DRIVE_FOLDER_ID");
-    return sharedRoot;
-  }
+  if (!sharedRoot) return "root";
+  assertDriveId(sharedRoot, "GOOGLE_DRIVE_FOLDER_ID");
+  return sharedRoot;
+}
+
+async function findFile(drive, parentId, name, mimeType) {
   const response = await drive.files.list({
-    q: `name=${driveString(ROOT_FOLDER_NAME)} and mimeType='application/vnd.google-apps.folder' and trashed=false`,
-    fields: "files(id, name)",
+    q: `name=${driveString(name)} and ${driveString(parentId)} in parents and mimeType=${driveString(mimeType)} and trashed=false`,
+    fields: "files(id, webViewLink)",
     spaces: "drive",
     supportsAllDrives: true,
     includeItemsFromAllDrives: true,
   });
-  if (response.data.files?.length > 0) {
-    return response.data.files[0].id;
-  }
+  return response.data.files?.[0];
+}
+
+async function getOrCreateFolder(drive, parentId, name) {
+  const existing = await findFile(drive, parentId, name, FOLDER_MIME);
+  if (existing) return existing.id;
   const folder = await drive.files.create({
-    requestBody: {
-      name: ROOT_FOLDER_NAME,
-      mimeType: "application/vnd.google-apps.folder",
-    },
+    requestBody: { name, mimeType: FOLDER_MIME, parents: [parentId] },
     fields: "id",
     supportsAllDrives: true,
   });
   return folder.data.id;
 }
 
-async function getOrCreateDiplomaFolder(drive, rootFolderId, diplomaCode, diplomaName) {
-  const folderName = `${diplomaCode} - ${diplomaName}`;
-  const response = await drive.files.list({
-    q: `name=${driveString(folderName)} and ${driveString(rootFolderId)} in parents and mimeType='application/vnd.google-apps.folder' and trashed=false`,
-    fields: "files(id, name)",
-    spaces: "drive",
-    supportsAllDrives: true,
-    includeItemsFromAllDrives: true,
-  });
-  if (response.data.files?.length > 0) {
-    return response.data.files[0].id;
-  }
-  const folder = await drive.files.create({
-    requestBody: {
-      name: folderName,
-      mimeType: "application/vnd.google-apps.folder",
-      parents: [rootFolderId],
-    },
-    fields: "id",
-    supportsAllDrives: true,
-  });
-  return folder.data.id;
+// Replaces the content of the same-named file in the folder, or creates it.
+async function upsertFile(drive, parentId, name, mimeType, media) {
+  const existing = await findFile(drive, parentId, name, mimeType);
+  const file = existing
+    ? await drive.files.update({ fileId: existing.id, media, fields: "id, webViewLink", supportsAllDrives: true })
+    : await drive.files.create({
+      requestBody: { name, mimeType, parents: [parentId] },
+      media,
+      fields: "id, webViewLink",
+      supportsAllDrives: true,
+    });
+  return file.data;
+}
+
+function getOrCreateDiplomaFolder(drive, rootFolderId, diplomaCode, diplomaName) {
+  return getOrCreateFolder(drive, rootFolderId, `${diplomaCode} - ${diplomaName}`);
 }
 
 export async function ensureDiplomaFolderStructure(diplomas) {
@@ -106,22 +114,24 @@ export async function ensureDiplomaFolderStructure(diplomas) {
   return { rootFolderId, folderMap };
 }
 
-// Saves one diploma's curriculum (CSV text) as a Google Sheet in that diploma's folder.
-export async function uploadCurriculumCsv(diploma, csv) {
+// Saves curriculum rows (CSV text) as the Google Sheet "Diploma's/Year N/<CODE> Year N Curriculum".
+// With pdf, the sheet is also exported to "Curriculum PDFs/<sheet name>.pdf", outside the Diploma's tree.
+// Re-saving replaces the same files instead of piling up copies.
+export async function saveCurriculumSheet(diploma, year, csv, { pdf = false } = {}) {
   const drive = await getDriveClient();
-  const rootFolderId = await getOrCreateRootFolder(drive);
-  const folderId = await getOrCreateDiplomaFolder(drive, rootFolderId, diploma.code, diploma.name);
-  const file = await drive.files.create({
-    requestBody: {
-      name: `${diploma.code} Curriculum ${new Date().toISOString().slice(0, 10)}`,
-      mimeType: "application/vnd.google-apps.spreadsheet",
-      parents: [folderId],
-    },
-    media: { mimeType: "text/csv", body: csv },
-    fields: "id, name, webViewLink",
-    supportsAllDrives: true,
-  });
-  return { diplomaCode: diploma.code, fileName: file.data.name, link: file.data.webViewLink };
+  const base = getBaseFolder();
+  const yearFolder = await getOrCreateFolder(drive, await getOrCreateFolder(drive, base, DIPLOMAS_FOLDER_NAME), `Year ${year}`);
+  const fileName = `${diploma.code} Year ${year} Curriculum`;
+  const sheet = await upsertFile(drive, yearFolder, fileName, SHEET_MIME, { mimeType: "text/csv", body: csv });
+  const saved = { diplomaCode: diploma.code, year, fileName, link: sheet.webViewLink };
+  if (pdf) {
+    const exported = await drive.files.export({ fileId: sheet.id, mimeType: PDF_MIME }, { responseType: "arraybuffer" });
+    const pdfFolder = await getOrCreateFolder(drive, base, PDF_FOLDER_NAME);
+    const pdfFile = await upsertFile(drive, pdfFolder, `${fileName}.pdf`, PDF_MIME,
+      { mimeType: PDF_MIME, body: Readable.from([Buffer.from(exported.data)]) });
+    saved.pdfLink = pdfFile.webViewLink;
+  }
+  return saved;
 }
 
 export async function listDiplomaFolders() {

@@ -21,7 +21,7 @@
 <div class="min-w-0">
 <div class="flex items-center gap-1.5">
 <span class="text-[11px] font-bold tracking-[0.12em] uppercase text-slate-500">TESDA Region XI</span>
-<span class="bg-amber-50 text-amber-700 text-[11px] px-1.5 rounded font-semibold border border-amber-200">PoC</span>
+<span class="bg-amber-50 text-amber-700 text-[11px] px-1.5 py-0.5 rounded font-semibold border border-amber-200">PoC</span>
 </div>
 <h1 class="font-display text-[13px] font-bold text-slate-900 tracking-tight leading-tight truncate mt-0.5">TESDA Regional Operations Hub</h1>
 </div>
@@ -273,18 +273,18 @@ Secure Gateway &middot; Institutional Google Workspace
 </select>
 </div>
 <div>
-<label class="field-label">Semester</label>
-<select class="field" id="schedSemFilter" data-change="renderTimetable|renderDashboard|syncScheduleToDashboardFilters">
-<option value="1">1st Semester</option>
-<option selected="" value="2">2nd Semester</option>
-</select>
-</div>
-<div>
 <label class="field-label">Year Level</label>
 <select class="field" id="schedYearFilter" data-change="renderTimetable|renderDashboard|syncScheduleToDashboardFilters">
 <option value="1">1st Year</option>
 <option value="2">2nd Year</option>
 <option value="3">3rd Year</option>
+</select>
+</div>
+<div>
+<label class="field-label">Semester</label>
+<select class="field" id="schedSemFilter" data-change="renderTimetable|renderDashboard|syncScheduleToDashboardFilters">
+<option value="1">1st Semester</option>
+<option selected="" value="2">2nd Semester</option>
 </select>
 </div>
 <div>
@@ -444,15 +444,15 @@ Secure Gateway &middot; Institutional Google Workspace
 <span class="material-symbols-outlined text-[18px] text-blue-600">table_view</span>
 <span class="">Import from Sheet</span>
 </button>
-<button class="btn-secondary" id="driveUploadButton" data-click="uploadCurriculumToDrive" title="Save the curriculum of the diploma picked in Name of Diploma as a Google Sheet in its Drive folder" type="button">
+<button class="btn-secondary" id="driveUploadButton" data-click="uploadCurriculumToDrive" title="Save the diploma and year picked below as Google Sheets in Drive (Diploma's / Year N)" type="button">
 <span class="material-symbols-outlined text-[18px] text-amber-600">add_to_drive</span>
 <span class="">Upload to Drive</span>
 </button>
-<button class="btn-secondary" data-click="printCurriculumReport:pdf" title="Save the curriculum of the diploma picked in Name of Diploma as a PDF" type="button">
+<button class="btn-secondary" id="pdfExportButton" data-click="openCurriculumPdfModal" title="Pick a diploma and year, then export it to Google Sheets and save it as a PDF in Drive" type="button">
 <span class="material-symbols-outlined text-[18px] text-rose-600">picture_as_pdf</span>
 <span class="">Export to PDF</span>
 </button>
-<button class="btn-secondary" data-click="printCurriculumReport" title="Print the curriculum of the diploma picked in Name of Diploma" type="button">
+<button class="btn-secondary" data-click="openCurriculumPdfModal:print" title="Pick a diploma and year, then print its curriculum" type="button">
 <span class="material-symbols-outlined text-[18px] text-slate-500">print</span>
 <span class="">Print</span>
 </button>
@@ -732,10 +732,40 @@ Secure Gateway &middot; Institutional Google Workspace
 Google Sheet ID or URL
 <input class="field mt-1.5 font-mono text-xs" id="importSheetInput" placeholder="1AbC... or https://docs.google.com/spreadsheets/d/1AbC.../edit" type="text">
 </label>
-<p class="text-xs text-slate-500">Find the Sheet ID in the URL: <code class="font-mono bg-slate-100 px-1 rounded text-slate-700">docs.google.com/spreadsheets/d/<span class="text-blue-600">SHEET_ID</span>/edit</code></p>
+<p class="text-xs text-slate-500">Find the Sheet ID in the URL: <code class="font-mono bg-slate-100 px-1.5 py-0.5 rounded text-slate-700">docs.google.com/spreadsheets/d/<span class="text-blue-600">SHEET_ID</span>/edit</code></p>
 <div class="pt-3 flex justify-end gap-2 border-t border-slate-100">
 <button class="btn-ghost" data-click="closeImportSheetModal" type="button">Cancel</button>
 <button class="btn-primary" id="importSheetSubmit" data-click="handleImportSheet">Import</button>
+</div>
+</div>
+</div>
+</div>
+<!-- MODAL: EXPORT CURRICULUM TO PDF (Google Sheets -> Drive) -->
+<div class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4" id="curriculumPdfModal">
+<div class="modal-panel max-w-md">
+<div class="modal-head">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-rose-600" id="pdfModalIcon">picture_as_pdf</span>
+<h4 class="text-[15px] font-bold text-slate-900" id="pdfModalTitle">Export Curriculum to PDF</h4>
+</div>
+<button class="modal-close" data-click="closeCurriculumPdfModal" type="button">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div class="p-5 space-y-4 text-xs">
+<label class="block">
+<span class="field-label">Diploma</span>
+<select class="field" id="pdfDiplomaSelect" data-change="updatePdfYearOptions"></select>
+</label>
+<label class="block">
+<span class="field-label">Year Level</span>
+<select class="field" id="pdfYearSelect"></select>
+</label>
+<p class="text-xs text-slate-500" id="pdfModalNote">Each year level is saved as a Google Sheet in <strong class="text-slate-700">Diploma's / Year N</strong>, then exported as a PDF to the separate <strong class="text-slate-700">Curriculum PDFs</strong> folder.</p>
+<ul class="space-y-1 hidden" id="pdfExportResult"></ul>
+<div class="pt-3 flex justify-end gap-2 border-t border-slate-100">
+<button class="btn-ghost" data-click="closeCurriculumPdfModal" type="button">Close</button>
+<button class="btn-primary" id="pdfExportSubmit" data-click="exportCurriculumPdf" type="button">Export</button>
 </div>
 </div>
 </div>

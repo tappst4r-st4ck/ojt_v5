@@ -10,11 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - **UI redesign** — Clean bento layout for login, sidebar, dashboard KPIs, schedule, faculty and curriculum views (Tailwind CDN, Plus Jakarta Sans + Inter, Material Symbols).
 - **Faculty Loading Report** — Prints A4 landscape from an in-page frame (no pop-up); choose "Save as PDF" in the print dialog.
-- **Legibility** — Grey text darkened to meet WCAG AA contrast (slate-300/400 → slate-500; slate-600 on slate-100 backgrounds). Nothing is smaller than 11px, and body copy is at least 12px.
+- **Legibility** — Grey text darkened to meet WCAG AA contrast (slate-300/400 → slate-500; slate-600 on slate-100 backgrounds). Nothing is smaller than 11px, and body copy is at least 12px. Pills, the PoC badge and inline code chips have more breathing room.
 - **Roles** — `Head Trainer` is the only editor role; the unused `Head Trainer Admin` role was removed.
 - **Curriculum Hub** — One collapsible panel per diploma with a single table split by year/semester (panels stay open across refreshes). Add Course / Add a Diploma switch slides between modes.
 - **Curriculum Print / Export to PDF** — Builds an A4 report for the diploma and year picked in the filters (one page per diploma when "All" is picked). Import from Sheet and Upload to Drive are hidden from read-only users.
-- **Upload to Drive** — Saves the picked diploma's curriculum (or every diploma) as a Google Sheet in its Drive folder (`POST /api/drive/curriculum` now takes `{ diplomaCode }`). Formula-like cells are neutralised. Set `GOOGLE_DRIVE_FOLDER_ID` to a Shared Drive folder: service accounts can't own uploaded files.
+- **Upload to Drive** — Saves the diploma and year picked in the filters as Google Sheets in `Diploma's / Year N / <CODE> Year N Curriculum`. Folders are created when missing, and re-uploading replaces the same sheet instead of adding a copy (`POST /api/drive/curriculum` takes `{ diplomaCode, year, pdf }`). Formula-like cells are neutralised. Set `GOOGLE_DRIVE_FOLDER_ID` to a Shared Drive folder: service accounts can't own uploaded files.
+- **Export to PDF** — Opens a dialog to pick a diploma and year level. Each sheet is saved as above, exported by Google Sheets to PDF, and stored in a separate `Curriculum PDFs` folder. The dialog lists links to the PDFs. Print opens the same diploma/year dialog (for every role) and prints the report locally.
 
 ### Security
 - **Removed `/api/add-dmet`** — It wrote to the Sheet with no sign-in, role, origin or rate-limit checks. Use `scripts/add-dmet.mjs` locally instead.

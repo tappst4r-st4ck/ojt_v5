@@ -14,7 +14,7 @@
       },
       {
         "rule": "overused-font",
-        "value": "Inter",
+        "value": "inter",
         "files": [
           "styles/tesda-main-screen.css"
         ],
@@ -23,12 +23,21 @@
       },
       {
         "rule": "overused-font",
-        "value": "Plus Jakarta Sans",
+        "value": "plus jakarta sans",
         "files": [
           "styles/tesda-main-screen.css"
         ],
         "createdAt": "2026-11-18T09:00:00.000Z",
         "reason": "Sanctioned exception: the user's redesign brief specifies Plus Jakarta Sans for headings"
+      },
+      {
+        "rule": "cramped-padding",
+        "value": "*",
+        "files": [
+          "public/tesda-main-screen.html"
+        ],
+        "createdAt": "2026-11-18T07:35:34.553Z",
+        "reason": "Claude triage: static file scan has no layout, so it reports every card/modal as flush. Measured in the rendered page (all views and modals) and via a live URL scan: no cramped padding."
       }
     ]
   }
